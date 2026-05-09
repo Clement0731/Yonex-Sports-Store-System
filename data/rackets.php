@@ -1,0 +1,9 @@
+<?php
+return [
+    ['name' => 'Astrox 100ZZ',       'series' => 'ASTROX Series',    'price' => 'RM 1,099', 'tag' => 'HOT',  'img' => 'https://www.yonex.com/media/catalog/product/a/s/astrox100zz_kurenai.png?quality=80&bg-color=248,248,248,0.75&fit=bounds&height=819&width=600&canvas=600:819'],
+    ['name' => 'Astrox 88D Pro',      'series' => 'ASTROX Series',    'price' => 'RM 1,099', 'tag' => 'NEW',     'img' => 'https://www.yonex.com/media/catalog/product/3/a/3ax88d-p_076-1_02.png?quality=80&bg-color=248,248,248,0.75&fit=bounds&height=819&width=600&canvas=600:819'],
+    ['name' => 'Nanoflare 1000Z',     'series' => 'NANOFLARE Series', 'price' => 'RM 1,099', 'tag' => '',  'img' => 'https://www.yonex.com/media/catalog/product/n/a/nanoflare_1000_z.png?quality=80&bg-color=248,248,248,0.75&fit=bounds&height=819&width=600&canvas=600:819'],
+    ['name' => 'Nanoflare 800PRO',    'series' => 'NANOFLARE Series', 'price' => 'RM 899',   'tag' => '',     'img' => 'https://www.yonex.com/media/catalog/product/a/l/all_nf-800p_269-1.png?quality=80&bg-color=248,248,248,0.75&fit=bounds&height=819&width=600&canvas=600:819'],
+    ['name' => 'Duora Z-STRIKE',      'series' => 'DUORA Series',     'price' => 'RM 999',   'tag' => 'SALE', 'img' => 'https://www.yonex.com/media/catalog/product/d/u/duo-zs.png?quality=80&bg-color=248,248,248,0.75&fit=bounds&height=819&width=600&canvas=600:819'],
+    ['name' => 'Arcsaber 11PRO',   'series' => 'ARCSABER Series',  'price' => 'RM 999',   'tag' => '',     'img' => 'https://www.yonex.com/media/catalog/product/a/r/arc11-p.png?quality=80&bg-color=248,248,248,0.75&fit=bounds&height=819&width=600&canvas=600:819'],
+];
