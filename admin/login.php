@@ -24,11 +24,23 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     <meta charset="UTF-8">
     <title>Admin Login | Yonex</title>
     <link rel="stylesheet" href="style.css">
+    <style>
+        .login-body {
+            background:url('../images/LEEBG.jpg');
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+        }
+    </style>
 </head>
 <body class="login-body">
 <div class="login-box">
-    <h2>YONEX</h2>
-    <p>Admin Portal Secure Login</p>
+    <img src="../images/yonex_logo.png" alt="YONEX Logo" style="max-width: 320px; margin-bottom: 10px; display: inline-block;">
+    <p style="font-size: 20px; font-weight: bold; color: #000000;">Admin Portal Secure Login</p>
     <?php if(isset($error)) { echo "<div class='error-msg'>$error</div>"; } ?>
     <form action="login.php" method="POST">
         <div class="form-group">
