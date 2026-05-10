@@ -11,28 +11,34 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $price = $_POST['price'];
     $qty = $_POST['stock_qty'];
     $category = $_POST['category'];
-    $specs = $_POST['specs'];
+    $series_name = $_POST['series_name'];
+    $tag = $_POST['tag'];
     
-    $image_path = "";
+    $image_file = "default.png";
+    
     if (isset($_FILES["prod_image"]) && $_FILES["prod_image"]["error"] == 0) {
-        $target_dir = "uploads/";
+        $target_dir = "../images/"; 
         $file_extension = pathinfo($_FILES["prod_image"]["name"], PATHINFO_EXTENSION);
         $new_filename = uniqid() . "." . $file_extension;
         $target_file = $target_dir . $new_filename;
         
+        if (!file_exists($target_dir)) {
+            mkdir($target_dir, 0777, true);
+        }
+        
         if (move_uploaded_file($_FILES["prod_image"]["tmp_name"], $target_file)) {
-            $image_path = $target_file;
+            $image_file = $new_filename; 
         }
     }
 
-    $sql = "INSERT INTO PRODUCTS (PROD_NAME, PRICE, STOCK_QTY, CATEGORY, SPECS, IMAGE_PATH) 
-            VALUES ('$name', '$price', '$qty', '$category', '$specs', '$image_path')";
+    $sql = "INSERT INTO products (PROD_NAME, CATEGORY, SERIES_NAME, PRICE, TAG, STOCK_QTY, IMAGE_FILE) 
+            VALUES ('$name', '$category', '$series_name', '$price', '$tag', '$qty', '$image_file')";
     
     if ($conn->query($sql) === TRUE) {
         header("Location: manage_product.php");
         exit();
     } else {
-        $error = "Error adding product!";
+        $error = "Error adding product: " . $conn->error;
     }
 }
 ?>
@@ -51,28 +57,43 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             <h1>Add New Product</h1>
         </div>
         <div class="table-box" style="max-width: 600px;">
-            <?php if(isset($error)) { echo "<p class='error-msg'>$error</p>"; } ?>
+            <?php if(isset($error)) { echo "<p class='error-msg' style='color:red;'>$error</p>"; } ?>
             <form action="add_product.php" method="POST" enctype="multipart/form-data">
+                
                 <div class="form-group">
                     <label>Product Name</label>
                     <input type="text" name="prod_name" required>
                 </div>
-                <div class="form-group">
-                    <label>Category</label>
-                    <select name="category" required>
-                        <option value="Rackets">Rackets</option>
-                        <option value="Footwear">Footwear</option>
-                        <option value="Shuttlecocks">Shuttlecocks</option>
-                        <option value="Bags">Bags</option>
-                        <option value="Apparel">Apparel</option>
-                        <option value="Accessories">Accessories</option>
-                        <option value="Strings">Strings</option>
-                    </select>
+                
+                <div style="display: flex; gap: 20px;">
+                    <div class="form-group" style="flex: 1;">
+                        <label>Category</label>
+                        <select name="category" required>
+                            <option value="Rackets">Rackets</option>
+                            <option value="Footwear">Footwear</option>
+                            <option value="Shuttlecocks">Shuttlecocks</option>
+                            <option value="Bags">Bags</option>
+                            <option value="Apparel">Apparel</option>
+                            <option value="Accessories">Accessories</option>
+                        </select>
+                    </div>
+                    <div class="form-group" style="flex: 1;">
+                        <label>Product Tag</label>
+                        <select name="tag">
+                            <option value="">None</option>
+                            <option value="HOT">HOT</option>
+                            <option value="NEW">NEW</option>
+                            <option value="SALE">SALE</option>
+                            <option value="DISCOUNT">DISCOUNT</option>
+                        </select>
+                    </div>
                 </div>
+
                 <div class="form-group">
-                    <label>Available Specs / Sizes / Series</label>
-                    <input type="text" name="specs" placeholder="e.g., 4U/G5 OR Unisex M OR ASTROX Series" required>
+                    <label>Series Name</label>
+                    <input type="text" name="series_name" placeholder="e.g., ASTROX SERIES" required>
                 </div>
+
                 <div style="display: flex; gap: 20px;">
                     <div class="form-group" style="flex: 1;">
                         <label>Price (RM)</label>
@@ -83,13 +104,14 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                         <input type="number" name="stock_qty" required>
                     </div>
                 </div>
+
                 <div class="form-group">
                     <label>Product Image</label>
                     <input type="file" name="prod_image" accept="image/*" required>
                 </div>
                 <br>
                 <button type="submit" class="btn btn-add">Save Product</button>
-                <a href="manage_product.php" class="btn" style="background:#cbd5e1; color:#1e293b; margin-left:10px;">Cancel</a>
+                <a href="manage_product.php" class="btn" style="background:#cbd5e1; color:#1e293b; margin-left:10px; text-decoration:none; padding:8px 15px; border-radius:4px;">Cancel</a>
             </form>
         </div>
     </div>
