@@ -1,26 +1,29 @@
 <?php
-// 当前活跃类别
+// 当前活跃类别，默认为 'home'
 $activeCategory = isset($_GET['category']) ? htmlspecialchars($_GET['category']) : 'home';
 
+// 检查是否有 product 参数（产品详情页）
+$product = isset($_GET['product']) ? htmlspecialchars($_GET['product']) : '';
+
+// 主导航类别
 $categories = [
-    'home'         => 'Home',
-    'rackets'      => 'Rackets',
-    'footwear'     => 'Footwear',
-    'shuttlecocks' => 'Shuttlecocks',
-    'bags'         => 'Bags',
-    'apparel'      => 'Apparel',
-    'accessories'  => 'Accessories',
-    'strings'      => 'Strings',
+    'home'      => 'Home',
+    'badminton' => 'Badminton',
+    'service'   => 'Service',
+    'about'     => 'About',
 ];
 
-// 核心逻辑：根据当前类别动态加载对应的 PHP 文件
-$dataPath = __DIR__ . "/data/{$activeCategory}.php";
-if (file_exists($dataPath)) {
-    $currentProducts = require $dataPath;
-} else {
-    // 默认加载 home
-    $currentProducts = require __DIR__ . "/data/home.php";
-}
+// Badminton 子类别及其对应的 PHP 文件
+$badmintonSubcategories = [
+    'badminton'    => ['label' => 'All Product', 'file' => 'badminton.php'],
+    'rackets'      => ['label' => 'Racket', 'file' => 'data/rackets.php'],
+    'footwear'     => ['label' => 'Footwear', 'file' => 'data/footwear.php'],
+    'shuttlecocks' => ['label' => 'Shuttlecocks', 'file' => 'data/shuttlecocks.php'],
+    'bags'         => ['label' => 'Bags', 'file' => 'data/bags.php'],
+    'apparel'      => ['label' => 'Apparel', 'file' => 'data/apparel.php'],
+    'accessories'  => ['label' => 'Accessories', 'file' => 'data/accessories.php'],
+    'package'      => ['label' => 'Package', 'file' => 'data/package.php'],
+];
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -31,7 +34,7 @@ if (file_exists($dataPath)) {
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700;800&family=Cormorant+Garamond:wght@400;500;600&display=swap" rel="stylesheet">
     <style>
-        /* 这里的 CSS 保持你之前代码的原样，不要修改 */
+        /* 全局变量和基础设置保持不变 */
         *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
         :root {
             --white:     #ffffff;
@@ -52,174 +55,137 @@ if (file_exists($dataPath)) {
         }
 
         html { scroll-behavior: smooth; }
+        body { font-family: 'Montserrat', sans-serif; background: var(--offwhite); color: var(--text-main); min-height: 100vh; display: flex; flex-direction: column; }
+        main { flex: 1; }
 
-        body {
-            font-family: 'Montserrat', sans-serif;
-            background: var(--offwhite);
-            color: var(--text-main);
-            min-height: 100vh;
-        }
-
-        header {
-            position: sticky;
-            top: 0;
-            z-index: 100;
-            background: var(--white);
-            height: var(--nav-h);
-            display: flex;
-            align-items: center;
-            padding: 0 40px;
-            box-shadow: 0 1px 0 var(--border);
-        }
-
-        .logo-area {
-            display: flex;
-            align-items: center;
-            text-decoration: none;
-            min-width: 200px;
-        }
-
+        /* --- Header & 导航栏 --- */
+        header { position: sticky; top: 0; z-index: 1000; background: var(--white); height: var(--nav-h); display: flex; align-items: center; padding: 0 40px; box-shadow: 0 1px 0 var(--border); }
+        .logo-area { display: flex; align-items: center; text-decoration: none; min-width: 200px; }
         .logo-image { height: 38px; width: auto; display: block; }
+        
+        nav { flex: 1; display: flex; justify-content: center; gap: 4px; height: 100%; align-items: center; }
+        
+        /* 导航链接基础样式 */
+        nav a, .dropdown-trigger {
+            position: relative; padding: 8px 18px; color: var(--text-muted); text-decoration: none; 
+            font-size: 0.85rem; font-weight: 600; letter-spacing: 0.12em; text-transform: uppercase; 
+            transition: color 0.25s; white-space: nowrap; cursor: pointer;
+            display: flex; align-items: center; height: 100%;
+            background: none; border: none; font-family: inherit;
+        }
+        
+        /* 导航栏黑色线条特效 */
+        nav a::after, .dropdown-trigger::after {
+            content: ''; position: absolute; bottom: 15px; left: 50%; transform: translateX(-50%);
+            width: 0; height: 2px; background: var(--charcoal); transition: width 0.3s ease;
+        }
+        nav a:hover, .dropdown-trigger:hover { color: var(--charcoal); }
+        nav a:hover::after, .dropdown-trigger:hover::after { width: 70%; }
+        nav a.active, .dropdown-trigger.active { color: var(--charcoal); font-weight: 700; }
+        nav a.active::after, .dropdown-trigger.active::after { width: 70%; background: var(--charcoal); }
 
-        nav { flex: 1; display: flex; justify-content: center; gap: 4px; }
-
-        nav a {
-            position: relative;
-            padding: 8px 18px;
-            color: var(--text-muted);
-            text-decoration: none;
-            font-size: 0.78rem;
-            font-weight: 600;
-            letter-spacing: 0.12em;
-            text-transform: uppercase;
-            transition: color 0.25s;
+        /* ========== Badminton 下拉菜单专属 CSS ========== */
+        .dropdown { position: relative; height: 100%; display: flex; align-items: center; }
+        
+        .dropdown-content {
+            display: none; 
+            position: absolute; 
+            top: var(--nav-h); 
+            left: 50%; 
+            transform: translateX(-50%); 
+            background-color: var(--white); 
+            min-width: 220px; 
+            box-shadow: var(--shadow-hover); 
+            z-index: 1100; 
+            border: 1px solid var(--border); 
+            border-radius: 0 0 8px 8px;
+            padding: 8px 0;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+        
+        .dropdown:hover .dropdown-content {
+            display: block;
+            opacity: 1;
+        }
+        
+        .dropdown-content a {
+            color: var(--text-muted); 
+            padding: 12px 24px; 
+            text-decoration: none; 
+            display: block; 
+            font-size: 0.8rem; 
+            font-weight: 500; 
+            text-transform: none;
+            letter-spacing: 0.05em;
+            transition: 0.2s; 
+            text-align: left;
             white-space: nowrap;
         }
-
-        nav a::after {
-            content: '';
-            position: absolute;
-            bottom: 0;
-            left: 50%;
-            transform: translateX(-50%);
-            width: 0;
-            height: 2px;
-            background: var(--red);
-            transition: width 0.3s ease;
+        
+        .dropdown-content a:hover { 
+            background-color: var(--lightgray); 
+            color: var(--red); 
+            padding-left: 30px; 
         }
+        
+        /* 下拉菜单项不需要底部线条 */
+        .dropdown-content a::after { display: none; }
 
-        nav a:hover { color: var(--charcoal); }
-        nav a:hover::after { width: 70%; }
-        nav a.active { color: var(--charcoal); font-weight: 700; }
-        nav a.active::after { width: 70%; background: var(--red); }
-
-        .header-actions {
-            min-width: 200px;
-            display: flex;
-            justify-content: flex-end;
-            align-items: center;
-            gap: 16px;
-        }
-
+        .header-actions { min-width: 200px; display: flex; justify-content: flex-end; align-items: center; gap: 16px; }
         .icon-btn { background: none; border: none; cursor: pointer; color: var(--text-muted); padding: 6px; border-radius: 6px; transition: color 0.2s, background 0.2s; display: flex; align-items: center; }
         .icon-btn:hover { color: var(--charcoal); background: var(--lightgray); }
 
+        /* --- 首页特定样式：大型产品宣传面 --- */
         .hero {
             background: linear-gradient(rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0.25)), url('images/badminton-hero.jpg');
-            background-size: cover;
-            background-position: center 40%;
-            padding: 180px 60px 170px;
-            display: flex;
-            align-items: center;
-            position: relative;
-            overflow: hidden;
+            background-size: cover; background-position: center 40%; padding: 180px 60px 170px;
+            display: flex; align-items: center; position: relative; overflow: hidden;
         }
-
-        .hero::before {
-            content: '';
-            position: absolute;
-            top: 0; left: 0; right: 0; bottom: 0;
-            background: linear-gradient(90deg, rgba(0,0,0,0.6) 0%, rgba(0,0,0,0.2) 100%);
-            pointer-events: none;
-        }
-
+        .hero::before { content: ''; position: absolute; top: 0; left: 0; right: 0; bottom: 0; background: linear-gradient(90deg, rgba(0,0,0,0.6) 0%, rgba(0,0,0,0.2) 100%); pointer-events: none; }
         .hero-content { flex: 1; position: relative; z-index: 2; }
         .hero-eyebrow { font-size: 0.72rem; letter-spacing: 0.3em; text-transform: uppercase; color: var(--gold); margin-bottom: 16px; font-weight: 700; }
         .hero-title { font-family: 'Cormorant Garamond', serif; font-size: 4.2rem; font-weight: 600; line-height: 1.1; margin-bottom: 20px; color: var(--white); }
         .hero-title span { color: var(--red); }
         .hero-desc { font-size: 1rem; color: rgba(255,255,255,0.9); line-height: 1.7; max-width: 480px; margin-bottom: 36px; }
-        .btn-primary { display: inline-flex; align-items: center; gap: 8px; background: var(--red); color: var(--white); text-decoration: none; padding: 13px 32px; font-size: 0.78rem; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase; border-radius: 40px; transition: background 0.2s, transform 0.2s; }
-        .btn-primary:hover { background: var(--red-hover); transform: translateY(-2px); }
+        
+        .btn-primary { display: inline-flex; align-items: center; gap: 8px; background: var(--red); color: var(--white); text-decoration: none; padding: 13px 32px; font-size: 0.78rem; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase; border-radius: 40px; transition: background 0.2s, transform 0.2s; border: 2px solid var(--red); }
+        .btn-primary:hover { background: var(--red-hover); border-color: var(--red-hover); transform: translateY(-2px); }
+        
+        .btn-outline { display: inline-flex; align-items: center; gap: 8px; background: transparent; color: var(--charcoal); text-decoration: none; padding: 13px 32px; font-size: 0.78rem; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase; border-radius: 40px; transition: 0.3s; border: 2px solid var(--charcoal); }
+        .btn-outline:hover { background: var(--charcoal); color: var(--white); transform: translateY(-2px); }
 
-        .page-header {
-            padding: 290px 60px 290px; 
-            border-bottom: 2px solid var(--border);
-            position: relative;
-            overflow: hidden;
-            color: var(--white);
-            background-size: cover !important;
-            background-position: center !important;
+        .promo-section {
+            display: flex; align-items: center; justify-content: space-between;
+            min-height: 70vh; padding: 80px 10%; background: var(--white);
+            border-bottom: 1px solid var(--border);
         }
+        .promo-section:nth-child(even) { flex-direction: row-reverse; background: var(--offwhite); }
+        
+        .promo-text { flex: 1; padding: 40px; max-width: 600px; }
+        .promo-series { font-size: 0.8rem; letter-spacing: 0.2em; text-transform: uppercase; color: var(--red); font-weight: 700; margin-bottom: 15px; }
+        .promo-name { font-family: 'Cormorant Garamond', serif; font-size: 3.5rem; font-weight: 600; color: var(--charcoal); margin-bottom: 20px; line-height: 1.1; }
+        .promo-desc { font-size: 1.1rem; color: var(--text-muted); line-height: 1.6; margin-bottom: 40px; }
+        
+        .promo-image { flex: 1; display: flex; justify-content: center; align-items: center; padding: 20px; }
+        .promo-image img { width: 100%; max-width: 500px; height: auto; object-fit: contain; filter: drop-shadow(0 20px 30px rgba(0,0,0,0.1)); transition: transform 0.5s ease; }
+        .promo-section:hover .promo-image img { transform: scale(1.05) rotate(-2deg); }
 
-        .page-header::after {
-            content: attr(data-label);
-            position: absolute; right: 40px; top: 50%; transform: translateY(-50%);
-            font-family: 'Cormorant Garamond', serif; font-size: 6rem; font-weight: 600; color: rgba(255,255,255,0.08); text-transform: uppercase; letter-spacing: 0.05em; pointer-events: none;
-        }
-
-        .page-header-eyebrow { font-size: 0.7rem; letter-spacing: 0.3em; text-transform: uppercase; color: var(--gold); margin-bottom: 10px; font-weight: 700; position: relative; z-index: 2; }
-        .page-header h1 { font-family: 'Cormorant Garamond', serif; font-size: 4.2rem; font-weight: 600; position: relative; z-index: 2; color: var(--white); }
-
-        /* 特定背景图 */
-        .page-header[data-category="rackets"] { background: linear-gradient(rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0.2)), url('images/rackets-bg.jpg'); }
-        .page-header[data-category="footwear"] { background: linear-gradient(rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0.2)), url('images/footwear-bg.jpg'); }
-        .page-header[data-category="shuttlecocks"] { background: linear-gradient(rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0.2)), url('images/shuttlecocks-bg.jpg'); }
-        .page-header[data-category="bags"] { background: linear-gradient(rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0.2)), url('images/bags-bg.jpg'); }
-        .page-header[data-category="apparel"] { background: linear-gradient(rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0.2)), url('images/apparel-bg.jpg'); }
-        .page-header[data-category="accessories"] { background: linear-gradient(rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0.2)), url('images/accessories-bg.jpg'); }
-        .page-header[data-category="strings"] { background: linear-gradient(rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0.2)), url('images/strings-bg.jpg'); }
-
-        .products-section { padding: 52px 60px 70px; }
-        .section-meta { display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 36px; border-bottom: 1px solid var(--border); padding-bottom: 20px; }
-        .section-label { font-size: 0.68rem; letter-spacing: 0.28em; text-transform: uppercase; color: var(--text-muted); font-weight: 600; }
-        .product-count { font-size: 0.8rem; color: var(--text-muted); }
-        .product-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 32px; }
-
-        .product-card { background: var(--white); border-radius: 16px; overflow: hidden; border: 1px solid var(--border); transition: transform 0.3s, box-shadow 0.3s; cursor: pointer; text-decoration: none; color: inherit; display: block; }
-        .product-card:hover { transform: translateY(-6px); box-shadow: var(--shadow-hover); border-color: transparent; }
-        .card-img-wrap { position: relative; background: #f5f7fa; height: 360px; display: flex; align-items: center; justify-content: center; overflow: hidden; }
-        .card-img-wrap img { width: 100%; height: 100%; object-fit: contain; transition: transform 0.4s ease; }
-        .product-card:hover .card-img-wrap img { transform: scale(1.04); }
-
-        .tag { position: absolute; top: 14px; left: 14px; padding: 4px 10px; font-size: 0.63rem; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase; border-radius: 20px; z-index: 2; }
-        .tag-new  { background: var(--charcoal); color: var(--white); }
-        .tag-hot  { background: var(--red);  color: var(--white); }
-        .tag-sale { background: var(--gold); color: var(--charcoal); }
-
-        .card-body { padding: 20px 20px 24px; border-top: 1px solid var(--border); background: var(--white); }
-        .card-series { font-size: 0.65rem; letter-spacing: 0.2em; text-transform: uppercase; color: var(--red); font-weight: 600; margin-bottom: 8px; }
-        .card-name { font-size: 1rem; font-weight: 700; color: var(--charcoal); margin-bottom: 14px; line-height: 1.3; }
-        .card-footer { display: flex; align-items: center; justify-content: space-between; }
-        .card-price { font-size: 1.05rem; font-weight: 800; color: var(--dark); }
-        .card-action { width: 34px; height: 34px; background: var(--lightgray); border-radius: 50%; display: flex; align-items: center; justify-content: center; transition: background 0.2s, transform 0.2s; }
-        .product-card:hover .card-action { background: var(--charcoal); }
-        .product-card:hover .card-action svg { stroke: var(--white); }
+        /* 其他页面的默认头部（占位） */
+        .page-header { padding: 200px 60px; text-align: center; background: var(--charcoal); color: var(--white); }
+        .page-header h1 { font-family: 'Cormorant Garamond', serif; font-size: 4.2rem; font-weight: 600; }
 
         footer { background: var(--white); color: var(--text-muted); text-align: center; padding: 32px 40px; font-size: 0.75rem; letter-spacing: 0.06em; border-top: 1px solid var(--border); }
         footer strong { color: var(--charcoal); }
 
+        /* 响应式适配 */
         @media (max-width: 900px) {
             header { padding: 0 20px; }
-            nav a  { padding: 8px 12px; font-size: 0.7rem; }
-            .hero { padding: 100px 30px 90px; }
-            .page-header { padding: 100px 30px 90px; }
-            .hero-title, .page-header h1 { font-size: 2.6rem; }
-            .page-header, .products-section { padding-left: 24px; padding-right: 24px; }
-        }
-
-        @media (max-width: 640px) {
-            nav a { padding: 8px 6px; font-size: 0.62rem; }
-            .hero-title, .page-header h1 { font-size: 2rem; }
+            .hero { padding: 120px 30px 100px; }
+            .promo-section, .promo-section:nth-child(even) { flex-direction: column !important; text-align: center; padding: 60px 20px; }
+            .promo-text { padding: 20px 0; }
+            .promo-image { margin-top: 30px; }
+            .promo-name { font-size: 2.8rem; }
         }
     </style>
 </head>
@@ -230,11 +196,34 @@ if (file_exists($dataPath)) {
         <img src="yonex-logo.png" alt="YONEX" class="logo-image">
     </a>
     <nav>
-        <?php foreach ($categories as $key => $label): ?>
-            <a href="?category=<?= $key ?>" class="<?= $activeCategory === $key ? 'active' : '' ?>">
-                <?= $label ?>
-            </a>
-        <?php endforeach; ?>
+        <!-- Home 链接 -->
+        <a href="?category=home" class="<?= $activeCategory === 'home' && empty($product) ? 'active' : '' ?>">
+            Home
+        </a>
+        
+        <!-- Badminton 下拉菜单 -->
+        <div class="dropdown">
+            <span class="dropdown-trigger <?= isset($badmintonSubcategories[$activeCategory]) ? 'active' : '' ?>">
+                Badminton
+            </span>
+            <div class="dropdown-content">
+                <?php foreach ($badmintonSubcategories as $subKey => $subData): ?>
+                    <a href="?category=<?= $subKey ?>">
+                        <?= $subData['label'] ?>
+                    </a>
+                <?php endforeach; ?>
+            </div>
+        </div>
+
+        <!-- Service 链接 -->
+        <a href="?category=service" class="<?= $activeCategory === 'service' ? 'active' : '' ?>">
+            Service
+        </a>
+        
+        <!-- About 链接 -->
+        <a href="?category=about" class="<?= $activeCategory === 'about' ? 'active' : '' ?>">
+            About
+        </a>
     </nav>
     <div class="header-actions">
         <button class="icon-btn" title="Search"><svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.35-4.35"/></svg></button>
@@ -244,49 +233,46 @@ if (file_exists($dataPath)) {
 </header>
 
 <main>
-<?php if ($activeCategory === 'home'): ?>
-    <section class="hero">
-        <div class="hero-content">
-            <p class="hero-eyebrow">Official Badminton Equipment</p>
-            <h1 class="hero-title">Play Like <span>Champions</span><br>Perform at the Top</h1>
-            <p class="hero-desc">YONEX has equipped world champions for decades. Explore our latest rackets, footwear, and accessories.</p>
-            <a href="?category=rackets" class="btn-primary">Shop Rackets <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M5 12h14M12 5l7 7-7 7"/></svg></a>
-        </div>
-    </section>
-<?php else: ?>
-    <div class="page-header" data-label="<?= htmlspecialchars($categories[$activeCategory]) ?>" data-category="<?= $activeCategory ?>">
-        <p class="page-header-eyebrow">YONEX Collection</p>
-        <h1><?= htmlspecialchars($categories[$activeCategory]) ?></h1>
-    </div>
-<?php endif; ?>
-
-    <section class="products-section">
-        <div class="section-meta">
-            <span class="section-label"><?= $activeCategory === 'home' ? 'Featured Products' : htmlspecialchars($categories[$activeCategory]) . ' Collection' ?></span>
-            <span class="product-count"><?= count($currentProducts) ?> products</span>
-        </div>
-
-        <div class="product-grid">
-            <?php foreach ($currentProducts as $product): ?>
-            <a href="#" class="product-card">
-                <div class="card-img-wrap">
-                    <img src="<?= $product['img'] ?>" alt="<?= htmlspecialchars($product['name']) ?>">
-                    <?php if (!empty($product['tag'])): ?>
-                        <span class="tag tag-<?= strtolower($product['tag']) ?>"><?= $product['tag'] ?></span>
-                    <?php endif; ?>
-                </div>
-                <div class="card-body">
-                    <p class="card-series"><?= htmlspecialchars($product['series']) ?></p>
-                    <p class="card-name"><?= htmlspecialchars($product['name']) ?></p>
-                    <div class="card-footer">
-                        <span class="card-price"><?= $product['price'] ?></span>
-                        <div class="card-action"><svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M5 12h14M12 5l7 7-7 7"/></svg></div>
-                    </div>
-                </div>
-            </a>
-            <?php endforeach; ?>
-        </div>
-    </section>
+    <?php 
+        // 优先检查是否是产品详情页
+        if (!empty($product)) {
+            // 产品详情页面路由 - 根据 category 和 product 动态定位
+            $productFile = $activeCategory . '/' . $product . '.php';
+            if (file_exists($productFile)) {
+                include $productFile;
+            } else {
+                echo '<div class="page-header">';
+                echo '<h1>Product Not Found</h1>';
+                echo '<p style="margin-top:20px; font-size:1.2rem; color:var(--midgray);">The requested product could not be found.</p>';
+                echo '</div>';
+            }
+        } elseif (isset($badmintonSubcategories[$activeCategory])) {
+            // Badminton 子类别页面
+            $fileToLoad = $badmintonSubcategories[$activeCategory]['file'];
+            if (file_exists($fileToLoad)) {
+                include $fileToLoad;
+            } else {
+                // 如果文件不存在，显示占位页面
+                echo '<div class="page-header">';
+                echo '<h1>' . htmlspecialchars($badmintonSubcategories[$activeCategory]['label']) . '</h1>';
+                echo '<p style="margin-top:20px; font-size:1.2rem; color:var(--midgray);">Coming soon - ' . htmlspecialchars($fileToLoad) . ' will be created</p>';
+                echo '</div>';
+            }
+        } elseif ($activeCategory === 'home') {
+            // 首页
+            if (file_exists('home.php')) {
+                include 'home.php';
+            } else {
+                echo "<p style='padding:50px; text-align:center;'>Error: home.php not found.</p>";
+            }
+        } else {
+            // 其他页面（service, about等）
+            echo '<div class="page-header">';
+            echo '<h1>' . htmlspecialchars($categories[$activeCategory] ?? 'Page') . '</h1>';
+            echo '<p style="margin-top:20px; font-size:1.2rem; color:var(--midgray);">Page content coming soon...</p>';
+            echo '</div>';
+        }
+    ?>
 </main>
 
 <footer>

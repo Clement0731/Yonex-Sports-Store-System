@@ -1,12 +1,12 @@
 <?php
-// accessories.php - YONEX Accessories Page
+// package.php - YONEX Package Page
 ?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <style>
-        .accessories-hero {
-            background: url('/FYP 1/images/accessories-bg.jpg') no-repeat center center;
+        .package-hero {
+            background: url('/FYP 1/images/package-bg.jpg') no-repeat center center;
             background-size: cover;
             height: 700px;
             width: 100%;
@@ -96,7 +96,7 @@
         }
 
         @media (max-width: 768px) {
-            .accessories-hero {
+            .package-hero {
                 height: 300px;
             }
 
@@ -112,45 +112,45 @@
 </head>
 <body>
 
-    <div class="accessories-hero"></div>
+    <div class="package-hero"></div>
 
     <section class="all-product-container">
-        <h2 class="section-title">Accessories</h2>
+        <h2 class="section-title">Package</h2>
 
         <div class="product-grid">
-            <!-- 产品1: Super Grap -->
+            <!-- 套餐1: Beginner Set -->
             <div class="product-card">
-                <img src="/FYP 1/images/accessories-supergrap.webp" alt="Super Grap">
-                <p class="p-series">GRIP SERIES</p>
-                <h3 class="p-name">SUPER GRAP</h3>
-                <span class="p-price">RM 25.00</span>
+                <img src="/FYP 1/images/package-beginner.webp" alt="Beginner Set">
+                <p class="p-series">BEGINNER PACKAGE</p>
+                <h3 class="p-name">BEGINNER SET</h3>
+                <span class="p-price">RM 499.00</span>
                 <a href="#" class="btn-info">View Info</a>
             </div>
 
-            <!-- 产品2: Wristband -->
+            <!-- 套餐2: Intermediate Set -->
             <div class="product-card">
-                <img src="/FYP 1/images/accessories-wristband.webp" alt="Wristband">
-                <p class="p-series">PERFORMANCE SERIES</p>
-                <h3 class="p-name">WRISTBAND</h3>
-                <span class="p-price">RM 19.00</span>
+                <img src="/FYP 1/images/package-intermediate.webp" alt="Intermediate Set">
+                <p class="p-series">INTERMEDIATE PACKAGE</p>
+                <h3 class="p-name">INTERMEDIATE SET</h3>
+                <span class="p-price">RM 899.00</span>
                 <a href="#" class="btn-info">View Info</a>
             </div>
 
-            <!-- 产品3: String BG66 -->
+            <!-- 套餐3: Pro Set -->
             <div class="product-card">
-                <img src="/FYP 1/images/accessories-string.webp" alt="String BG66">
-                <p class="p-series">STRING SERIES</p>
-                <h3 class="p-name">STRING BG66</h3>
-                <span class="p-price">RM 35.00</span>
+                <img src="/FYP 1/images/package-pro.webp" alt="Pro Set">
+                <p class="p-series">PRO PACKAGE</p>
+                <h3 class="p-name">PRO SET</h3>
+                <span class="p-price">RM 1,499.00</span>
                 <a href="#" class="btn-info">View Info</a>
             </div>
 
-            <!-- 产品4: Towel -->
+            <!-- 套餐4: Tournament Set -->
             <div class="product-card">
-                <img src="/FYP 1/images/accessories-towel.webp" alt="Towel">
-                <p class="p-series">ESSENTIALS SERIES</p>
-                <h3 class="p-name">TOWEL</h3>
-                <span class="p-price">RM 29.00</span>
+                <img src="/FYP 1/images/package-tournament.webp" alt="Tournament Set">
+                <p class="p-series">TOURNAMENT PACKAGE</p>
+                <h3 class="p-name">TOURNAMENT SET</h3>
+                <span class="p-price">RM 1,999.00</span>
                 <a href="#" class="btn-info">View Info</a>
             </div>
         </div>
