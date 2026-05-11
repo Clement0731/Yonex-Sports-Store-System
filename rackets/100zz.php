@@ -416,7 +416,7 @@
         
         <!-- 左侧：产品图片 -->
         <div class="product-image-section">
-            <img src="images/astrox100zz_kurenai.webp" alt="Astrox 100 ZZ">
+            <img src="/FYP/Yonex-Sports-Store-System/images/astrox100zz_kurenai.webp" alt="Astrox 100 ZZ">
         </div>
         
         <!-- 右侧：产品信息 -->
