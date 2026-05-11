@@ -7,7 +7,7 @@
     <style>
         /* ========== 背景图横幅 ========== */
         .racket-hero {
-            background: url('/FYP 1/images/rackets-bg.jpg') no-repeat center center;
+            background: url('/FYP/images/rackets-bg.jpg') no-repeat center center;
             background-size: cover;
             height: 700px;
             width: 100%;
@@ -126,7 +126,7 @@
         <div class="product-grid">
             <!-- 产品1: Astrox 100 ZZ -->
             <div class="product-card">
-                <img src="/FYP 1/images/astrox100zz_kurenai.webp" alt="Astrox 100 ZZ">
+                <img src="/FYP/images/astrox100zz_kurenai.webp" alt="Astrox 100 ZZ">
                 <p class="p-series">ASTROX SERIES</p>
                 <h3 class="p-name">ASTROX 100 ZZ</h3>
                 <span class="p-price">RM 1,099.00</span>
@@ -135,7 +135,7 @@
 
             <!-- 产品2: Astrox 88D Pro -->
             <div class="product-card">
-                <img src="/FYP 1/images/Astrox_88D.webp" alt="Astrox 88D Pro">
+                <img src="/FYP/images/Astrox_88D.webp" alt="Astrox 88D Pro">
                 <p class="p-series">ASTROX SERIES</p>
                 <h3 class="p-name">ASTROX 88D PRO</h3>
                 <span class="p-price">RM 949.00</span>
@@ -144,7 +144,7 @@
 
             <!-- 产品3: Nanoflare 800 Pro -->
             <div class="product-card">
-                <img src="/FYP 1/images/Nanoflare_800.webp" alt="Nanoflare 800 Pro">
+                <img src="/FYP/images/Nanoflare_800.webp" alt="Nanoflare 800 Pro">
                 <p class="p-series">NANOFLARE SERIES</p>
                 <h3 class="p-name">NANOFLARE 800 PRO</h3>
                 <span class="p-price">RM 899.00</span>
@@ -153,7 +153,7 @@
 
             <!-- 产品4: Arcsaber 11 Pro -->
             <div class="product-card">
-                <img src="/FYP 1/images/Arcsaber_11_Pro.webp" alt="Arcsaber 11 Pro">
+                <img src="/FYP/images/Arcsaber_11_Pro.webp" alt="Arcsaber 11 Pro">
                 <p class="p-series">ARCSABER SERIES</p>
                 <h3 class="p-name">ARCSABER 11 PRO</h3>
                 <span class="p-price">RM 849.00</span>

@@ -6,7 +6,7 @@
 <head>
     <style>
         .accessories-hero {
-            background: url('/FYP 1/images/accessories-bg.jpg') no-repeat center center;
+            background: url('/FYP/images/accessories-bg.jpg') no-repeat center center;
             background-size: cover;
             height: 700px;
             width: 100%;
@@ -120,7 +120,7 @@
         <div class="product-grid">
             <!-- 产品1: Super Grap -->
             <div class="product-card">
-                <img src="/FYP 1/images/accessories-supergrap.webp" alt="Super Grap">
+                <img src="/FYP/images/accessories-supergrap.webp" alt="Super Grap">
                 <p class="p-series">GRIP SERIES</p>
                 <h3 class="p-name">SUPER GRAP</h3>
                 <span class="p-price">RM 25.00</span>
@@ -129,7 +129,7 @@
 
             <!-- 产品2: Wristband -->
             <div class="product-card">
-                <img src="/FYP 1/images/accessories-wristband.webp" alt="Wristband">
+                <img src="/FYP/images/accessories-wristband.webp" alt="Wristband">
                 <p class="p-series">PERFORMANCE SERIES</p>
                 <h3 class="p-name">WRISTBAND</h3>
                 <span class="p-price">RM 19.00</span>
@@ -138,7 +138,7 @@
 
             <!-- 产品3: String BG66 -->
             <div class="product-card">
-                <img src="/FYP 1/images/accessories-string.webp" alt="String BG66">
+                <img src="/FYP/images/accessories-string.webp" alt="String BG66">
                 <p class="p-series">STRING SERIES</p>
                 <h3 class="p-name">STRING BG66</h3>
                 <span class="p-price">RM 35.00</span>
@@ -147,7 +147,7 @@
 
             <!-- 产品4: Towel -->
             <div class="product-card">
-                <img src="/FYP 1/images/accessories-towel.webp" alt="Towel">
+                <img src="/FYP/images/accessories-towel.webp" alt="Towel">
                 <p class="p-series">ESSENTIALS SERIES</p>
                 <h3 class="p-name">TOWEL</h3>
                 <span class="p-price">RM 29.00</span>

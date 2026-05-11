@@ -1,7 +1,7 @@
 <style>
     /* Badminton 页面背景图 */
     .badminton-hero {
-        background: url('images/badminton bg.png') no-repeat center center;
+        background: url('images/badminton bg.jpg') no-repeat center center;
         background-size: cover;
         height: 700px; 
         width: 100%;
@@ -99,7 +99,7 @@
 
     <div class="product-grid">
         <div class="product-card">
-            <img src="/FYP 1/images/astrox100zz_kurenai.webp" alt="Astrox 100 ZZ">
+            <img src="/FYP/images/astrox100zz_kurenai.webp" alt="Astrox 100 ZZ">
             <p class="p-series">ASTROX SERIES</p>
             <h3 class="p-name">ASTROX 100 ZZ</h3>
             <span class="p-price">RM 1,099.00</span>

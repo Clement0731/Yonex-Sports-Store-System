@@ -6,7 +6,7 @@
 <head>
     <style>
         .footwear-hero {
-            background: url('/FYP 1/images/footwear-bg.jpg') no-repeat center center;
+            background: url('/FYP/images/footwear-bg.jpg') no-repeat center center;
             background-size: cover;
             height: 700px;
             width: 100%;
@@ -120,7 +120,7 @@
         <div class="product-grid">
             <!-- 产品1: Power Cushion 65 Z 4 -->
             <div class="product-card">
-                <img src="/FYP 1/images/powercushion65z4.webp" alt="Power Cushion 65 Z 4">
+                <img src="/FYP/images/powercushion65z4.webp" alt="Power Cushion 65 Z 4">
                 <p class="p-series">POWER CUSHION SERIES</p>
                 <h3 class="p-name">POWER CUSHION 65 Z 4</h3>
                 <span class="p-price">RM 599.00</span>
@@ -129,7 +129,7 @@
 
             <!-- 产品2: Power Cushion 88 Dial 3 -->
             <div class="product-card">
-                <img src="/FYP 1/images/powercushion88dial3.webp" alt="Power Cushion 88 Dial 3">
+                <img src="/FYP/images/powercushion88dial3.webp" alt="Power Cushion 88 Dial 3">
                 <p class="p-series">POWER CUSHION SERIES</p>
                 <h3 class="p-name">POWER CUSHION 88 DIAL 3</h3>
                 <span class="p-price">RM 699.00</span>
@@ -138,7 +138,7 @@
 
             <!-- 产品3: Eclipsion Z 3 -->
             <div class="product-card">
-                <img src="/FYP 1/images/eclipsionz3.webp" alt="Eclipsion Z 3">
+                <img src="/FYP/images/eclipsionz3.webp" alt="Eclipsion Z 3">
                 <p class="p-series">ECLIPSION SERIES</p>
                 <h3 class="p-name">ECLIPSION Z 3</h3>
                 <span class="p-price">RM 649.00</span>
@@ -147,7 +147,7 @@
 
             <!-- 产品4: Cascade Drive -->
             <div class="product-card">
-                <img src="/FYP 1/images/cascadedrive.webp" alt="Cascade Drive">
+                <img src="/FYP/images/cascadedrive.webp" alt="Cascade Drive">
                 <p class="p-series">CASCADE SERIES</p>
                 <h3 class="p-name">CASCADE DRIVE</h3>
                 <span class="p-price">RM 399.00</span>

@@ -6,7 +6,7 @@
 <head>
     <style>
         .apparel-hero {
-            background: url('/FYP 1/images/apparel-bg.jpg') no-repeat center center;
+            background: url('/FYP/images/apparel-bg.jpg') no-repeat center center;
             background-size: cover;
             height: 700px;
             width: 100%;
@@ -120,7 +120,7 @@
         <div class="product-grid">
             <!-- 产品1: Tournament Shirt -->
             <div class="product-card">
-                <img src="/FYP 1/images/apparel-shirt.webp" alt="Tournament Shirt">
+                <img src="/FYP/images/apparel-shirt.webp" alt="Tournament Shirt">
                 <p class="p-series">TOURNAMENT SERIES</p>
                 <h3 class="p-name">TOURNAMENT SHIRT</h3>
                 <span class="p-price">RM 179.00</span>
@@ -129,7 +129,7 @@
 
             <!-- 产品2: Training Shorts -->
             <div class="product-card">
-                <img src="/FYP 1/images/apparel-shorts.webp" alt="Training Shorts">
+                <img src="/FYP/images/apparel-shorts.webp" alt="Training Shorts">
                 <p class="p-series">TRAINING SERIES</p>
                 <h3 class="p-name">TRAINING SHORTS</h3>
                 <span class="p-price">RM 129.00</span>
@@ -138,7 +138,7 @@
 
             <!-- 产品3: Team Jacket -->
             <div class="product-card">
-                <img src="/FYP 1/images/apparel-jacket.webp" alt="Team Jacket">
+                <img src="/FYP/images/apparel-jacket.webp" alt="Team Jacket">
                 <p class="p-series">TEAM SERIES</p>
                 <h3 class="p-name">TEAM JACKET</h3>
                 <span class="p-price">RM 249.00</span>
@@ -147,7 +147,7 @@
 
             <!-- 产品4: Compression Tights -->
             <div class="product-card">
-                <img src="/FYP 1/images/apparel-tights.webp" alt="Compression Tights">
+                <img src="/FYP/images/apparel-tights.webp" alt="Compression Tights">
                 <p class="p-series">PERFORMANCE SERIES</p>
                 <h3 class="p-name">COMPRESSION TIGHTS</h3>
                 <span class="p-price">RM 159.00</span>

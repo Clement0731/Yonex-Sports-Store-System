@@ -6,7 +6,7 @@
 <head>
     <style>
         .bags-hero {
-            background: url('/FYP 1/images/bags-bg.jpg') no-repeat center center;
+            background: url('/FYP/images/bags-bg.jpg') no-repeat center center;
             background-size: cover;
             height: 700px;
             width: 100%;
@@ -120,7 +120,7 @@
         <div class="product-grid">
             <!-- 产品1: Pro Tournament Bag -->
             <div class="product-card">
-                <img src="/FYP 1/images/bag-protournament.webp" alt="Pro Tournament Bag">
+                <img src="/FYP/images/bag-protournament.webp" alt="Pro Tournament Bag">
                 <p class="p-series">PRO SERIES</p>
                 <h3 class="p-name">PRO TOURNAMENT BAG</h3>
                 <span class="p-price">RM 399.00</span>
@@ -129,7 +129,7 @@
 
             <!-- 产品2: Team Bag -->
             <div class="product-card">
-                <img src="/FYP 1/images/bag-team.webp" alt="Team Bag">
+                <img src="/FYP/images/bag-team.webp" alt="Team Bag">
                 <p class="p-series">TEAM SERIES</p>
                 <h3 class="p-name">TEAM BAG</h3>
                 <span class="p-price">RM 249.00</span>
@@ -138,7 +138,7 @@
 
             <!-- 产品3: Racket Bag Pro -->
             <div class="product-card">
-                <img src="/FYP 1/images/bag-racketpro.webp" alt="Racket Bag Pro">
+                <img src="/FYP/images/bag-racketpro.webp" alt="Racket Bag Pro">
                 <p class="p-series">PRO SERIES</p>
                 <h3 class="p-name">RACKET BAG PRO</h3>
                 <span class="p-price">RM 199.00</span>
@@ -147,7 +147,7 @@
 
             <!-- 产品4: Backpack -->
             <div class="product-card">
-                <img src="/FYP 1/images/bag-backpack.webp" alt="Backpack">
+                <img src="/FYP/images/bag-backpack.webp" alt="Backpack">
                 <p class="p-series">CASUAL SERIES</p>
                 <h3 class="p-name">BACKPACK</h3>
                 <span class="p-price">RM 149.00</span>

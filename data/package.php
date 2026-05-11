@@ -6,7 +6,7 @@
 <head>
     <style>
         .package-hero {
-            background: url('/FYP 1/images/package-bg.jpg') no-repeat center center;
+            background: url('/FYP/images/package-bg.jpg') no-repeat center center;
             background-size: cover;
             height: 700px;
             width: 100%;
@@ -120,7 +120,7 @@
         <div class="product-grid">
             <!-- 套餐1: Beginner Set -->
             <div class="product-card">
-                <img src="/FYP 1/images/package-beginner.webp" alt="Beginner Set">
+                <img src="/FYP/images/package-beginner.webp" alt="Beginner Set">
                 <p class="p-series">BEGINNER PACKAGE</p>
                 <h3 class="p-name">BEGINNER SET</h3>
                 <span class="p-price">RM 499.00</span>
@@ -129,7 +129,7 @@
 
             <!-- 套餐2: Intermediate Set -->
             <div class="product-card">
-                <img src="/FYP 1/images/package-intermediate.webp" alt="Intermediate Set">
+                <img src="/FYP/images/package-intermediate.webp" alt="Intermediate Set">
                 <p class="p-series">INTERMEDIATE PACKAGE</p>
                 <h3 class="p-name">INTERMEDIATE SET</h3>
                 <span class="p-price">RM 899.00</span>
@@ -138,7 +138,7 @@
 
             <!-- 套餐3: Pro Set -->
             <div class="product-card">
-                <img src="/FYP 1/images/package-pro.webp" alt="Pro Set">
+                <img src="/FYP/images/package-pro.webp" alt="Pro Set">
                 <p class="p-series">PRO PACKAGE</p>
                 <h3 class="p-name">PRO SET</h3>
                 <span class="p-price">RM 1,499.00</span>
@@ -147,7 +147,7 @@
 
             <!-- 套餐4: Tournament Set -->
             <div class="product-card">
-                <img src="/FYP 1/images/package-tournament.webp" alt="Tournament Set">
+                <img src="/FYP/images/package-tournament.webp" alt="Tournament Set">
                 <p class="p-series">TOURNAMENT PACKAGE</p>
                 <h3 class="p-name">TOURNAMENT SET</h3>
                 <span class="p-price">RM 1,999.00</span>
