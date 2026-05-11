@@ -126,7 +126,7 @@
         <div class="product-grid">
             <!-- 产品1: Astrox 100 ZZ -->
             <div class="product-card">
-                <img src="/FYP/images/astrox100zz_kurenai.webp" alt="Astrox 100 ZZ">
+                <img src="/FYP/Yonex-Sports-Store-System/images/astrox100zz_kurenai.webp" alt="Astrox 100 ZZ">
                 <p class="p-series">ASTROX SERIES</p>
                 <h3 class="p-name">ASTROX 100 ZZ</h3>
                 <span class="p-price">RM 1,099.00</span>
