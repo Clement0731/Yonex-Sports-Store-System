@@ -123,17 +123,17 @@
                 <img src="/FYP/Yonex-Sports-Store-System/images/Aerosensa_50.webp" alt="Aerosensa 50">
                 <p class="p-series">AEROSENSA SERIES</p>
                 <h3 class="p-name">AEROSENSA 50</h3>
-                <span class="p-price">RM 165.00</span>
-                <a href="#" class="btn-info">View Info</a>
+                <span class="p-price">RM 85.00</span>
+                <a href="?category=shuttlecocks&product=aerosensa_50" class="btn-info">View Info</a>
             </div>
 
             <!-- 产品2: Crosswind 70 -->
             <div class="product-card">
                 <img src="/FYP/Yonex-Sports-Store-System/images/Crosswind_70.webp" alt="Crosswind 70">
-                <p class="p-series">CROSSWIND SERIES</p>
+                <p class="p-series">NYLON SERIES</p>
                 <h3 class="p-name">CROSSWIND 70</h3>
-                <span class="p-price">RM 125.00</span>
-                <a href="#" class="btn-info">View Info</a>
+                <span class="p-price">RM 28.00</span>
+                <a href="?category=shuttlecocks&product=crosswind_70" class="btn-info">View Info</a>
             </div>
 
            

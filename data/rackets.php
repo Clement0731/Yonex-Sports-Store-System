@@ -133,32 +133,70 @@
                 <a href="?category=rackets&product=100zz" class="btn-info">View Info</a>
             </div>
 
-            <!-- 产品2: Astrox 88D Pro -->
+            <!-- 产品2: Astrox 88D  -->
             <div class="product-card">
-                <img src="/FYP/Yonex-Sports-Store-System/images/Astrox_88D.webp" alt="Astrox 88D Pro">
+                <img src="/FYP/Yonex-Sports-Store-System/images/Astrox_88D.webp" alt="Astrox 88D ">
                 <p class="p-series">ASTROX SERIES</p>
-                <h3 class="p-name">ASTROX 88D PRO</h3>
-                <span class="p-price">RM 949.00</span>
+                <h3 class="p-name">ASTROX 88D </h3>
+                <span class="p-price">RM 1099.00</span>
                 <a href="?category=rackets&product=astrox88dpro" class="btn-info">View Info</a>
             </div>
 
-            <!-- 产品3: Nanoflare 800 Pro -->
+            <!-- 产品3: Nanoflare 800  -->
             <div class="product-card">
-                <img src="/FYP/Yonex-Sports-Store-System/images/Nanoflare_800.webp" alt="Nanoflare 800 Pro">
+                <img src="/FYP/Yonex-Sports-Store-System/images/Nanoflare_800.webp" alt="Nanoflare 800 ">
                 <p class="p-series">NANOFLARE SERIES</p>
-                <h3 class="p-name">NANOFLARE 800 PRO</h3>
+                <h3 class="p-name">NANOFLARE 800 </h3>
                 <span class="p-price">RM 899.00</span>
                 <a href="?category=rackets&product=nanoflare800pro" class="btn-info">View Info</a>
             </div>
 
-            <!-- 产品4: Arcsaber 11 Pro -->
+           
+             <!-- 产品4: Nanoflare 1000Z -->
             <div class="product-card">
-                <img src="/FYP/Yonex-Sports-Store-System/images/Arcsaber_11_Pro.webp" alt="Arcsaber 11 Pro">
-                <p class="p-series">ARCSABER SERIES</p>
-                <h3 class="p-name">ARCSABER 11 PRO</h3>
-                <span class="p-price">RM 849.00</span>
-                <a href="?category=rackets&product=arcsaber11pro" class="btn-info">View Info</a>
+                <img src="/FYP/Yonex-Sports-Store-System/images/Nanoflare_1000_Z.webp" alt="Nanoflare 1000Z">
+                <p class="p-series">NANOFLARE SERIES</p>
+                <h3 class="p-name">NANOFLARE 1000Z</h3>
+                <span class="p-price">RM 1099.00</span>
+                <a href="?category=rackets&product=nanoflare1000z" class="btn-info">View Info</a>
             </div>
+
+             <!-- 产品5: Duora Z Strike -->
+            <div class="product-card">
+                <img src="/FYP/Yonex-Sports-Store-System/images/Duora_Z-Strike.webp" alt="Duora Z Strike">
+                <p class="p-series">DUORA SERIES</p>
+                <h3 class="p-name">DUORA Z STRIKE</h3>
+                <span class="p-price">RM 999.00</span>
+                <a href="?category=rackets&product=duorazstrike" class="btn-info">View Info</a>
+            </div>
+
+             <!-- 产品6: Arcsaber 11  -->
+            <div class="product-card">
+                <img src="/FYP/Yonex-Sports-Store-System/images/Arcsaber_11_Pro.webp" alt="Arcsaber 11 ">
+                <p class="p-series">ARCSABER SERIES</p>
+                <h3 class="p-name">ARCSABER 11 </h3>
+                <span class="p-price">RM 999.00</span>
+                <a href="?category=rackets&product=arcSaber11pro" class="btn-info">View Info</a>
+            </div>
+
+           <!-- 产品7: Astrox 99  -->
+            <div class="product-card">
+                <img src="/FYP/Yonex-Sports-Store-System/images/Astrox_99_Pro.webp" alt="Astrox 99 Pro">
+                <p class="p-series">ASTROX SERIES</p>
+                <h3 class="p-name">ASTROX 99 </h3>
+                <span class="p-price">RM 899.00</span>
+                <a href="?category=rackets&product=astrox99pro" class="btn-info">View Info</a>
+            </div>
+
+            <!-- 产品8: Arcsaber 7  -->
+            <div class="product-card">
+                <img src="/FYP/Yonex-Sports-Store-System/images/Arcsaber_7_Play.webp" alt="Arcsaber 7 ">
+                <p class="p-series">ARCSABER SERIES</p>
+                <h3 class="p-name">ARCSABER 7 </h3>
+                <span class="p-price">RM 899.00</span>
+                <a href="?category=rackets&product=astrox99pro" class="btn-info">View Info</a>
+            </div>
+
         </div>
     </section>
 

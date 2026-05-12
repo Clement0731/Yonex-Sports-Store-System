@@ -120,29 +120,29 @@
         <div class="product-grid">
             <!-- 产品1: Power Cushion 65 Z 4 -->
             <div class="product-card">
-                <img src="/FYP/Yonex-Sports-Store-System/images/Power_Cushion_65Z4.webp" alt="Power Cushion 65 Z4">
+                <img src="/FYP/Yonex-Sports-Store-System/images/Poer_Cushion_65Z_Wide.webp" alt="Power Cushion 65 Z4">
                 <p class="p-series">POWER CUSHION SERIES</p>
                 <h3 class="p-name">POWER CUSHION 65 Z4</h3>
                 <span class="p-price">RM 599.00</span>
-                <a href="#" class="btn-info">View Info</a>
+                <a href="?category=footwear&product=power_cushion_65z4" class="btn-info">View Info</a>
             </div>
 
-            <!-- 产品2: Power Cushion 88 Dial 3 -->
+            <!-- 产品2: SUBAXIA GT -->
             <div class="product-card">
                 <img src="/FYP/Yonex-Sports-Store-System/images/SUBAXIA_GT.webp" alt="SUBAXIA GT">
                 <p class="p-series">SUBAXIA SERIES</p>
                 <h3 class="p-name">SUBAXIA GT </h3>
-                <span class="p-price">RM 699.00</span>
-                <a href="#" class="btn-info">View Info</a>
+                <span class="p-price">RM 799.00</span>
+                <a href="?category=footwear&product=subaxia_gt" class="btn-info">View Info</a>
             </div>
 
-            <!-- 产品3: Eclipsion Z 3 -->
+            <!-- 产品3: Eclipsion Z  -->
             <div class="product-card">
-                <img src="/FYP/Yonex-Sports-Store-System/images/Power_Cushion_Eclipsion_Z.webp" alt="Power Cushion Eclipsion Z3">
+                <img src="/FYP/Yonex-Sports-Store-System/images/Power_Cushion_Eclipsion_Z.webp" alt="Power Cushion Eclipsion Z">
                 <p class="p-series">ECLIPSION SERIES</p>
-                <h3 class="p-name">POWER CUSHION ECLIPSION Z3</h3>
-                <span class="p-price">RM 649.00</span>
-                <a href="#" class="btn-info">View Info</a>
+                <h3 class="p-name">POWER CUSHION ECLIPSION Z</h3>
+                <span class="p-price">RM 699.00</span>
+                <a href="?category=footwear&product=eclipsion_z" class="btn-info">View Info</a>
             </div>
 
             <!-- 产品4: Power Cushion AerusZ -->
@@ -150,8 +150,8 @@
                 <img src="/FYP/Yonex-Sports-Store-System/images/Power_Cushion_AerusZ_Wide(blue).webp" alt="Power Cushion AerusZ ">
                 <p class="p-series">AERUS SERIES</p>
                 <h3 class="p-name">POWER CUSHION AERUS Z </h3>
-                <span class="p-price">RM 499.00</span>
-                <a href="#" class="btn-info">View Info</a>
+                <span class="p-price">RM 599.00</span>
+                <a href="?category=footwear&product=power_cushion_aerusz" class="btn-info">View Info</a>
             </div>
         </div>
     </section>

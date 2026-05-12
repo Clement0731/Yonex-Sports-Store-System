@@ -123,17 +123,17 @@
                 <img src="/FYP/Yonex-Sports-Store-System/images/Pro_Racquet_Bag_9Pcs_(White).webp" alt="Pro Tournament Bag">
                 <p class="p-series">PRO SERIES</p>
                 <h3 class="p-name">PRO TOURNAMENT BAG (9PCS)</h3>
-                <span class="p-price">RM 399.00</span>
-                <a href="#" class="btn-info">View Info</a>
+                <span class="p-price">RM 499.00</span>
+                <a href="?category=bags&product=pro_tournament_bag" class="btn-info">View Info</a>
             </div>
 
-            <!-- 产品2: Expert Racket Bag -->
+            <!-- 产品2: Expert Tournament Bag -->
             <div class="product-card">
-                <img src="/FYP/Yonex-Sports-Store-System/images/Expert_Racquet_Bag.webp" alt="Expert Racket Bag">
+                <img src="/FYP/Yonex-Sports-Store-System/images/Expert_Racquet_Bag.webp" alt="Expert Tournament Bag">
                 <p class="p-series">EXPERT SERIES</p>
-                <h3 class="p-name">EXPERT RACKET BAG (6PCS)</h3>
-                <span class="p-price">RM 249.00</span>
-                <a href="#" class="btn-info">View Info</a>
+                <h3 class="p-name">EXPERT TOURNAMENT BAG (6PCS)</h3>
+                <span class="p-price">RM 199.00</span>
+                <a href="?category=bags&product=expert_tournament_bag" class="btn-info">View Info</a>
             </div>
 
             <!-- 产品3: Expert Backpack -->
@@ -141,8 +141,8 @@
                 <img src="/FYP/Yonex-Sports-Store-System/images/Expert_Backpack_2Pcs_(Blue).webp" alt="Expert Backpack">
                 <p class="p-series">EXPERT SERIES</p>
                 <h3 class="p-name">EXPERT BACKPACK (2PCS)</h3>
-                <span class="p-price">RM 199.00</span>
-                <a href="#" class="btn-info">View Info</a>
+                <span class="p-price">RM 169.00</span>
+                <a href="?category=bags&product=expert_backpack" class="btn-info">View Info</a>
             </div>
 
         </div>

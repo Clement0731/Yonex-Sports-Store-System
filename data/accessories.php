@@ -118,40 +118,40 @@
         <h2 class="section-title">Accessories</h2>
 
         <div class="product-grid">
-            <!-- 产品1: Super Grap -->
+            <!-- 产品1: Sport Towel -->
             <div class="product-card">
-                <img src="/FYP/images/accessories-supergrap.webp" alt="Super Grap">
-                <p class="p-series">GRIP SERIES</p>
-                <h3 class="p-name">SUPER GRAP</h3>
-                <span class="p-price">RM 25.00</span>
-                <a href="#" class="btn-info">View Info</a>
+                <img src="/FYP/Yonex-Sports-Store-System/images/Sport_Towel.webp" alt="Sport Towel">
+                <p class="p-series">TOWEL SERIES</p>
+                <h3 class="p-name">SPORT TOWEL</h3>
+                <span class="p-price">RM 39.00</span>
+                <a href="?category=accessories&product=sport_towel" class="btn-info">View Info</a>
             </div>
 
-            <!-- 产品2: Wristband -->
+            <!-- 产品2: Dry Super Grap -->
             <div class="product-card">
-                <img src="/FYP/images/accessories-wristband.webp" alt="Wristband">
-                <p class="p-series">PERFORMANCE SERIES</p>
+                <img src="/FYP/Yonex-Sports-Store-System/images/Dry_Super_Grap(3wraps).webp" alt="Dry Super Grap(3wraps)">
+                <p class="p-series">OVERGRIPS SERIES</p>
+                <h3 class="p-name">DRY SUPER GRAP (3WRAPS)</h3>
+                <span class="p-price">RM 18.00</span>
+                <a href="?category=accessories&product=dry_super_grap" class="btn-info">View Info</a>
+            </div>
+
+            <!-- 产品3: Wristband -->
+            <div class="product-card">
+                <img src="/FYP/Yonex-Sports-Store-System/images/Yonex_Sports_Wristband(White).webp" alt="Wristband">
+                <p class="p-series">WRISTBAND SERIES</p>
                 <h3 class="p-name">WRISTBAND</h3>
-                <span class="p-price">RM 19.00</span>
-                <a href="#" class="btn-info">View Info</a>
+                <span class="p-price">RM 39.00</span>
+                <a href="?category=accessories&product=wristband" class="btn-info">View Info</a>
             </div>
 
-            <!-- 产品3: String BG66 -->
+            <!-- 产品4: Headband -->
             <div class="product-card">
-                <img src="/FYP/images/accessories-string.webp" alt="String BG66">
-                <p class="p-series">STRING SERIES</p>
-                <h3 class="p-name">STRING BG66</h3>
-                <span class="p-price">RM 35.00</span>
-                <a href="#" class="btn-info">View Info</a>
-            </div>
-
-            <!-- 产品4: Towel -->
-            <div class="product-card">
-                <img src="/FYP/images/accessories-towel.webp" alt="Towel">
-                <p class="p-series">ESSENTIALS SERIES</p>
-                <h3 class="p-name">TOWEL</h3>
-                <span class="p-price">RM 29.00</span>
-                <a href="#" class="btn-info">View Info</a>
+                <img src="/FYP/Yonex-Sports-Store-System/images/Headband.webp" alt="Headband">
+                <p class="p-series">HEADBAND SERIES</p>
+                <h3 class="p-name">HEADBAND</h3>
+                <span class="p-price">RM 12.00</span>
+                <a href="?category=accessories&product=headband" class="btn-info">View Info</a>
             </div>
         </div>
     </section>

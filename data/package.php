@@ -124,7 +124,7 @@
                 <p class="p-series">BEGINNER PACKAGE</p>
                 <h3 class="p-name">BEGINNER SET</h3>
                 <span class="p-price">RM 499.00</span>
-                <a href="#" class="btn-info">View Info</a>
+                <a href="?category=package&product=beginner_set" class="btn-info">View Info</a>
             </div>
 
             <!-- 套餐2: Intermediate Set -->
@@ -133,7 +133,7 @@
                 <p class="p-series">INTERMEDIATE PACKAGE</p>
                 <h3 class="p-name">INTERMEDIATE SET</h3>
                 <span class="p-price">RM 899.00</span>
-                <a href="#" class="btn-info">View Info</a>
+                <a href="?category=package&product=intermediate_set" class="btn-info">View Info</a>
             </div>
 
             <!-- 套餐3: Pro Set -->
@@ -142,7 +142,7 @@
                 <p class="p-series">PRO PACKAGE</p>
                 <h3 class="p-name">PRO SET</h3>
                 <span class="p-price">RM 1,499.00</span>
-                <a href="#" class="btn-info">View Info</a>
+                <a href="?category=package&product=pro_set" class="btn-info">View Info</a>
             </div>
 
             <!-- 套餐4: Tournament Set -->
@@ -151,7 +151,7 @@
                 <p class="p-series">TOURNAMENT PACKAGE</p>
                 <h3 class="p-name">TOURNAMENT SET</h3>
                 <span class="p-price">RM 1,999.00</span>
-                <a href="#" class="btn-info">View Info</a>
+                <a href="?category=package&product=tournament_set" class="btn-info">View Info</a>
             </div>
         </div>
     </section>
