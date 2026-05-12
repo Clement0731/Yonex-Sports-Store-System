@@ -6,7 +6,7 @@
 <head>
     <style>
         .bags-hero {
-            background: url('/FYP/images/bags-bg.jpg') no-repeat center center;
+            background: url('/FYP/Yonex-Sports-Store-System/images/bags-bg.jpg') no-repeat center center;
             background-size: cover;
             height: 700px;
             width: 100%;
@@ -120,39 +120,31 @@
         <div class="product-grid">
             <!-- 产品1: Pro Tournament Bag -->
             <div class="product-card">
-                <img src="/FYP/images/bag-protournament.webp" alt="Pro Tournament Bag">
+                <img src="/FYP/Yonex-Sports-Store-System/images/Pro_Racquet_Bag_9Pcs_(White).webp" alt="Pro Tournament Bag">
                 <p class="p-series">PRO SERIES</p>
-                <h3 class="p-name">PRO TOURNAMENT BAG</h3>
+                <h3 class="p-name">PRO TOURNAMENT BAG (9PCS)</h3>
                 <span class="p-price">RM 399.00</span>
                 <a href="#" class="btn-info">View Info</a>
             </div>
 
-            <!-- 产品2: Team Bag -->
+            <!-- 产品2: Expert Racket Bag -->
             <div class="product-card">
-                <img src="/FYP/images/bag-team.webp" alt="Team Bag">
-                <p class="p-series">TEAM SERIES</p>
-                <h3 class="p-name">TEAM BAG</h3>
+                <img src="/FYP/Yonex-Sports-Store-System/images/Expert_Racquet_Bag.webp" alt="Expert Racket Bag">
+                <p class="p-series">EXPERT SERIES</p>
+                <h3 class="p-name">EXPERT RACKET BAG (6PCS)</h3>
                 <span class="p-price">RM 249.00</span>
                 <a href="#" class="btn-info">View Info</a>
             </div>
 
-            <!-- 产品3: Racket Bag Pro -->
+            <!-- 产品3: Expert Backpack -->
             <div class="product-card">
-                <img src="/FYP/images/bag-racketpro.webp" alt="Racket Bag Pro">
-                <p class="p-series">PRO SERIES</p>
-                <h3 class="p-name">RACKET BAG PRO</h3>
+                <img src="/FYP/Yonex-Sports-Store-System/images/Expert_Backpack_2Pcs_(Blue).webp" alt="Expert Backpack">
+                <p class="p-series">EXPERT SERIES</p>
+                <h3 class="p-name">EXPERT BACKPACK (2PCS)</h3>
                 <span class="p-price">RM 199.00</span>
                 <a href="#" class="btn-info">View Info</a>
             </div>
 
-            <!-- 产品4: Backpack -->
-            <div class="product-card">
-                <img src="/FYP/images/bag-backpack.webp" alt="Backpack">
-                <p class="p-series">CASUAL SERIES</p>
-                <h3 class="p-name">BACKPACK</h3>
-                <span class="p-price">RM 149.00</span>
-                <a href="#" class="btn-info">View Info</a>
-            </div>
         </div>
     </section>
 

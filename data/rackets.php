@@ -135,7 +135,7 @@
 
             <!-- 产品2: Astrox 88D Pro -->
             <div class="product-card">
-                <img src="/FYP/images/Astrox_88D.webp" alt="Astrox 88D Pro">
+                <img src="/FYP/Yonex-Sports-Store-System/images/Astrox_88D.webp" alt="Astrox 88D Pro">
                 <p class="p-series">ASTROX SERIES</p>
                 <h3 class="p-name">ASTROX 88D PRO</h3>
                 <span class="p-price">RM 949.00</span>
@@ -144,7 +144,7 @@
 
             <!-- 产品3: Nanoflare 800 Pro -->
             <div class="product-card">
-                <img src="/FYP/images/Nanoflare_800.webp" alt="Nanoflare 800 Pro">
+                <img src="/FYP/Yonex-Sports-Store-System/images/Nanoflare_800.webp" alt="Nanoflare 800 Pro">
                 <p class="p-series">NANOFLARE SERIES</p>
                 <h3 class="p-name">NANOFLARE 800 PRO</h3>
                 <span class="p-price">RM 899.00</span>
@@ -153,7 +153,7 @@
 
             <!-- 产品4: Arcsaber 11 Pro -->
             <div class="product-card">
-                <img src="/FYP/images/Arcsaber_11_Pro.webp" alt="Arcsaber 11 Pro">
+                <img src="/FYP/Yonex-Sports-Store-System/images/Arcsaber_11_Pro.webp" alt="Arcsaber 11 Pro">
                 <p class="p-series">ARCSABER SERIES</p>
                 <h3 class="p-name">ARCSABER 11 PRO</h3>
                 <span class="p-price">RM 849.00</span>

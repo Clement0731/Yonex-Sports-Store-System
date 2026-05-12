@@ -6,7 +6,7 @@
 <head>
     <style>
         .package-hero {
-            background: url('/FYP/images/package-bg.jpg') no-repeat center center;
+            background: url('/FYP/Yonex-Sports-Store-System/images/package-bg.jpg') no-repeat center center;
             background-size: cover;
             height: 700px;
             width: 100%;

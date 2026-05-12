@@ -120,39 +120,23 @@
         <div class="product-grid">
             <!-- 产品1: Aerosensa 50 -->
             <div class="product-card">
-                <img src="/FYP/images/aerosensa50.webp" alt="Aerosensa 50">
+                <img src="/FYP/Yonex-Sports-Store-System/images/Aerosensa_50.webp" alt="Aerosensa 50">
                 <p class="p-series">AEROSENSA SERIES</p>
                 <h3 class="p-name">AEROSENSA 50</h3>
                 <span class="p-price">RM 165.00</span>
                 <a href="#" class="btn-info">View Info</a>
             </div>
 
-            <!-- 产品2: Aerosensa 40 -->
+            <!-- 产品2: Crosswind 70 -->
             <div class="product-card">
-                <img src="/FYP/images/aerosensa40.webp" alt="Aerosensa 40">
-                <p class="p-series">AEROSENSA SERIES</p>
-                <h3 class="p-name">AEROSENSA 40</h3>
+                <img src="/FYP/Yonex-Sports-Store-System/images/Crosswind_70.webp" alt="Crosswind 70">
+                <p class="p-series">CROSSWIND SERIES</p>
+                <h3 class="p-name">CROSSWIND 70</h3>
                 <span class="p-price">RM 125.00</span>
                 <a href="#" class="btn-info">View Info</a>
             </div>
 
-            <!-- 产品3: Aerosensa 30 -->
-            <div class="product-card">
-                <img src="/FYP/images/aerosensa30.webp" alt="Aerosensa 30">
-                <p class="p-series">AEROSENSA SERIES</p>
-                <h3 class="p-name">AEROSENSA 30</h3>
-                <span class="p-price">RM 95.00</span>
-                <a href="#" class="btn-info">View Info</a>
-            </div>
-
-            <!-- 产品4: Mavis 2000 -->
-            <div class="product-card">
-                <img src="/FYP/images/mavis2000.webp" alt="Mavis 2000">
-                <p class="p-series">MAVIS SERIES</p>
-                <h3 class="p-name">MAVIS 2000</h3>
-                <span class="p-price">RM 45.00</span>
-                <a href="#" class="btn-info">View Info</a>
-            </div>
+           
         </div>
     </section>
 

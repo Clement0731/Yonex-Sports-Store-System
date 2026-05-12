@@ -6,7 +6,7 @@
 <head>
     <style>
         .footwear-hero {
-            background: url('/FYP/images/footwear-bg.jpg') no-repeat center center;
+            background: url('/FYP/Yonex-Sports-Store-System/images/footwear-bg.jpg') no-repeat center center;
             background-size: cover;
             height: 700px;
             width: 100%;
@@ -120,37 +120,37 @@
         <div class="product-grid">
             <!-- 产品1: Power Cushion 65 Z 4 -->
             <div class="product-card">
-                <img src="/FYP/images/powercushion65z4.webp" alt="Power Cushion 65 Z 4">
+                <img src="/FYP/Yonex-Sports-Store-System/images/Power_Cushion_65Z4.webp" alt="Power Cushion 65 Z4">
                 <p class="p-series">POWER CUSHION SERIES</p>
-                <h3 class="p-name">POWER CUSHION 65 Z 4</h3>
+                <h3 class="p-name">POWER CUSHION 65 Z4</h3>
                 <span class="p-price">RM 599.00</span>
                 <a href="#" class="btn-info">View Info</a>
             </div>
 
             <!-- 产品2: Power Cushion 88 Dial 3 -->
             <div class="product-card">
-                <img src="/FYP/images/powercushion88dial3.webp" alt="Power Cushion 88 Dial 3">
-                <p class="p-series">POWER CUSHION SERIES</p>
-                <h3 class="p-name">POWER CUSHION 88 DIAL 3</h3>
+                <img src="/FYP/Yonex-Sports-Store-System/images/SUBAXIA_GT.webp" alt="SUBAXIA GT">
+                <p class="p-series">SUBAXIA SERIES</p>
+                <h3 class="p-name">SUBAXIA GT </h3>
                 <span class="p-price">RM 699.00</span>
                 <a href="#" class="btn-info">View Info</a>
             </div>
 
             <!-- 产品3: Eclipsion Z 3 -->
             <div class="product-card">
-                <img src="/FYP/images/eclipsionz3.webp" alt="Eclipsion Z 3">
+                <img src="/FYP/Yonex-Sports-Store-System/images/Power_Cushion_Eclipsion_Z.webp" alt="Power Cushion Eclipsion Z3">
                 <p class="p-series">ECLIPSION SERIES</p>
-                <h3 class="p-name">ECLIPSION Z 3</h3>
+                <h3 class="p-name">POWER CUSHION ECLIPSION Z3</h3>
                 <span class="p-price">RM 649.00</span>
                 <a href="#" class="btn-info">View Info</a>
             </div>
 
-            <!-- 产品4: Cascade Drive -->
+            <!-- 产品4: Power Cushion AerusZ -->
             <div class="product-card">
-                <img src="/FYP/images/cascadedrive.webp" alt="Cascade Drive">
-                <p class="p-series">CASCADE SERIES</p>
-                <h3 class="p-name">CASCADE DRIVE</h3>
-                <span class="p-price">RM 399.00</span>
+                <img src="/FYP/Yonex-Sports-Store-System/images/Power_Cushion_AerusZ_Wide(blue).webp" alt="Power Cushion AerusZ ">
+                <p class="p-series">AERUS SERIES</p>
+                <h3 class="p-name">POWER CUSHION AERUS Z </h3>
+                <span class="p-price">RM 499.00</span>
                 <a href="#" class="btn-info">View Info</a>
             </div>
         </div>

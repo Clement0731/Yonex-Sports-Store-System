@@ -6,7 +6,7 @@
 <head>
     <style>
         .accessories-hero {
-            background: url('/FYP/images/accessories-bg.jpg') no-repeat center center;
+            background: url('/FYP/Yonex-Sports-Store-System/images/accessories-bg.jpg') no-repeat center center;
             background-size: cover;
             height: 700px;
             width: 100%;
