@@ -73,7 +73,7 @@ $banks = [
                         <?php foreach ($banks as $bank): ?>
                         <div class="col-6 col-md-4">
                             <div class="bank-card" onclick="selectBank(this, '<?php echo $bank['name']; ?>')">
-                                <img src="images/<?php echo $bank['img']; ?>" alt="<?php echo $bank['name']; ?>">
+                                <img src="../../images/payment/<?php echo $bank['img']; ?>" alt="<?php echo $bank['name']; ?>">
                                 <div class="small fw-bold"><?php echo $bank['name']; ?></div>
                             </div>
                         </div>
@@ -104,7 +104,6 @@ $banks = [
             return;
         }
         const total = "<?php echo $total; ?>";
-        // 修改后的跳转逻辑：去往 bank_login.php
         window.location.href = 'bank_login.php?bank=' + encodeURIComponent(selectedBankName) + '&amount=' + total;
     }
 </script>
