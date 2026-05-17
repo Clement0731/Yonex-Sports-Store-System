@@ -15,7 +15,7 @@ $categories = [
 
 // Badminton 子类别及其对应的 PHP 文件
 $badmintonSubcategories = [
-    'badminton'    => ['label' => 'All Product', 'file' => 'badminton.php'],
+    'badminton'    => ['label' => 'All Product', 'file' => 'data/all_product.php'],
     'rackets'      => ['label' => 'Racket', 'file' => 'data/rackets.php'],
     'footwear'     => ['label' => 'Footwear', 'file' => 'data/footwear.php'],
     'shuttlecocks' => ['label' => 'Shuttlecocks', 'file' => 'data/shuttlecocks.php'],

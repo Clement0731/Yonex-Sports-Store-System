@@ -130,7 +130,7 @@
                 <p class="p-series">ASTROX SERIES</p>
                 <h3 class="p-name">ASTROX 100 ZZ</h3>
                 <span class="p-price">RM 1,099.00</span>
-                <a href="?category=rackets&product=100zz" class="btn-info">View Info</a>
+                <a href="?category=rackets&product=astrox100zz" class="btn-info">View Info</a>
             </div>
 
             <!-- 产品2: Astrox 88D  -->
@@ -139,7 +139,7 @@
                 <p class="p-series">ASTROX SERIES</p>
                 <h3 class="p-name">ASTROX 88D </h3>
                 <span class="p-price">RM 1099.00</span>
-                <a href="?category=rackets&product=astrox88dpro" class="btn-info">View Info</a>
+                <a href="?category=rackets&product=astrox88d" class="btn-info">View Info</a>
             </div>
 
             <!-- 产品3: Nanoflare 800  -->
@@ -148,7 +148,7 @@
                 <p class="p-series">NANOFLARE SERIES</p>
                 <h3 class="p-name">NANOFLARE 800 </h3>
                 <span class="p-price">RM 899.00</span>
-                <a href="?category=rackets&product=nanoflare800pro" class="btn-info">View Info</a>
+                <a href="?category=rackets&product=nanoflare800" class="btn-info">View Info</a>
             </div>
 
            
@@ -176,7 +176,7 @@
                 <p class="p-series">ARCSABER SERIES</p>
                 <h3 class="p-name">ARCSABER 11 </h3>
                 <span class="p-price">RM 999.00</span>
-                <a href="?category=rackets&product=arcSaber11pro" class="btn-info">View Info</a>
+                <a href="?category=rackets&product=arcsaber11" class="btn-info">View Info</a>
             </div>
 
            <!-- 产品7: Astrox 99  -->
@@ -185,7 +185,7 @@
                 <p class="p-series">ASTROX SERIES</p>
                 <h3 class="p-name">ASTROX 99 </h3>
                 <span class="p-price">RM 899.00</span>
-                <a href="?category=rackets&product=astrox99pro" class="btn-info">View Info</a>
+                <a href="?category=rackets&product=astrox99" class="btn-info">View Info</a>
             </div>
 
             <!-- 产品8: Arcsaber 7  -->
@@ -194,7 +194,7 @@
                 <p class="p-series">ARCSABER SERIES</p>
                 <h3 class="p-name">ARCSABER 7 </h3>
                 <span class="p-price">RM 899.00</span>
-                <a href="?category=rackets&product=astrox99pro" class="btn-info">View Info</a>
+                <a href="?category=rackets&product=arcsaber7" class="btn-info">View Info</a>
             </div>
 
         </div>
