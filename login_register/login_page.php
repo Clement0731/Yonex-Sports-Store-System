@@ -1,35 +1,27 @@
 <?php
-require_once 'db.php'; // 1. 引入数据库连接文件
+require_once __DIR__ . '/../db.php';
 session_start();
 $pageTitle = "Yonex - Login Portal";
 $error = "";
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
-    // 接收登录输入（可以是用户名或邮箱）
-    $login_input = trim($_POST['login_input']); 
+    $login_input = trim($_POST['login_input']);
     $password = $_POST['password'];
 
     try {
-        // 2. 从数据库中查找匹配用户名或邮箱的用户
         $stmt = $pdo->prepare("SELECT * FROM users WHERE username = ? OR email = ?");
         $stmt->execute([$login_input, $login_input]);
         $user = $stmt->fetch();
 
-        // 3. 验证用户是否存在，并对比加密后的密码
         if ($user && password_verify($password, $user['password'])) {
-            // 登录成功，将用户信息存入 Session
             $_SESSION['user_id'] = $user['id'];
             $_SESSION['username'] = $user['username'];
-            
-            // 跳转到首页（index.php 在上一层文件夹中）
-            header("Location: ../index.php"); 
+            header("Location: ../index.php");
             exit;
         } else {
-            // 登录失败提示
             $error = "Invalid identity or password. Please try again.";
         }
     } catch (PDOException $e) {
-        // 如果数据库连接或查询出错
         $error = "System error: " . $e->getMessage();
     }
 }
@@ -41,7 +33,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title><?php echo $pageTitle; ?></title>
-    <!-- 引入 Font Awesome 用于显示小眼睛图标 -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
         :root {
@@ -64,7 +55,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             position: relative;
         }
 
-        /* 背景运动感装饰 */
         body::before {
             content: "";
             position: absolute;
@@ -127,7 +117,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             box-shadow: 0 0 0 4px rgba(0, 51, 102, 0.05);
         }
 
-        /* 眼睛图标样式 */
         .toggle-password {
             position: absolute;
             right: 15px;
@@ -202,15 +191,13 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         </div>
         <div class="input-group">
             <input type="password" name="password" id="password" placeholder="Password" required>
-            <!-- 眼睛图标：初始为闭眼状态 -->
             <i class="fa-solid fa-eye-slash toggle-password" onclick="togglePass('password', this)"></i>
         </div>
         <button type="submit" class="btn">LOGIN</button>
     </form>
     
     <div class="register-footer">
-        <!-- 这里的 href 已经指向了你的注册页面 -->
-        Don't have an account? <a href="register page.php">Register Now</a>
+        Don't have an account? <a href="register_page.php">Register Now</a>
     </div>
 </div>
 
@@ -218,12 +205,10 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     function togglePass(inputId, icon) {
         const inputField = document.getElementById(inputId);
         if (inputField.type === "password") {
-            // 切换为显示明文并显示睁眼图标
             inputField.type = "text";
             icon.classList.remove("fa-eye-slash");
             icon.classList.add("fa-eye");
         } else {
-            // 切换为隐藏并显示闭眼图标
             inputField.type = "password";
             icon.classList.remove("fa-eye");
             icon.classList.add("fa-eye-slash");

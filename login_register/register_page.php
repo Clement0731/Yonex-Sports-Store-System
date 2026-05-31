@@ -1,22 +1,18 @@
 <?php
-require_once 'db.php'; // 1. 引入数据库连接文件
+require_once __DIR__ . '/../db.php';
 session_start();
 $pageTitle = "Join the Team - Yonex Badminton";
 $message = "";
 $messageType = "";
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
-    // 收集并清理输入
     $username = htmlspecialchars(trim($_POST['username']));
     $email    = filter_var($_POST['email'], FILTER_SANITIZE_EMAIL);
     $password = $_POST['password'];
     $confirm  = $_POST['confirm_password'];
 
-    // --- 密码强度验证正则表达式 ---
-    // 要求：至少8位，包含大写字母、小写字母、数字和特殊符号
     $passwordPattern = '/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[\W_]).{8,}$/';
 
-    // 验证逻辑
     if ($password !== $confirm) {
         $message = "Passwords do not match!";
         $messageType = "error";
@@ -25,7 +21,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $messageType = "error";
     } else {
         try {
-            // 2. 检查邮箱是否已经存在
             $checkEmail = $pdo->prepare("SELECT id FROM users WHERE email = ?");
             $checkEmail->execute([$email]);
 
@@ -33,10 +28,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 $message = "This email is already registered!";
                 $messageType = "error";
             } else {
-                // 3. 加密密码
                 $hashedPassword = password_hash($password, PASSWORD_DEFAULT);
-
-                // 4. 执行插入数据库操作
                 $stmt = $pdo->prepare("INSERT INTO users (username, email, password) VALUES (?, ?, ?)");
                 $success = $stmt->execute([$username, $email, $hashedPassword]);
 
@@ -62,7 +54,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title><?php echo $pageTitle; ?></title>
-    <!-- 引入 Font Awesome 用于显示小眼睛图标 -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
         :root {
@@ -134,7 +125,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             box-shadow: 0 0 0 4px rgba(0, 51, 102, 0.05);
         }
 
-        /* 眼睛图标样式 */
         .toggle-password {
             position: absolute;
             right: 15px;
@@ -190,19 +180,17 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         </div>
         <div class="input-group">
             <input type="password" name="password" id="password" placeholder="Password (Upper, Lower, Num, Symbol)" required>
-            <!-- 初始状态设为闭眼 fa-eye-slash -->
             <i class="fa-solid fa-eye-slash toggle-password" onclick="togglePass('password', this)"></i>
         </div>
         <div class="input-group">
             <input type="password" name="confirm_password" id="confirm_password" placeholder="Confirm Password" required>
-            <!-- 初始状态设为闭眼 fa-eye-slash -->
             <i class="fa-solid fa-eye-slash toggle-password" onclick="togglePass('confirm_password', this)"></i>
         </div>
         <button type="submit" class="btn">REGISTER NOW</button>
     </form>
     
     <div class="footer-link">
-        Already a member? <a href="login page.php">Login Here</a>
+        Already a member? <a href="login_page.php">Login Here</a>
     </div>
 </div>
 
@@ -210,12 +198,10 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     function togglePass(inputId, icon) {
         const inputField = document.getElementById(inputId);
         if (inputField.type === "password") {
-            // 点击后切换为明文并睁眼
             inputField.type = "text";
             icon.classList.remove("fa-eye-slash");
             icon.classList.add("fa-eye");
         } else {
-            // 再次点击切换为隐藏并闭眼
             inputField.type = "password";
             icon.classList.remove("fa-eye");
             icon.classList.add("fa-eye-slash");
