@@ -250,3 +250,33 @@ table th {
     font-weight: bold;
     display: inline-block;
 }
+
+/* =========================================
+   Admin Services 页面专属样式
+   ========================================= */
+.badge { 
+    padding: 5px 12px; 
+    border-radius: 20px; 
+    font-size: 12px; 
+    font-weight: bold; 
+    color: white; 
+    display: inline-block; 
+}
+.badge-string { background: #e60012; } /* Yonex 红 */
+.badge-tension { background: #0033a0; } /* Yonex 蓝 */
+
+.btn-back { 
+    background: #6c757d; 
+    color: white; 
+    margin-right: 10px; 
+}
+.btn-back:hover { background: #5a6268; }
+
+.page-title { 
+    color: #0033a0; 
+    font-size: 28px; 
+    font-weight: 900; 
+    letter-spacing: 1px; 
+    margin: 0; 
+    text-transform: uppercase; 
+}

@@ -263,10 +263,15 @@ $badmintonSubcategories = [
         } 
         // 4. 其他页面
         else {
-            echo '<div class="page-header">';
-            echo '<h1>' . htmlspecialchars($categories[$activeCategory] ?? 'Page') . '</h1>';
-            echo '<p style="margin-top:20px; font-size:1.2rem; color:var(--midgray);">Page content coming soon...</p>';
-            echo '</div>';
+            $otherFile = $activeCategory . '.php'; // 比如 service 就会变成 service.php
+            if (file_exists($otherFile)) {
+                include $otherFile;
+            } else {
+                echo '<div class="page-header">';
+                echo '<h1>' . htmlspecialchars($categories[$activeCategory] ?? 'Page') . '</h1>';
+                echo '<p style="margin-top:20px; font-size:1.2rem; color:var(--midgray);">Page content coming soon...</p>';
+                echo '</div>';
+            }
         }
     ?>
 </main>

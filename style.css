@@ -109,3 +109,48 @@
     .button-group { flex-direction: column; }
     .details-grid { grid-template-columns: 1fr; }
 }
+
+/* --- 穿线服务专属样式 --- */
+.custom-stringing-box {
+    background-color: var(--offwhite);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 20px;
+    margin-bottom: 25px;
+}
+
+.option-title {
+    font-size: 0.9rem;
+    font-weight: 700;
+    color: var(--red);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-bottom: 15px;
+    border-bottom: 1px dashed var(--midgray);
+    padding-bottom: 8px;
+}
+
+.option-label {
+    display: block;
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: var(--charcoal);
+    margin-bottom: 8px;
+}
+
+.form-select {
+    width: 100%;
+    padding: 10px 12px;
+    font-family: inherit;
+    font-size: 0.9rem;
+    color: var(--charcoal);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    background-color: var(--white);
+    transition: border-color 0.3s;
+}
+
+.form-select:focus {
+    outline: none;
+    border-color: var(--charcoal);
+}

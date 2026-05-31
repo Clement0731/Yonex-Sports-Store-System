@@ -26,6 +26,59 @@ if (isset($_GET['id'])) {
     <title><?php echo $row['name']; ?> - Yonex Store</title>
     
     <link rel="stylesheet" href="style.css">
+    
+    <style>
+        .custom-service-box {
+            background-color: var(--offwhite);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 20px;
+            margin-top: 20px;
+            margin-bottom: 25px;
+        }
+        .service-title {
+            font-size: 0.9rem;
+            font-weight: 700;
+            color: var(--red);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 15px;
+            border-bottom: 1px dashed var(--midgray);
+            padding-bottom: 8px;
+        }
+        .service-label {
+            display: block;
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: var(--charcoal);
+            margin-bottom: 8px;
+            margin-top: 15px;
+        }
+        .service-input {
+            width: 100%;
+            padding: 10px 12px;
+            font-family: inherit;
+            font-size: 0.9rem;
+            color: var(--charcoal);
+            border: 1px solid var(--border);
+            border-radius: 4px;
+            background-color: var(--white);
+            transition: border-color 0.3s;
+        }
+        .service-input:focus {
+            outline: none;
+            border-color: var(--charcoal);
+        }
+        /* 印字参考照片的样式（如果你不用下拉框的话，这个样式会生效） */
+        .printing-example-img {
+            width: 100%;
+            max-width: 280px; 
+            border-radius: 6px; 
+            border: 1px solid var(--border);
+            margin-top: 5px;
+            display: block;
+        }
+    </style>
 </head>
 <body>
 
@@ -66,6 +119,26 @@ if (isset($_GET['id'])) {
                     <div class="spec-option active" onclick="selectSpec(this, '3U')">3U (88g) / G5</div>
                     <div class="spec-option" onclick="selectSpec(this, '4U')">4U (83g) / G5</div>
                 </div>
+            </div>
+            
+            <div class="custom-service-box">
+                <h4 class="service-title">Stringing Service (穿线服务)</h4>
+                
+                <label for="string_type" class="service-label" style="margin-top: 0;">String Type (线种):</label>
+                <select name="string_type" id="string_type" class="service-input">
+                    <option value="unstrung">Unstrung (空拍) - RM 0.00</option>
+                    <option value="bg66um">BG66 Ultimax (+ RM 35.00)</option>
+                    <option value="exbolt63">EXBOLT 63 (+ RM 40.00)</option>
+                    <option value="aerobite">AEROBITE (+ RM 42.00)</option>
+                </select>
+
+                <label for="tension" class="service-label">Tension (磅数):</label>
+                <select name="tension" id="tension" class="service-input">
+                    <option value="none">No Tension (不穿线)</option>
+                    <option value="24">24 lbs (Beginner / 初学)</option>
+                    <option value="26">26 lbs (Intermediate / 进阶)</option>
+                    <option value="28">28 lbs (Advanced / 高级)</option>
+                </select>
             </div>
             <?php } ?>
 
@@ -112,6 +185,22 @@ if (isset($_GET['id'])) {
                     <div class="spec-option" onclick="selectSpec(this, 'L')">L</div>
                     <div class="spec-option" onclick="selectSpec(this, 'XL')">XL</div>
                 </div>
+            </div>
+            
+            <div class="custom-service-box">
+                <h4 class="service-title">Name Customization (专属印字)</h4>
+                
+                <label for="custom_name" class="service-label" style="margin-top: 0;">Print Name (印字内容 - 可选):</label>
+                <input type="text" id="custom_name" name="custom_name" class="service-input" placeholder="e.g. LIN DAN (+ RM 20.00)" maxlength="15">
+                <p style="font-size: 0.75rem; color: var(--text-muted); margin-top: 5px;">* Max 15 characters. Leave blank if not required.</p>
+                
+                <!-- 💡 这里是自带动画效果的下拉折叠框 -->
+                <details style="margin-top: 15px;">
+                    <summary style="cursor: pointer; color: var(--red); font-weight: 700; font-size: 0.85rem; outline: none; padding: 5px 0;">
+                        ▶ View Example (点击展开效果参考)
+                    </summary>
+                    <img src="images/example name.jpg" alt="Printing Example" style="width: 100%; max-width: 320px; border-radius: 8px; border: 1px solid #e2e8f0; margin-top: 12px; display: block; box-shadow: 0 4px 12px rgba(0,0,0,0.05);" onerror="this.style.display='none'">
+                </details>
             </div>
             <?php } ?>
             

@@ -12,7 +12,7 @@ $current_page = basename($_SERVER['SCRIPT_NAME']);
         
         <a href="manage_product.php" class="<?php echo (in_array($current_page, ['manage_product.php', 'add_product.php', 'edit_product.php'])) ? 'active' : ''; ?>">All Products</a>
         
-        <a href="service.php" class="<?php echo ($current_page == 'service.php') ? 'active' : ''; ?>">Services</a>
+        <a href="admin_service.php" class="<?php echo ($current_page == 'admin_service.php') ? 'active' : ''; ?>">Services</a>
         
         <a href="manage_customer.php" class="<?php echo ($current_page == 'manage_customer.php') ? 'active' : ''; ?>">Manage Customers</a>
         
