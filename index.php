@@ -1,4 +1,5 @@
 <?php
+session_start();
 // 当前活跃类别，默认为 'home'
 $activeCategory = isset($_GET['category']) ? htmlspecialchars($_GET['category']) : 'home';
 
@@ -133,7 +134,7 @@ $badmintonSubcategories = [
         .dropdown-content a::after { display: none; }
 
         .header-actions { min-width: 200px; display: flex; justify-content: flex-end; align-items: center; gap: 16px; }
-        .icon-btn { background: none; border: none; cursor: pointer; color: var(--text-muted); padding: 6px; border-radius: 6px; transition: color 0.2s, background 0.2s; display: flex; align-items: center; }
+        .icon-btn { background: none; border: none; cursor: pointer; color: var(--text-muted); padding: 6px; border-radius: 6px; transition: color 0.2s, background 0.2s; display: flex; align-items: center; text-decoration: none; }
         .icon-btn:hover { color: var(--charcoal); background: var(--lightgray); }
 
         /* --- 首页特定样式：大型产品宣传面 --- */
@@ -226,9 +227,55 @@ $badmintonSubcategories = [
         </a>
     </nav>
     <div class="header-actions">
-        <button class="icon-btn" title="Search"><svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.35-4.35"/></svg></button>
-        <button class="icon-btn" title="Cart"><svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 01-8 0"/></svg></button>
-        <button class="icon-btn" title="Account"><svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></button>
+        <!-- Search 图标 -->
+        <button class="icon-btn" title="Search">
+            <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                <circle cx="11" cy="11" r="7"/>
+                <path d="M21 21l-4.35-4.35"/>
+            </svg>
+        </button>
+        
+        <!-- Cart 图标 -->
+        <button class="icon-btn" title="Cart">
+            <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                <path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z"/>
+                <line x1="3" y1="6" x2="21" y2="6"/>
+                <path d="M16 10a4 4 0 01-8 0"/>
+            </svg>
+        </button>
+        
+        <?php if (isset($_SESSION['user_id'])): ?>
+            <!-- 用户名显示 -->
+            <span style="font-size:0.75rem; margin-right:4px; color:var(--charcoal); font-weight:500;">
+                <?= htmlspecialchars($_SESSION['username']) ?>
+            </span>
+            <!-- Logout 图标 -->
+            <a href="login_register/logout.php" class="icon-btn" title="Logout">
+                <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                    <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/>
+                    <polyline points="16 17 21 12 16 7"/>
+                    <line x1="21" y1="12" x2="9" y2="12"/>
+                </svg>
+            </a>
+        <?php else: ?>
+            <!-- Login 图标 -->
+            <a href="login_register/login_page.php" class="icon-btn" title="Login">
+                <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                    <path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/>
+                    <polyline points="10 17 15 12 10 7"/>
+                    <line x1="15" y1="12" x2="3" y2="12"/>
+                </svg>
+            </a>
+            <!-- Register 图标 -->
+            <a href="login_register/register_page.php" class="icon-btn" title="Register">
+                <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                    <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/>
+                    <circle cx="9" cy="7" r="4"/>
+                    <line x1="19" y1="8" x2="19" y2="14"/>
+                    <line x1="16" y1="11" x2="22" y2="11"/>
+                </svg>
+            </a>
+        <?php endif; ?>
     </div>
 </header>
 
