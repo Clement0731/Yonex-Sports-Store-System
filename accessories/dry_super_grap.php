@@ -1,5 +1,9 @@
 <?php
-// dry_super_grap.php - Dry Super Grap (3wraps) Product Detail Page
+include 'db_connect.php';
+$sql = "SELECT * FROM products WHERE category = 'Accessories'";
+$result = $conn->query($sql);
+?>
+
 ?>
 <!DOCTYPE html>
 <html lang="en">
