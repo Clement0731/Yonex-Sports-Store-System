@@ -169,7 +169,7 @@
         <div class="service-image">
             <div class="img-placeholder">IMAGE: STRINGING</div>
             <!-- 如果你有穿线的图片，可以放进 images 文件夹，然后在这里改名字 -->
-            <img src="images/stringing_service.jpg" alt="Racket Stringing Service" onerror="this.style.opacity='0'">
+            <img src="images/RS.jpg" alt="Racket Stringing Service" onerror="this.style.opacity='0'">
         </div>
         <div class="service-content">
             <span class="service-tag">Professional Equipment Care</span>
@@ -189,7 +189,7 @@
         <div class="service-image">
             <div class="img-placeholder">IMAGE: APPAREL PRINTING</div>
             <!-- 如果你有印字的图片，可以放进 images 文件夹，然后在这里改名字 -->
-            <img src="images/apparel_printing.jpg" alt="Apparel Printing Service" onerror="this.style.opacity='0'">
+            <img src="images/AC.jpg" alt="Apparel Printing Service" onerror="this.style.opacity='0'">
         </div>
         <div class="service-content">
             <span class="service-tag">Make It Yours</span>

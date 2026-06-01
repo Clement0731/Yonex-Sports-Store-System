@@ -18,7 +18,7 @@ $cust_q = $conn->query("SELECT COUNT(USER_ID) as count FROM USERS WHERE ROLE = '
 $cust_data = $cust_q->fetch_assoc();
 $total_cust = $cust_data['count'];
 
-$prod_q = $conn->query("SELECT COUNT(PRODUCT_ID) as count FROM PRODUCTS");
+$prod_q = $conn->query("SELECT COUNT(id) as count FROM products");
 $prod_data = $prod_q->fetch_assoc();
 $total_products = $prod_data['count'];
 

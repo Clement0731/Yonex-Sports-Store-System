@@ -97,13 +97,18 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 <div class="form-row">
                     <div class="form-group">
                         <label>Category</label>
-                        <select name="category" id="categorySelector" onchange="updateSpecLabels()" required>
-                            <option value="Rackets">Rackets</option>
-                            <option value="Footwear">Footwear</option>
-                            <option value="Shuttlecocks">Shuttlecocks</option>
-                            <option value="Apparel">Apparel</option>
-                            <option value="Bags">Bags</option>
-                            <option value="Accessories">Accessories</option>
+                        <select name="category" id="category" required onchange="changeCategory()" style="width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 4px;">
+                            <option value="">-- Select Category --</option>
+                            <?php
+                             // 去数据库抓取所有分类
+                                    $cat_dropdown_query = $conn->query("SELECT category_name FROM categories ORDER BY id ASC");
+                                    if ($cat_dropdown_query && $cat_dropdown_query->num_rows > 0) {
+                                    while($cat_row = $cat_dropdown_query->fetch_assoc()) {
+                                    $c_name = htmlspecialchars($cat_row['category_name']);
+                                    echo "<option value='{$c_name}'>{$c_name}</option>";
+                                    }
+                                 }
+                            ?>
                         </select>
                     </div>
                     <div class="form-group">
