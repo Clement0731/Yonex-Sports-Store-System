@@ -19,7 +19,7 @@ if (file_exists($dataPath)) {
     $currentProducts = require $dataPath;
 } else {
     // 默认加载 home
-    $currentProducts = require __DIR__ . "/data/home.php";
+    $currentProducts = require __DIR__ . "../../home.php";
 }
 ?>
 <!DOCTYPE html>
