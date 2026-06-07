@@ -46,20 +46,20 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
                 $mail = new PHPMailer(true);
                 try {
-                    // ====== SMTP 服务器配置 ======
+                    // ====== 【优化：统一采用你测试成功的 465 SSL 配置】 ======
                     $mail->isSMTP();
                     $mail->Host       = 'smtp.gmail.com';                                 
                     $mail->SMTPAuth   = true;                                             
                     
-                    // 🚀 打开这个可以看具体的发信错误日志。测试成功后，改成 0 即可关闭
-                    $mail->SMTPDebug  = 2; 
+                    // 调试模式：测试时保留 2 打印日志，确认没问题后可以改为 0 关闭
+                    $mail->SMTPDebug  = 0; 
 
-                    // ⚠️ 记得去谷歌后台生成全新的 16位应用密码
-                    $mail->Username   = 'teolijie4gmail@gmail.com';                           
-                    $mail->Password   = 'ywxqvhuhuxtxtecv';                               
+                    $mail->Username   = 'teolijie4@gmail.com'; // 修正了连写错误，使用你登录页成功的账号
+                    $mail->Password   = 'hodzkfiyllwycvxy';    // 使用你测试成功的16位谷歌应用密码
                     
-                    $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;                   
-                    $mail->Port       = 587;                                              
+                    $mail->SMTPSecure = PHPMailer::ENCRYPTION_SMTPS;                    
+                    $mail->Port       = 465;                                              
+                    $mail->CharSet    = 'UTF-8';
 
                     // 绕过本地 XAMPP 的 SSL 证书验证限制
                     $mail->SMTPOptions = array(
@@ -71,7 +71,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                     );
 
                     // 收件人信息
-                    $mail->setFrom('teolijie4gmail@gmail.com', 'Yonex Badminton');            
+                    $mail->setFrom('teolijie4@gmail.com', 'Yonex Badminton');            
                     $mail->addAddress($email, $username); 
 
                     // HTML 邮件内容设计
@@ -85,7 +85,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                             <div style='text-align: center; margin: 30px 0;'>
                                 <span style='font-size: 32px; font-weight: bold; color: #003366; letter-spacing: 5px; background: #f7fafc; padding: 10px 30px; border-radius: 8px; border: 1px dashed #003366;'>$otp_code</span>
                             </div>
-                            <p style='font-size: 12px; color: #718096; text-align: center;'>If you did not request this code, please secure your account.</p>
+                            <p style='font-size: 12px; color: #718096; text-align: center;'>This code is valid for 5 minutes. If you did not request this code, please secure your account.</p>
                         </div>
                     ";
 
@@ -98,11 +98,12 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                     $success = $stmt->execute([$username, $email, $phone, $hashedPassword]);
 
                     if ($success) {
-                        // 数据存入 Session，供下一个页面比对
+                        // 数据存入 Session，供 otpverify.php 页面进行验证比对
                         $_SESSION['pending_user_email'] = $email;
                         $_SESSION['generated_otp'] = (string)$otp_code; 
+                        $_SESSION['register_otp_time'] = time(); // 记录生成时间防止验证码过期
 
-                        // 跳转到 OTP 验证页面（确保文件名完全对应）
+                        // 成功跳转到验证码拦截页面
                         header("Location: otpverify.php");
                         exit();
                     } else {

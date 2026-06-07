@@ -105,7 +105,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title><?php echo $pageTitle; ?></title>
-    <!-- 引入 Font Awesome 用于显示小眼睛图标 -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
         :root {
@@ -143,7 +142,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             border-radius: 20px;
             box-shadow: 0 20px 50px rgba(0, 51, 102, 0.08);
             width: 100%;
-            max-width: 400px;
+            max-width: 450px; /* 稍微增加了卡片最大宽度 (从400px到450px)，给长邮箱留出更多横向空间 */
             text-align: center;
             position: relative;
             z-index: 1;
@@ -214,17 +213,28 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             box-shadow: 0 0 0 4px rgba(0, 51, 102, 0.05);
         }
 
-        /* 新增：带有发送按钮的输入框容器 */
+        /* 修复核心：同一行内的 OTP 输入组布局调整 */
         .otp-group {
             display: flex;
             gap: 10px;
+            align-items: center;
         }
+        
+        /* 让邮箱输入框占据绝大部分空间，并稍微缩小字号、减少左右内边距，确保长邮箱能完整放下不被截断 */
+        .otp-group input {
+            flex: 1; 
+            min-width: 0; /* 允许输入框根据 flex 压缩，防止撑破容器 */
+            padding: 15px 10px; /* 减少内边距提供更多文本显示空间 */
+            font-size: 13.5px; /* 稍微调小字号，完美容纳长学校邮箱后缀 */
+        }
+        
         .btn-send-otp {
             background: #edf2f7;
             border: 1.5px solid #edf2f7;
             color: var(--yonex-blue);
             border-radius: 12px;
             padding: 0 15px;
+            height: 50px; /* 让按钮高度和输入框完全对齐保持美观 */
             font-size: 13px;
             font-weight: 600;
             cursor: pointer;
@@ -326,7 +336,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     <h1 class="main-title">YONEX</h1>
     <p class="sub-title">Sign in to your account</p>
 
-    <!-- 新增：登录面板切换器 -->
     <div class="login-tabs">
         <button type="button" class="tab-btn active" id="tab-pwd" onclick="switchLoginMode('password')">Password</button>
         <button type="button" class="tab-btn" id="tab-otp" onclick="switchLoginMode('otp')">Email OTP</button>
@@ -340,7 +349,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         <div class="success-msg"><?php echo $success_msg; ?></div>
     <?php endif; ?>
 
-    <!-- 表单1：密码登录（你原本的表单，加入隐藏的 action_type 标明身份） -->
     <form id="form-password" method="POST" action="">
         <input type="hidden" name="action_type" value="password_login">
         <div class="input-group">
@@ -348,19 +356,15 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         </div>
         <div class="input-group">
             <input type="password" name="password" id="password" placeholder="Password" required>
-            <!-- 眼睛图标 -->
             <i class="fa-solid fa-eye-slash toggle-password" onclick="togglePass('password', this)"></i>
         </div>
-        <!-- 新增：忘记密码链接 -->
         <div class="forgot-link-container">
             <a href="forget_password.php">Forgot Password?</a>
         </div>
         <button type="submit" class="btn">LOGIN</button>
     </form>
 
-    <!-- 表单2：OTP登录（独立出来的表单，默认隐藏） -->
     <form id="form-otp" method="POST" action="" style="display: none;">
-        <!-- 点击发送 OTP 按钮时通过 JS 动态更改此值 -->
         <input type="hidden" name="action_type" id="otp-action-field" value="otp_login">
         
         <div class="input-group otp-group">
@@ -376,7 +380,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     </form>
     
     <div class="register-footer">
-        Don't have an account? <a href="register page.php">Register Now</a>
+        Don't have an account? <a href="register.php">Register Now</a>
     </div>
 </div>
 

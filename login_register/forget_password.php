@@ -1,4 +1,12 @@
 <?php
+// 1. 引入 PHPMailer 核心类文件（根据你的目录结构精准匹配）
+use PHPMailer\PHPMailer\PHPMailer;
+use PHPMailer\PHPMailer\Exception;
+
+require 'PHPMailer-master/src/Exception.php';
+require 'PHPMailer-master/src/PHPMailer.php';
+require 'PHPMailer-master/src/SMTP.php';
+
 require_once 'db.php';
 session_start();
 $error = "";
@@ -21,17 +29,56 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             $_SESSION['reset_email'] = $email;
             $_SESSION['reset_token_time'] = time();
 
-            // 【核心修正】因为是同级跳转，链接直接写文件名就行，千万不要加文件夹名字！
-            $reset_link = "reset_password.php?token=" . $token;
+            // 生成绝对路径的重置链接，方便用户在邮件客户端里直接点击
+            $reset_link = "http://localhost/fyp/Yonex-Sports-Store-System/login_register/reset_password.php?token=" . $token;
 
-            // 模拟发送邮件
-            $subject = "YONEX - Reset Password Link";
-            $message = "Please click the link below to reset your password:\n" . $reset_link . "\nValid for 5 minutes.";
-            @mail($email, $subject, $message, "From: no-reply@yonex-portal.com");
+            // ==================== 【核心修改：使用 PHPMailer 发送真实邮件】 ====================
+            $mail = new PHPMailer(true);
 
-            // 精准同级跳转
-            header("Location: reset_password.php?status=sent&preview_link=" . urlencode($reset_link));
-            exit;
+            try {
+                // 服务器配置
+                $mail->isSMTP();                                            // 使用 SMTP 发送
+                $mail->Host       = 'smtp.gmail.com';                          // 如果你用的是 QQ 邮箱
+                // $mail->Host    = 'smtp.gmail.com';                       // 如果你用的是 Gmail 邮箱
+                
+                $mail->SMTPAuth   = true;                                   // 开启 SMTP 认证
+                $mail->Username   = 'teolijie4@gmail.com';                   // 【填写：你的发件人邮箱账号】
+                $mail->Password   = 'hodzkfiyllwycvxy';                         // 【填写：你获取的十六位客户端授权码，而非登录密码！】
+                
+                $mail->SMTPSecure = PHPMailer::ENCRYPTION_SMTPS;            // 开启 SSL 加密
+                $mail->Port       = 465;                                    // SSL 端口号
+                $mail->CharSet    = 'UTF-8';                                // 防止邮件中文乱码
+
+                // 收件人与发件人
+                $mail->setFrom('teolijie4@gmail.com', 'YONEX Official');
+                $mail->addAddress($email);                                  // 动态接收前端表单提交的用户邮箱
+
+                // 邮件内容
+                $mail->isHTML(true);                                        // 支持 HTML 格式
+                $mail->Subject = 'YONEX - Reset Password Link';
+                
+                // 邮件正文（支持 HTML 标签，看起来更专业）
+                $mail->Body    = "
+                    <h3>Dear User,</h3>
+                    <p>We received a request to reset your password. Please click the link below to proceed:</p>
+                    <p><a href='{$reset_link}' style='padding: 10px 20px; background-color: #003366; color: white; text-decoration: none; border-radius: 5px; display: inline-block;'>Reset Password</a></p>
+                    <p>Or copy this link to your browser:</p>
+                    <p><a href='{$reset_link}'>{$reset_link}</a></p>
+                    <br>
+                    <p><i>Valid for 5 minutes. If you did not make this request, please ignore this email.</i></p>
+                ";
+
+                $mail->send();
+
+                // 【关键修正】发送成功后，不再传递 preview_link 参数，直接跳转干净的成功状态
+                header("Location: reset_password.php?status=sent");
+                exit;
+
+            } catch (Exception $e) {
+                $error = "Mail could not be sent. Error: {$mail->ErrorInfo}";
+            }
+            // ===============================================================================
+
         } else {
             $error = "This email address is not registered.";
         }
