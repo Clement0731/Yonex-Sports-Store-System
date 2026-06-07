@@ -1,9 +1,11 @@
 <?php
+include 'db_connect.php';
+
 // 当前活跃类别，默认为 'home'
 $activeCategory = isset($_GET['category']) ? htmlspecialchars($_GET['category']) : 'home';
 
-// 检查是否有 product 参数（产品详情页）
-$product = isset($_GET['product']) ? htmlspecialchars($_GET['product']) : '';
+// ★ 新增：检测网址里有没有产品 ID (比如 ?id=1)
+$productId = isset($_GET['id']) ? intval($_GET['id']) : 0;
 
 // 主导航类别
 $categories = [
@@ -15,7 +17,7 @@ $categories = [
 
 // Badminton 子类别及其对应的 PHP 文件
 $badmintonSubcategories = [
-    'badminton'    => ['label' => 'All Product', 'file' => 'badminton.php'],
+    'badminton'    => ['label' => 'All Product', 'file' => 'data/all_product.php'],
     'rackets'      => ['label' => 'Racket', 'file' => 'data/rackets.php'],
     'footwear'     => ['label' => 'Footwear', 'file' => 'data/footwear.php'],
     'shuttlecocks' => ['label' => 'Shuttlecocks', 'file' => 'data/shuttlecocks.php'],
@@ -65,7 +67,6 @@ $badmintonSubcategories = [
         
         nav { flex: 1; display: flex; justify-content: center; gap: 4px; height: 100%; align-items: center; }
         
-        /* 导航链接基础样式 */
         nav a, .dropdown-trigger {
             position: relative; padding: 8px 18px; color: var(--text-muted); text-decoration: none; 
             font-size: 0.85rem; font-weight: 600; letter-spacing: 0.12em; text-transform: uppercase; 
@@ -74,7 +75,6 @@ $badmintonSubcategories = [
             background: none; border: none; font-family: inherit;
         }
         
-        /* 导航栏黑色线条特效 */
         nav a::after, .dropdown-trigger::after {
             content: ''; position: absolute; bottom: 15px; left: 50%; transform: translateX(-50%);
             width: 0; height: 2px; background: var(--charcoal); transition: width 0.3s ease;
@@ -84,7 +84,6 @@ $badmintonSubcategories = [
         nav a.active, .dropdown-trigger.active { color: var(--charcoal); font-weight: 700; }
         nav a.active::after, .dropdown-trigger.active::after { width: 70%; background: var(--charcoal); }
 
-        /* ========== Badminton 下拉菜单专属 CSS ========== */
         .dropdown { position: relative; height: 100%; display: flex; align-items: center; }
         
         .dropdown-content {
@@ -129,7 +128,6 @@ $badmintonSubcategories = [
             padding-left: 30px; 
         }
         
-        /* 下拉菜单项不需要底部线条 */
         .dropdown-content a::after { display: none; }
 
         .header-actions { min-width: 200px; display: flex; justify-content: flex-end; align-items: center; gap: 16px; }
@@ -171,14 +169,12 @@ $badmintonSubcategories = [
         .promo-image img { width: 100%; max-width: 500px; height: auto; object-fit: contain; filter: drop-shadow(0 20px 30px rgba(0,0,0,0.1)); transition: transform 0.5s ease; }
         .promo-section:hover .promo-image img { transform: scale(1.05) rotate(-2deg); }
 
-        /* 其他页面的默认头部（占位） */
         .page-header { padding: 200px 60px; text-align: center; background: var(--charcoal); color: var(--white); }
         .page-header h1 { font-family: 'Cormorant Garamond', serif; font-size: 4.2rem; font-weight: 600; }
 
         footer { background: var(--white); color: var(--text-muted); text-align: center; padding: 32px 40px; font-size: 0.75rem; letter-spacing: 0.06em; border-top: 1px solid var(--border); }
         footer strong { color: var(--charcoal); }
 
-        /* 响应式适配 */
         @media (max-width: 900px) {
             header { padding: 0 20px; }
             .hero { padding: 120px 30px 100px; }
@@ -196,12 +192,10 @@ $badmintonSubcategories = [
         <img src="yonex-logo.png" alt="YONEX" class="logo-image">
     </a>
     <nav>
-        <!-- Home 链接 -->
-        <a href="?category=home" class="<?= $activeCategory === 'home' && empty($product) ? 'active' : '' ?>">
+        <a href="?category=home" class="<?= $activeCategory === 'home' && empty($productId) ? 'active' : '' ?>">
             Home
         </a>
         
-        <!-- Badminton 下拉菜单 -->
         <div class="dropdown">
             <span class="dropdown-trigger <?= isset($badmintonSubcategories[$activeCategory]) ? 'active' : '' ?>">
                 Badminton
@@ -215,12 +209,10 @@ $badmintonSubcategories = [
             </div>
         </div>
 
-        <!-- Service 链接 -->
         <a href="?category=service" class="<?= $activeCategory === 'service' ? 'active' : '' ?>">
             Service
         </a>
         
-        <!-- About 链接 -->
         <a href="?category=about" class="<?= $activeCategory === 'about' ? 'active' : '' ?>">
             About
         </a>
@@ -234,43 +226,52 @@ $badmintonSubcategories = [
 
 <main>
     <?php 
-        // 优先检查是否是产品详情页
-        if (!empty($product)) {
-            // 产品详情页面路由 - 根据 category 和 product 动态定位
-            $productFile = $activeCategory . '/' . $product . '.php';
-            if (file_exists($productFile)) {
-                include $productFile;
+        // ★ 1. 如果网址里有 ?id=X，就直接在 main 里面加载万能详情页！
+        if ($productId > 0) {
+            if (file_exists('product_detail.php')) {
+                include 'product_detail.php';
+            } elseif (file_exists('data/product_detail.php')) {
+                include 'data/product_detail.php';
             } else {
-                echo '<div class="page-header">';
-                echo '<h1>Product Not Found</h1>';
-                echo '<p style="margin-top:20px; font-size:1.2rem; color:var(--midgray);">The requested product could not be found.</p>';
-                echo '</div>';
+                echo '<div class="page-header"><h1>Product Not Found</h1></div>';
             }
-        } elseif (isset($badmintonSubcategories[$activeCategory])) {
-            // Badminton 子类别页面
+        } 
+        // 2. Badminton 子类别页面 (Rackets, Shoes 等)
+        elseif (isset($badmintonSubcategories[$activeCategory])) {
             $fileToLoad = $badmintonSubcategories[$activeCategory]['file'];
+            // 兼容文件可能不在 data 文件夹里的情况
+            $fallbackFile = str_replace('data/', '', $fileToLoad);
+            
             if (file_exists($fileToLoad)) {
                 include $fileToLoad;
+            } elseif (file_exists($fallbackFile)) {
+                include $fallbackFile;
             } else {
-                // 如果文件不存在，显示占位页面
                 echo '<div class="page-header">';
                 echo '<h1>' . htmlspecialchars($badmintonSubcategories[$activeCategory]['label']) . '</h1>';
-                echo '<p style="margin-top:20px; font-size:1.2rem; color:var(--midgray);">Coming soon - ' . htmlspecialchars($fileToLoad) . ' will be created</p>';
+                echo '<p style="margin-top:20px; font-size:1.2rem; color:var(--midgray);">Coming soon...</p>';
                 echo '</div>';
             }
-        } elseif ($activeCategory === 'home') {
-            // 首页
+        } 
+        // 3. 首页
+        elseif ($activeCategory === 'home') {
             if (file_exists('home.php')) {
                 include 'home.php';
             } else {
                 echo "<p style='padding:50px; text-align:center;'>Error: home.php not found.</p>";
             }
-        } else {
-            // 其他页面（service, about等）
-            echo '<div class="page-header">';
-            echo '<h1>' . htmlspecialchars($categories[$activeCategory] ?? 'Page') . '</h1>';
-            echo '<p style="margin-top:20px; font-size:1.2rem; color:var(--midgray);">Page content coming soon...</p>';
-            echo '</div>';
+        } 
+        // 4. 其他页面
+        else {
+            $otherFile = $activeCategory . '.php'; // 比如 service 就会变成 service.php
+            if (file_exists($otherFile)) {
+                include $otherFile;
+            } else {
+                echo '<div class="page-header">';
+                echo '<h1>' . htmlspecialchars($categories[$activeCategory] ?? 'Page') . '</h1>';
+                echo '<p style="margin-top:20px; font-size:1.2rem; color:var(--midgray);">Page content coming soon...</p>';
+                echo '</div>';
+            }
         }
     ?>
 </main>

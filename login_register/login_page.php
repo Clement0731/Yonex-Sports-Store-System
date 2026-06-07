@@ -1,36 +1,76 @@
 <?php
-require_once 'db.php'; // 1. 引入数据库连接文件
+ini_set('display_errors', 1);
+error_reporting(E_ALL);
+
+// 1. 引入 PHPMailer 核心类文件（根据你的目录结构引入）
+require 'PHPMailer-master/src/Exception.php';
+require 'PHPMailer-master/src/PHPMailer.php';
+require 'PHPMailer-master/src/SMTP.php';
+
+use PHPMailer\PHPMailer\PHPMailer;
+use PHPMailer\PHPMailer\Exception;
+
+require_once 'db.php'; 
 session_start();
 $pageTitle = "Yonex - Login Portal";
 $error = "";
 $success_msg = "";
 
-// 模拟/封装邮件发送函数 (建议实际生产环境使用 PHPMailer 库)
+// 2. 使用真实的 SMTP 服务发送 OTP 邮件
 function sendOtpEmail($toEmail, $otp) {
-    // ----------------------------------------------------
-    // 【配置提示】实际对接时，在这里编写你的邮件发送逻辑。
-    // 例如使用 PHPMailer 发送：$mail->send();
-    // ----------------------------------------------------
-    $subject = "Your YONEX OTP Verification Code";
-    $message = "Your OTP code is: " . $otp . ". Valid for 5 minutes.";
-    $headers = "From: no-reply@yonex-portal.com";
-    
-    // 这里暂时使用 PHP 自带 mail，实际推荐用 PHPMailer 保证不进垃圾箱
-    return @mail($toEmail, $subject, $message, $headers); 
+    $mail = new PHPMailer(true);
+
+    try {
+        // --- SMTP 服务器配置 ---
+        $mail->isSMTP();                                            // 使用 SMTP 发送
+        $mail->Host       = 'smtp.gmail.com';                        // Gmail SMTP 服务器地址
+        $mail->SMTPAuth   = true;                                   // 开启 SMTP 认证
+        
+        // 【配置区：请填入你的真实邮箱信息】
+        $mail->Username   = 'teolijie4@gmail.com';             // 改成你的 Gmail 邮箱
+        $mail->Password   = 'hodzkfiyllwycvxy';                  // 填入第一步获取的 16 位 App Password (去掉空格)
+        
+        $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;         // 开启 TLS 加密
+        $mail->Port       = 587;                                    // TLS 端口号
+
+        // --- 收件人和发件人配置 ---
+        $mail->setFrom('no-reply@yonex-portal.com', 'YONEX Portal'); // 发件人显示名称
+        $mail->addAddress($toEmail);                                // 接收 OTP 的用户邮箱
+
+        // --- 邮件内容配置 ---
+        $mail->isHTML(true);                                        // 支持 HTML 格式
+        $mail->Subject = 'Your YONEX OTP Verification Code';
+        $mail->Body    = "
+            <div style='font-family: Arial, sans-serif; padding: 20px; border: 1px solid #edf2f7; border-radius: 10px; max-width: 500px;'>
+                <h2 style='color: #003366; border-bottom: 2px solid #003366; padding-bottom: 10px;'>YONEX Verification Portal</h2>
+                <p>Hello,</p>
+                <p>You are requesting an Email OTP login. Your 6-digit verification code is:</p>
+                <div style='background-color: #f7fafc; padding: 15px; text-align: center; border-radius: 8px; margin: 20px 0;'>
+                    <span style='font-size: 24px; font-weight: bold; color: #003366; letter-spacing: 5px;'>{$otp}</span>
+                </div>
+                <p style='color: #718096; font-size: 12px;'>This code is valid for 5 minutes. If you did not request this, please ignore this email.</p>
+            </div>
+        ";
+
+        $mail->send();
+        return true;
+    } catch (Exception $e) {
+        // 如果发送失败，把错误记录到全局变量里以便调试
+        global $error;
+        $error = "Mail could not be sent. Error: {$mail->ErrorInfo}";
+        return false;
+    }
 }
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
-    // 区分是 发送OTP请求、密码登录 还是 OTP登录
     $action_type = isset($_POST['action_type']) ? $_POST['action_type'] : 'password_login';
 
     try {
-        // 场景 A：用户在 OTP 登录面板点击了 "Send OTP"
         if ($action_type == 'send_otp') {
             $otp_email = trim($_POST['otp_email']);
             if (empty($otp_email)) {
                 $error = "Please enter your email address first.";
             } else {
-                // 检查邮箱是否存在
                 $stmt = $pdo->prepare("SELECT * FROM users WHERE email = ?");
                 $stmt->execute([$otp_email]);
                 $user = $stmt->fetch();
@@ -39,16 +79,17 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                     $otp = rand(100000, 999999);
                     $_SESSION['login_otp'] = $otp;
                     $_SESSION['login_otp_email'] = $otp_email;
-                    $_SESSION['login_otp_time'] = time(); // 记录生成时间
+                    $_SESSION['login_otp_time'] = time();
 
-                    sendOtpEmail($otp_email, $otp);
-                    $success_msg = "OTP code has been sent to your email!";
+                    // 调用真实的发送函数
+                    if (sendOtpEmail($otp_email, $otp)) {
+                        $success_msg = "OTP code has been successfully sent to your email!";
+                    }
                 } else {
                     $error = "Email address not registered.";
                 }
             }
         }
-        // 场景 B：传统的用户名/邮箱 + 密码登录 (你原本的代码逻辑)
         elseif ($action_type == 'password_login') {
             $login_input = trim($_POST['login_input']); 
             $password = $_POST['password'];
@@ -66,13 +107,11 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 $error = "Invalid identity or password. Please try again.";
             }
         }
-        // 场景 C：使用邮箱 + OTP 验证码登录
         elseif ($action_type == 'otp_login') {
             $otp_email = trim($_POST['otp_email']);
             $otp_code = trim($_POST['otp_code']);
 
             if (isset($_SESSION['login_otp']) && $_SESSION['login_otp'] == $otp_code && $_SESSION['login_otp_email'] == $otp_email) {
-                // 检查是否在 5 分钟内有效
                 if ((time() - $_SESSION['login_otp_time']) < 300) {
                     $stmt = $pdo->prepare("SELECT * FROM users WHERE email = ?");
                     $stmt->execute([$otp_email]);
@@ -81,7 +120,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                     $_SESSION['user_id'] = $user['id'];
                     $_SESSION['username'] = $user['username'];
 
-                    // 清除登录 OTP 缓存
                     unset($_SESSION['login_otp'], $_SESSION['login_otp_email'], $_SESSION['login_otp_time']);
 
                     header("Location: ../index.php"); 
@@ -98,7 +136,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     }
 }
 ?>
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -111,223 +148,52 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             --yonex-blue: #003366;
             --accent-gray: #718096;
         }
-
         * { box-sizing: border-box; }
-        
         body {
-            margin: 0;
-            padding: 0;
+            margin: 0; padding: 0;
             font-family: 'Inter', -apple-system, sans-serif;
             background: radial-gradient(circle at center, #ffffff 0%, #e9eff5 100%);
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-            overflow: hidden;
-            position: relative;
+            display: flex; justify-content: center; align-items: center;
+            height: 100vh; overflow: hidden; position: relative;
         }
-
-        /* 背景运动感装饰 */
         body::before {
-            content: "";
-            position: absolute;
+            content: ""; position: absolute;
             top: -50%; left: -50%; width: 200%; height: 200%;
             background: repeating-linear-gradient(45deg, transparent, transparent 100px, rgba(0, 51, 102, 0.015) 100px, rgba(0, 51, 102, 0.015) 200px);
             z-index: 0;
         }
-
         .login-card {
-            background: #ffffff;
-            padding: 50px 40px;
-            border-radius: 20px;
+            background: #ffffff; padding: 50px 40px; border-radius: 20px;
             box-shadow: 0 20px 50px rgba(0, 51, 102, 0.08);
-            width: 100%;
-            max-width: 450px; /* 稍微增加了卡片最大宽度 (从400px到450px)，给长邮箱留出更多横向空间 */
-            text-align: center;
-            position: relative;
-            z-index: 1;
+            width: 100%; max-width: 450px; text-align: center; position: relative; z-index: 1;
             border: 1px solid rgba(0, 51, 102, 0.05);
         }
-
-        .main-title {
-            font-size: 38px;
-            font-weight: 900;
-            color: var(--yonex-blue);
-            margin: 0;
-            letter-spacing: 4px;
-            text-transform: uppercase;
-        }
-
-        .sub-title {
-            font-size: 13px;
-            font-weight: 500;
-            color: var(--accent-gray);
-            margin: 8px 0 25px 0;
-            letter-spacing: 1px;
-        }
-
-        /* 新增：登录模式切换 Tab 样式 */
-        .login-tabs {
-            display: flex;
-            justify-content: center;
-            margin-bottom: 25px;
-            border-bottom: 2px solid #edf2f7;
-        }
-        .tab-btn {
-            background: none;
-            border: none;
-            padding: 10px 15px;
-            font-size: 14px;
-            font-weight: 600;
-            color: var(--accent-gray);
-            cursor: pointer;
-            transition: all 0.2s;
-        }
-        .tab-btn.active {
-            color: var(--yonex-blue);
-            border-bottom: 2px solid var(--yonex-blue);
-            margin-bottom: -2px;
-        }
-
-        .input-group {
-            margin-bottom: 18px;
-            text-align: left;
-            position: relative; 
-        }
-
-        .input-group input {
-            width: 100%;
-            padding: 15px;
-            padding-right: 45px; 
-            border: 1.5px solid #edf2f7;
-            border-radius: 12px;
-            font-size: 15px;
-            background-color: #f7fafc;
-            outline: none;
-            transition: all 0.2s ease;
-        }
-
-        .input-group input:focus {
-            border-color: var(--yonex-blue);
-            background-color: #fff;
-            box-shadow: 0 0 0 4px rgba(0, 51, 102, 0.05);
-        }
-
-        /* 修复核心：同一行内的 OTP 输入组布局调整 */
-        .otp-group {
-            display: flex;
-            gap: 10px;
-            align-items: center;
-        }
-        
-        /* 让邮箱输入框占据绝大部分空间，并稍微缩小字号、减少左右内边距，确保长邮箱能完整放下不被截断 */
-        .otp-group input {
-            flex: 1; 
-            min-width: 0; /* 允许输入框根据 flex 压缩，防止撑破容器 */
-            padding: 15px 10px; /* 减少内边距提供更多文本显示空间 */
-            font-size: 13.5px; /* 稍微调小字号，完美容纳长学校邮箱后缀 */
-        }
-        
-        .btn-send-otp {
-            background: #edf2f7;
-            border: 1.5px solid #edf2f7;
-            color: var(--yonex-blue);
-            border-radius: 12px;
-            padding: 0 15px;
-            height: 50px; /* 让按钮高度和输入框完全对齐保持美观 */
-            font-size: 13px;
-            font-weight: 600;
-            cursor: pointer;
-            white-space: nowrap;
-            transition: all 0.2s;
-        }
-        .btn-send-otp:hover {
-            background: #e2e8f0;
-        }
-
-        /* 眼睛图标样式 */
-        .toggle-password {
-            position: absolute;
-            right: 15px;
-            top: 50%;
-            transform: translateY(-50%);
-            cursor: pointer;
-            color: var(--accent-gray);
-            transition: color 0.2s;
-        }
+        .main-title { font-size: 38px; font-weight: 900; color: var(--yonex-blue); margin: 0; letter-spacing: 4px; text-transform: uppercase; }
+        .sub-title { font-size: 13px; font-weight: 500; color: var(--accent-gray); margin: 8px 0 25px 0; letter-spacing: 1px; }
+        .login-tabs { display: flex; justify-content: center; margin-bottom: 25px; border-bottom: 2px solid #edf2f7; }
+        .tab-btn { background: none; border: none; padding: 10px 15px; font-size: 14px; font-weight: 600; color: var(--accent-gray); cursor: pointer; transition: all 0.2s; }
+        .tab-btn.active { color: var(--yonex-blue); border-bottom: 2px solid var(--yonex-blue); margin-bottom: -2px; }
+        .input-group { margin-bottom: 18px; text-align: left; position: relative; }
+        .input-group input { width: 100%; padding: 15px; padding-right: 45px; border: 1.5px solid #edf2f7; border-radius: 12px; font-size: 15px; background-color: #f7fafc; outline: none; transition: all 0.2s ease; }
+        .input-group input:focus { border-color: var(--yonex-blue); background-color: #fff; box-shadow: 0 0 0 4px rgba(0, 51, 102, 0.05); }
+        .otp-group { display: flex; gap: 10px; align-items: center; }
+        .otp-group input { flex: 1; min-width: 0; padding: 15px 10px; font-size: 13.5px; }
+        .btn-send-otp { background: #edf2f7; border: 1.5px solid #edf2f7; color: var(--yonex-blue); border-radius: 12px; padding: 0 15px; height: 50px; font-size: 13px; font-weight: 600; cursor: pointer; white-space: nowrap; transition: all 0.2s; }
+        .btn-send-otp:hover { background: #e2e8f0; }
+        .toggle-password { position: absolute; right: 15px; top: 50%; transform: translateY(-50%); cursor: pointer; color: var(--accent-gray); transition: color 0.2s; }
         .toggle-password:hover { color: var(--yonex-blue); }
+        .btn { width: 100%; padding: 16px; background: linear-gradient(135deg, #003366 0%, #002244 100%); color: white; border: none; border-radius: 12px; font-size: 16px; font-weight: 700; cursor: pointer; margin-top: 10px; transition: all 0.3s ease; }
+        .btn:hover { transform: translateY(-2px); box-shadow: 0 5px 15px rgba(0, 51, 102, 0.2); }
+        
+        .error-msg { color: #e53e3e; font-size: 13px; margin-bottom: 20px; padding: 8px; background: #fff5f5; border-radius: 8px; text-align: left; word-break: break-all; }
+        .success-msg { color: #38a169; font-size: 13px; margin-bottom: 15px; padding: 8px; background: #f0fff4; border-radius: 8px; }
 
-        .btn {
-            width: 100%;
-            padding: 16px;
-            background: linear-gradient(135deg, #003366 0%, #002244 100%);
-            color: white;
-            border: none;
-            border-radius: 12px;
-            font-size: 16px;
-            font-weight: 700;
-            cursor: pointer;
-            margin-top: 10px;
-            transition: all 0.3s ease;
-        }
-
-        .btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(0, 51, 102, 0.2);
-        }
-
-        .error-msg {
-            color: #e53e3e;
-            font-size: 13px;
-            margin-bottom: 20px;
-            padding: 8px;
-            background: #fff5f5;
-            border-radius: 8px;
-        }
-
-        /* 新增：成功信息提示 */
-        .success-msg {
-            color: #38a169;
-            font-size: 13px;
-            margin-bottom: 20px;
-            padding: 8px;
-            background: #f0fff4;
-            border-radius: 8px;
-        }
-
-        /* 新增：忘记密码排版链接 */
-        .forgot-link-container {
-            text-align: right;
-            margin-top: -10px;
-            margin-bottom: 15px;
-        }
-        .forgot-link-container a {
-            font-size: 13px;
-            color: var(--accent-gray);
-            text-decoration: none;
-        }
-        .forgot-link-container a:hover {
-            color: var(--yonex-blue);
-            text-decoration: underline;
-        }
-
-        .register-footer {
-            margin-top: 30px;
-            padding-top: 20px;
-            border-top: 1px solid #f1f5f9;
-            font-size: 14px;
-            color: var(--accent-gray);
-        }
-
-        .register-footer a {
-            color: var(--yonex-blue);
-            text-decoration: none;
-            font-weight: 700;
-        }
-
-        .register-footer a:hover {
-            text-decoration: underline;
-        }
+        .forgot-link-container { text-align: right; margin-top: -10px; margin-bottom: 15px; }
+        .forgot-link-container a { font-size: 13px; color: var(--accent-gray); text-decoration: none; }
+        .forgot-link-container a:hover { color: var(--yonex-blue); text-decoration: underline; }
+        .register-footer { margin-top: 30px; padding-top: 20px; border-top: 1px solid #f1f5f9; font-size: 14px; color: var(--accent-gray); }
+        .register-footer a { color: var(--yonex-blue); text-decoration: none; font-weight: 700; }
+        .register-footer a:hover { text-decoration: underline; }
     </style>
 </head>
 <body>
@@ -359,7 +225,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             <i class="fa-solid fa-eye-slash toggle-password" onclick="togglePass('password', this)"></i>
         </div>
         <div class="forgot-link-container">
-            <a href="forget_password.php">Forgot Password?</a>
+            <a href="forgot_password.php">Forgot Password?</a>
         </div>
         <button type="submit" class="btn">LOGIN</button>
     </form>
@@ -385,7 +251,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 </div>
 
 <script>
-    // 原有的眼睛切换代码
     function togglePass(inputId, icon) {
         const inputField = document.getElementById(inputId);
         if (inputField.type === "password") {
@@ -399,7 +264,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         }
     }
 
-    // 新增：切换登录视图模式
     function switchLoginMode(mode) {
         const pwdForm = document.getElementById('form-password');
         const otpForm = document.getElementById('form-otp');
@@ -411,17 +275,16 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             otpForm.style.display = 'none';
             tabPwd.classList.add('active');
             tabOtp.classList.remove('active');
+            document.getElementById('otp_email').removeAttribute('required');
         } else {
             pwdForm.style.display = 'none';
             otpForm.style.display = 'block';
             tabPwd.classList.remove('active');
             tabOtp.classList.add('active');
-            // 给OTP邮箱加必填，防止误触
             document.getElementById('otp_email').setAttribute('required', 'true');
         }
     }
 
-    // 新增：点击 "Send OTP" 时提交部分表单的逻辑
     function triggerSendOtp() {
         const emailInput = document.getElementById('otp_email');
         if(!emailInput.value) {
@@ -432,7 +295,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         document.getElementById('form-otp').submit();
     }
 
-    // 页面刷新检测：如果上一次提交是OTP相关的，保持在OTP登录视图
     <?php if (isset($_POST['action_type']) && ($_POST['action_type'] == 'send_otp' || $_POST['action_type'] == 'otp_login')): ?>
         switchLoginMode('otp');
     <?php endif; ?>
