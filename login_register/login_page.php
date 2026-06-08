@@ -246,7 +246,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     </form>
     
     <div class="register-footer">
-        Don't have an account? <a href="register.php">Register Now</a>
+        Don't have an account? <a href="register_page.php">Register Now</a>
     </div>
 </div>
 
