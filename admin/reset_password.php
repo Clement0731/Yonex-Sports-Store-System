@@ -14,7 +14,7 @@ if (isset($_POST['reset_password'])) {
     $password_regex = "/^(?=.*[A-Z])(?=.*\d).{8,}$/";
 
     // 💡 2. 先去数据库检查 OTP 是否正确且没过期
-    $check_otp = $conn->query("SELECT * FROM USERS WHERE EMAIL = '$email' AND reset_otp = '$entered_otp' AND otp_expiry >= NOW()");
+    $check_otp = $conn->query("SELECT * FROM admin WHERE EMAIL = '$email' AND reset_otp = '$entered_otp' AND otp_expiry >= NOW()");
 
     if ($check_otp->num_rows == 0) {
         // 第一层拦截：验证码错了或者过期了

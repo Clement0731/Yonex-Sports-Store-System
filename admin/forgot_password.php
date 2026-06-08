@@ -15,7 +15,7 @@ if (isset($_POST['send_otp'])) {
     $email = $_POST['email'];
 
     // 检查邮箱是否存在于管理员名单中
-    $check_email = $conn->query("SELECT * FROM USERS WHERE EMAIL = '$email' AND ROLE = 'Admin'");
+    $check_email = $conn->query("SELECT * FROM admin WHERE EMAIL = '$email' AND ROLE = 'Admin'");
     
     if ($check_email->num_rows > 0) {
         // 生成 6 位数随机验证码 (OTP)

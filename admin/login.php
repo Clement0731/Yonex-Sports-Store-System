@@ -5,7 +5,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $email = $_POST['email'];
     $password = $_POST['password'];
 
-    $sql = "SELECT * FROM USERS WHERE EMAIL = '$email' AND PASSWORD = '$password' AND ROLE = 'Admin'";
+    $sql = "SELECT * FROM admin WHERE EMAIL = '$email' AND PASSWORD = '$password' AND ROLE = 'Admin'";
     $result = $conn->query($sql);
 
     if ($result->num_rows > 0) {

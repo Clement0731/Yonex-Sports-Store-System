@@ -46,7 +46,7 @@ if(isset($_GET['complete'])) {
                 </thead>
                 <tbody>
                     <?php
-                    $orders = $conn->query("SELECT ORDERS.ORDER_ID, USERS.USERNAME, ORDERS.ORDER_DATE, ORDERS.TOTAL_PRICE, ORDERS.STATUS FROM ORDERS JOIN USERS ON ORDERS.USER_ID = USERS.USER_ID ORDER BY ORDERS.ORDER_ID DESC");
+                    $orders = $conn->query("SELECT ORDERS.ORDER_ID, USERS.username AS USERNAME, ORDERS.ORDER_DATE, ORDERS.TOTAL_PRICE, ORDERS.STATUS FROM ORDERS JOIN USERS ON ORDERS.USER_ID = USERS.id ORDER BY ORDERS.ORDER_ID DESC");
                     if ($orders->num_rows > 0) {
                         while($row = $orders->fetch_assoc()) {
                             $badge_class = ($row['STATUS'] == 'Completed' || $row['STATUS'] == 'Paid') ? 'bg-success' : 'bg-warning';

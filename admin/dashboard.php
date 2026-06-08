@@ -14,7 +14,7 @@ $orders_q = $conn->query("SELECT COUNT(ORDER_ID) as count FROM ORDERS");
 $orders_data = $orders_q->fetch_assoc();
 $total_orders = $orders_data['count'];
 
-$cust_q = $conn->query("SELECT COUNT(USER_ID) as count FROM USERS WHERE ROLE = 'Customer'");
+$cust_q = $conn->query("SELECT COUNT(USER_ID) as count FROM admin WHERE ROLE = 'Customer'");
 $cust_data = $cust_q->fetch_assoc();
 $total_cust = $cust_data['count'];
 

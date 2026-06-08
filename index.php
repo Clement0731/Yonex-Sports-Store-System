@@ -13,6 +13,8 @@ $categories = [
     'badminton' => 'Badminton',
     'service'   => 'Service',
     'about'     => 'About',
+    'contact'   => 'contact',
+    'Find Rackets Smart' => 'Find Rackets Smart',
 ];
 
 // Badminton 子类别及其对应的 PHP 文件

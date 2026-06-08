@@ -17,7 +17,7 @@ $admin_id = $_SESSION['admin_id'];
 $msg = "";
 
 // 每次刷新都获取最新资料
-$sql = "SELECT * FROM USERS WHERE USER_ID = '$admin_id'";
+$sql = "SELECT * FROM admin WHERE USER_ID = '$admin_id'";
 $result = $conn->query($sql);
 $admin = $result->fetch_assoc();
 
@@ -31,7 +31,7 @@ if (isset($_POST['request_email_change'])) {
     if (!filter_var($new_email, FILTER_VALIDATE_EMAIL)) {
         $msg = "<div class='alert alert-danger'>Invalid email format! (邮箱格式不正确)</div>";
     } else {
-        $check_sql = "SELECT * FROM USERS WHERE EMAIL = '$new_email' AND USER_ID != '$admin_id'";
+        $check_sql = "SELECT * FROM admin WHERE EMAIL = '$new_email' AND USER_ID != '$admin_id'";
         if ($conn->query($check_sql)->num_rows > 0) {
             $msg = "<div class='alert alert-danger'>This email is already in use! (该邮箱已被占用)</div>";
         } else {

@@ -8,7 +8,7 @@ include 'db.php';
 
 if(isset($_GET['delete'])) {
     $del_id = $_GET['delete'];
-    $conn->query("DELETE FROM USERS WHERE USER_ID = $del_id AND ROLE = 'Customer'");
+    $conn->query("DELETE FROM admin WHERE USER_ID = $del_id AND ROLE = 'Customer'");
     header("Location: manage_customer.php");
     exit();
 }
@@ -40,7 +40,7 @@ if(isset($_GET['delete'])) {
                 </thead>
                 <tbody>
                     <?php
-                    $customers = $conn->query("SELECT * FROM USERS WHERE ROLE = 'Customer' ORDER BY USER_ID DESC");
+                    $customers = $conn->query("SELECT * FROM admin WHERE ROLE = 'Customer' ORDER BY USER_ID DESC");
                     if ($customers->num_rows > 0) {
                         while($row = $customers->fetch_assoc()) {
                             echo "<tr>
