@@ -199,7 +199,7 @@ if ($conn->query($sql)) {
         </div>
     </div>
 
-    <a href="index.php" class="btn-continue">Continue Shopping</a>
+    <a href="../index.php" class="btn-continue">Continue Shopping</a>
     
     <a href="order_history.php" class="btn-history">View Order History</a>
     
