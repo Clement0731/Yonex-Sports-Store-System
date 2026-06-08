@@ -1,10 +1,13 @@
 <?php
+// ★ 新增：开启 Session 以便检查用户是否登录
+session_start();
+
 include 'db_connect.php';
 
 // 当前活跃类别，默认为 'home'
 $activeCategory = isset($_GET['category']) ? htmlspecialchars($_GET['category']) : 'home';
 
-// ★ 新增：检测网址里有没有产品 ID (比如 ?id=1)
+// ★ 检测网址里有没有产品 ID (比如 ?id=1)
 $productId = isset($_GET['id']) ? intval($_GET['id']) : 0;
 
 // 主导航类别
@@ -28,6 +31,10 @@ $badmintonSubcategories = [
     'accessories'  => ['label' => 'Accessories', 'file' => 'data/accessories.php'],
     'package'      => ['label' => 'Package', 'file' => 'data/package.php'],
 ];
+
+// 🛠️ 核心修改：移除原有的条件判断，让小人图标始终固定指向 user_profile.php
+// 这样无论登入还是登出，都能顺畅进入该页面进行状态回显，彻底根除 404 隐患
+$account_url = "login_register/user_profile.php";
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -133,7 +140,7 @@ $badmintonSubcategories = [
         .dropdown-content a::after { display: none; }
 
         .header-actions { min-width: 200px; display: flex; justify-content: flex-end; align-items: center; gap: 16px; }
-        .icon-btn { background: none; border: none; cursor: pointer; color: var(--text-muted); padding: 6px; border-radius: 6px; transition: color 0.2s, background 0.2s; display: flex; align-items: center; }
+        .icon-btn { background: none; border: none; cursor: pointer; color: var(--text-muted); padding: 6px; border-radius: 6px; transition: color 0.2s, background 0.2s; display: flex; align-items: center; text-decoration: none; }
         .icon-btn:hover { color: var(--charcoal); background: var(--lightgray); }
 
         /* --- 首页特定样式：大型产品宣传面 --- */
@@ -222,13 +229,19 @@ $badmintonSubcategories = [
     <div class="header-actions">
         <button class="icon-btn" title="Search"><svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.35-4.35"/></svg></button>
         <button class="icon-btn" title="Cart"><svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 01-8 0"/></svg></button>
-        <button class="icon-btn" title="Account"><svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></button>
+        
+        <a href="<?= $account_url ?>" class="icon-btn" title="Account">
+            <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                <path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/>
+                <circle cx="12" cy="7" r="4"/>
+            </svg>
+        </a>
     </div>
 </header>
 
 <main>
     <?php 
-        // ★ 1. 如果网址里有 ?id=X，就直接在 main 里面加载万能详情页！
+        // 1. 如果网址里有 ?id=X，就直接在 main 里面加载万能详情页！
         if ($productId > 0) {
             if (file_exists('product_detail.php')) {
                 include 'product_detail.php';
@@ -241,7 +254,7 @@ $badmintonSubcategories = [
         // 2. Badminton 子类别页面 (Rackets, Shoes 等)
         elseif (isset($badmintonSubcategories[$activeCategory])) {
             $fileToLoad = $badmintonSubcategories[$activeCategory]['file'];
-            // 兼容文件可能不在 data 文件夹里的情况
+            // 兼容 file_exists 可能不在 data 文件夹里的情况
             $fallbackFile = str_replace('data/', '', $fileToLoad);
             
             if (file_exists($fileToLoad)) {
