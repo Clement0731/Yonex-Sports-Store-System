@@ -149,7 +149,33 @@ if (isset($_GET['search']) && !empty(trim($_GET['search']))) {
                                 if($spec4) $specs_html .= "<b>Spec 4:</b> $spec4<br>";
                                 if($spec5) $specs_html .= "<b>Spec 5:</b> $spec5<br>";
                             }
-                            
+                            // ================= 新增：获取库存明细逻辑 =================
+                            $pid = $row['id'];
+                            $var_query = $conn->query("SELECT spec_value, stock_quantity FROM product_variants WHERE product_id = $pid");
+                            $variant_html = "";
+
+                            if ($var_query && $var_query->num_rows > 0) {
+                                $variant_html = "<div style='margin-top:8px; font-size:11px; background:#f1f5f9; padding:6px; border-radius:4px; border: 1px solid #e2e8f0;'>";
+                                $has_variants = false;
+    
+                            while($v = $var_query->fetch_assoc()) {
+                                $val = $v['spec_value'];
+                                $qty = $v['stock_quantity'];
+        
+                            // 排除掉没有变体的 'Standard'，只显示有具体尺码的（如 XL, 40）
+                            if ($val != 'Standard') {
+                                $variant_html .= "<span style='display:inline-block; margin-right:8px; color:#334155; margin-bottom:4px;'><b>{$val}:</b> {$qty}件</span>";
+                                $has_variants = true;
+                                }
+                            }
+                            $variant_html .= "</div>";
+    
+                            // 如果只有 Standard，就清空这个气泡框
+                            if (!$has_variants) {
+                                $variant_html = "";
+                                }
+                            }
+                            // =========================================================
                             if($color) $specs_html .= "<b style='color:#0f172a;'>Color:</b> <span style='font-size:11px;'>$color</span>";
 
                             echo "<tr>
@@ -169,7 +195,10 @@ if (isset($_GET['search']) && !empty(trim($_GET['search']))) {
                                         " . $specs_html . "
                                     </td>
                                     
-                                    <td><span style='font-weight:bold; font-size:1.1em; color:".($row['total_stock']>0 ? '#16a34a' : '#dc2626').";'>".$row['total_stock']."</span></td>
+                                    <td>
+                                    <span style='font-weight:bold; font-size:1.1em; color:".($row['total_stock']>0 ? '#16a34a' : '#dc2626').";'>".$row['total_stock']."</span>
+                                    " . $variant_html . "
+                                    </td>
                                     <td style='font-weight:bold; font-size:1.1em; color:#b71c1c;'>RM ".number_format($row['price'], 2)."</td>
                                     
                                     <td>

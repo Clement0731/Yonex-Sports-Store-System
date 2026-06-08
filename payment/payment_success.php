@@ -24,13 +24,21 @@ if ($bank) {
     $product_details .= " (" . $bank . ")";
 }
 
-// 3. 将数据写入 orders 表
-$sql = "INSERT INTO orders (total_amount, product_details, status) 
-        VALUES ('$amount', '$product_details', 'Pending')";
+// 3. 💥 核心修复：将数据写入 orders 表 (使用了正确的列名，并加入了买家ID和当前时间)
+$user_id = isset($_SESSION['user_id']) ? (int)$_SESSION['user_id'] : 0; 
+// 使用 mysqli_real_escape_string 防止特殊字符（如单引号）导致数据库崩溃
+$clean_amount = $conn->real_escape_string($amount);
+$clean_details = $conn->real_escape_string($product_details);
+
+$sql = "INSERT INTO orders (USER_ID, ORDER_DATE, TOTAL_PRICE, STATUS) 
+        VALUES ('$user_id', NOW(), '$amount', 'Pending')";
 
 $db_order_id = "N/A";
 if ($conn->query($sql)) {
     $db_order_id = $conn->insert_id; 
+} else {
+    // 如果这里报错，说明数据库字段类型不够或者 SQL 语句格式有错
+    die("Database Error: " . $conn->error);
 }
 // --- 数据库逻辑结束 ---
 ?>
@@ -196,10 +204,10 @@ if ($conn->query($sql)) {
         <div class="summary-item">
             <span class="label" style="color: #1e293b; font-size: 1rem;">Total Paid</span>
             <span class="value" style="color: var(--yonex-blue); font-size: 1rem;">RM <?php echo number_format($amount, 2); ?></span>
-        </div>
+        </div>  
     </div>
 
-    <a href="index.php" class="btn-continue">Continue Shopping</a>
+    <a href="../index.php" class="btn-continue">Continue Shopping</a>
     
     <a href="order_history.php" class="btn-history">View Order History</a>
     

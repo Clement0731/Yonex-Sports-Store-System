@@ -33,7 +33,11 @@ if (isset($_POST['edit_spec'])) {
 }
 
 // 获取所有规格选项
-$sql = "SELECT * FROM product_specs ORDER BY category, id ASC";
+$sql = "SELECT ps.*, IFNULL(SUM(pv.stock_quantity), 0) as spec_total_stock 
+        FROM product_specs ps 
+        LEFT JOIN product_variants pv ON ps.spec_value = pv.spec_value 
+        GROUP BY ps.id 
+        ORDER BY ps.category, ps.id ASC";
 $result = $conn->query($sql);
 ?>
 <!DOCTYPE html>
@@ -79,7 +83,7 @@ $result = $conn->query($sql);
                         <th>ID</th>
                         <th>Category (分类)</th>
                         <th>Specification Value (规格值)</th>
-                        <th>Actions</th>
+                        <th>Total Stock (总库存)</th> <th>Actions</th>
                     </tr>
                 </thead>
                 <tbody>

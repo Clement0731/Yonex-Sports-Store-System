@@ -72,138 +72,133 @@ if ($spec_res && $spec_res->num_rows > 0) {
         </div>
         
         <div class="product-info-section">
-            <span class="product-series-badge"><?php echo $row['series']; ?> SERIES</span>
-            <h1 class="product-name"><?php echo $row['name']; ?></h1>
-            <p class="product-subtitle"><?php echo $row['subtitle']; ?></p>
-            <div class="product-price"><span class="currency">RM</span> <?php echo $row['price']; ?></div>
-            
-            <?php if ($current_category == 'rackets') { ?>
-            <div class="spec-selector">
-                <p class="spec-selector-label">Weight / Grip Size</p>
-                <div class="spec-options">
-                    <?php 
-                    $first = true;
-                    foreach($spec_options as $val) {
-                        $active = $first ? 'active' : '';
-                        echo '<div class="spec-option '.$active.'" onclick="selectSpec(this, \''.$val.'\')">'.$val.'</div>';
-                        $first = false;
-                    }
-                    ?>
-                </div>
-            </div>
-            
-            <div class="custom-service-box">
-                <h4 class="service-title">Stringing Service (穿线服务)</h4>
-                <label for="string_type" class="service-label" style="margin-top: 0;">String Type (线种):</label>
-                <select name="string_type" id="string_type" class="service-input">
-                    <?php foreach($string_options as $opt) { ?>
-                        <option value="<?php echo htmlspecialchars($opt['option_name']); ?>">
-                            <?php echo htmlspecialchars($opt['option_name']); ?> 
-                            <?php echo ($opt['additional_price'] != 0) ? '(+ RM ' . number_format($opt['additional_price'], 2) . ')' : '- RM 0.00'; ?>
-                        </option>
-                    <?php } ?>
-                </select>
+            <form action="add_to_cart.php" method="POST">
+                <input type="hidden" name="product_id" value="<?php echo $row['id']; ?>">
+                <input type="hidden" name="selected_spec" id="selected_spec" value="<?php echo !empty($spec_options) ? $spec_options[0] : ''; ?>">
+                <input type="hidden" name="quantity" id="form_quantity" value="1">
 
-                <label for="tension" class="service-label">Tension (磅数):</label>
-                <select name="tension" id="tension" class="service-input">
-                    <?php foreach($tension_options as $opt) { ?>
-                        <option value="<?php echo htmlspecialchars($opt['option_name']); ?>">
-                            <?php echo htmlspecialchars($opt['option_name']); ?>
-                            <?php echo ($opt['additional_price'] != 0) ? '(+ RM ' . number_format($opt['additional_price'], 2) . ')' : ''; ?>
-                        </option>
-                    <?php } ?>
-                </select>
-            </div>
-            <?php } ?>
-
-            <?php if ($current_category == 'footwear') { ?>
-            <div class="spec-selector">
-                <p class="spec-selector-label">Shoe Size (EU)</p>
-                <div class="spec-options">
-                    <?php 
-                    $first = true;
-                    foreach($spec_options as $val) {
-                        $active = $first ? 'active' : '';
-                        echo '<div class="spec-option '.$active.'" onclick="selectSpec(this, \''.$val.'\')">'.$val.'</div>';
-                        $first = false;
-                    }
-                    ?>
-                </div>
-            </div>
-            <?php } ?>
-
-            <?php if ($current_category == 'apparel') { ?>
-            <div class="spec-selector">
-                <p class="spec-selector-label">Size (Unisex)</p>
-                <div class="spec-options">
-                    <?php 
-                    $first = true;
-                    foreach($spec_options as $val) {
-                        $active = $first ? 'active' : '';
-                        echo '<div class="spec-option '.$active.'" onclick="selectSpec(this, \''.$val.'\')">'.$val.'</div>';
-                        $first = false;
-                    }
-                    ?>
-                </div>
-            </div>
-            
-            <div class="custom-service-box">
-                <h4 class="service-title">Name Customization (专属印字)</h4>
-                <label for="custom_name" class="service-label" style="margin-top: 0;">Print Name (印字内容 - 可选):</label>
-                <input type="text" id="custom_name" name="custom_name" class="service-input" placeholder="e.g. LIN DAN (+ RM 20.00)" maxlength="15">
-                <p style="font-size: 0.75rem; color: var(--text-muted); margin-top: 5px;">* Max 15 characters. Leave blank if not required.</p>
+                <span class="product-series-badge"><?php echo $row['series']; ?> SERIES</span>
+                <h1 class="product-name"><?php echo $row['name']; ?></h1>
+                <p class="product-subtitle"><?php echo $row['subtitle']; ?></p>
+                <div class="product-price"><span class="currency">RM</span> <?php echo $row['price']; ?></div>
                 
-                <details style="margin-top: 15px;">
-                    <summary style="cursor: pointer; color: var(--red); font-weight: 700; font-size: 0.85rem; outline: none; padding: 5px 0;">
-                        ▶ View Example (点击展开效果参考)
-                    </summary>
-                    <img src="images/example name.jpg" alt="Printing Example" style="width: 100%; max-width: 320px; border-radius: 8px; border: 1px solid #e2e8f0; margin-top: 12px; display: block; box-shadow: 0 4px 12px rgba(0,0,0,0.05);" onerror="this.style.display='none'">
-                </details>
-            </div>
-            <?php } ?>
+                <?php if ($current_category == 'rackets') { ?>
+                <div class="spec-selector">
+                    <p class="spec-selector-label">Weight / Grip Size</p>
+                    <div class="spec-options">
+                        <?php 
+                        $first = true;
+                        foreach($spec_options as $val) {
+                            $active = $first ? 'active' : '';
+                            echo '<div class="spec-option '.$active.'" onclick="selectSpec(this, \''.$val.'\')">'.$val.'</div>';
+                            $first = false;
+                        }
+                        ?>
+                    </div>
+                </div>
+                
+                <div class="custom-service-box">
+                    <h4 class="service-title">Stringing Service (穿线服务)</h4>
+                    <label for="string_type" class="service-label" style="margin-top: 0;">String Type (线种):</label>
+                    <select name="string_option_id" id="string_type" class="service-input">
+                        <option value="">No Stringing (不穿线)</option>
+                        <?php foreach($string_options as $opt) { ?>
+                            <option value="<?php echo $opt['id']; ?>">
+                                <?php echo htmlspecialchars($opt['option_name']); ?> 
+                                <?php echo ($opt['additional_price'] != 0) ? '(+ RM ' . number_format($opt['additional_price'], 2) . ')' : '- RM 0.00'; ?>
+                            </option>
+                        <?php } ?>
+                    </select>
 
-            <?php if ($current_category == 'bags') { ?>
-            <div class="spec-selector">
-                <p class="spec-selector-label">Capacity</p>
-                <div class="spec-options">
-                    <div class="spec-option active" onclick="selectSpec(this, '2 Rackets')">2 Rackets</div>
-                    <div class="spec-option" onclick="selectSpec(this, '6 Rackets')">6 Rackets</div>
-                    <div class="spec-option" onclick="selectSpec(this, '9 Rackets')">9 Rackets</div>
+                    <label for="tension" class="service-label">Tension (磅数):</label>
+                    <select name="tension_option_id" id="tension" class="service-input">
+                        <option value="">Not Required (不需要)</option>
+                        <?php foreach($tension_options as $opt) { ?>
+                            <option value="<?php echo $opt['id']; ?>">
+                                <?php echo htmlspecialchars($opt['option_name']); ?>
+                                <?php echo ($opt['additional_price'] != 0) ? '(+ RM ' . number_format($opt['additional_price'], 2) . ')' : ''; ?>
+                            </option>
+                        <?php } ?>
+                    </select>
                 </div>
-            </div>
-            <?php } ?>
+                <?php } ?>
 
-            <?php if ($current_category == 'shuttlecocks') { ?>
-            <div class="spec-selector">
-                <p class="spec-selector-label">Speed</p>
-                <div class="spec-options">
-                    <div class="spec-option" onclick="selectSpec(this, '76')">76 (Slow)</div>
-                    <div class="spec-option active" onclick="selectSpec(this, '77')">77 (Medium)</div>
-                    <div class="spec-option" onclick="selectSpec(this, '78')">78 (Fast)</div>
+                <?php if ($current_category == 'footwear') { ?>
+                <div class="spec-selector">
+                    <p class="spec-selector-label">Shoe Size (EU)</p>
+                    <div class="spec-options">
+                        <?php 
+                        $first = true;
+                        foreach($spec_options as $val) {
+                            $active = $first ? 'active' : '';
+                            echo '<div class="spec-option '.$active.'" onclick="selectSpec(this, \''.$val.'\')">'.$val.'</div>';
+                            $first = false;
+                        }
+                        ?>
+                    </div>
                 </div>
-            </div>
-            <?php } ?>
-            
-            <div class="quantity-selector">
-                <p class="quantity-selector-label">Quantity</p>
-                <div class="quantity-controls">
-                    <button class="quantity-btn" onclick="changeQuantity(-1)">−</button>
-                    <input type="text" class="quantity-input" id="quantity" value="1" readonly>
-                    <button class="quantity-btn" onclick="changeQuantity(1)">+</button>
+                <?php } ?>
+
+                <?php if ($current_category == 'apparel') { ?>
+                <div class="spec-selector">
+                    <p class="spec-selector-label">Size (Unisex)</p>
+                    <div class="spec-options">
+                        <?php 
+                        $first = true;
+                        foreach($spec_options as $val) {
+                            $active = $first ? 'active' : '';
+                            echo '<div class="spec-option '.$active.'" onclick="selectSpec(this, \''.$val.'\')">'.$val.'</div>';
+                            $first = false;
+                        }
+                        ?>
+                    </div>
                 </div>
-            </div>
-            
-            <div class="shopping-guarantee">
-                <div class="guarantee-item"><span class="guarantee-icon">✓</span> Free Shipping</div>
-                <div class="guarantee-item"><span class="guarantee-icon">✓</span> Authentic Product</div>
-                <div class="guarantee-item"><span class="guarantee-icon">✓</span> 30-Day Return</div>
-            </div>
-            
-            <div class="button-group">
-                <a href="#" class="btn-add-to-cart">Add to Cart</a>
-                <a href="#" class="btn-buy-now">Buy Now</a>
-            </div>
-            
+                <?php } ?>
+
+                <?php if ($current_category == 'bags') { ?>
+                <div class="spec-selector">
+                    <p class="spec-selector-label">Capacity</p>
+                    <div class="spec-options">
+                        <div class="spec-option active" onclick="selectSpec(this, '2 Rackets')">2 Rackets</div>
+                        <div class="spec-option" onclick="selectSpec(this, '6 Rackets')">6 Rackets</div>
+                        <div class="spec-option" onclick="selectSpec(this, '9 Rackets')">9 Rackets</div>
+                        <script> document.getElementById('selected_spec').value = '2 Rackets'; </script>
+                    </div>
+                </div>
+                <?php } ?>
+
+                <?php if ($current_category == 'shuttlecocks') { ?>
+                <div class="spec-selector">
+                    <p class="spec-selector-label">Speed</p>
+                    <div class="spec-options">
+                        <div class="spec-option" onclick="selectSpec(this, '76')">76 (Slow)</div>
+                        <div class="spec-option active" onclick="selectSpec(this, '77')">77 (Medium)</div>
+                        <div class="spec-option" onclick="selectSpec(this, '78')">78 (Fast)</div>
+                        <script> document.getElementById('selected_spec').value = '77'; </script>
+                    </div>
+                </div>
+                <?php } ?>
+                
+                <div class="quantity-selector">
+                    <p class="quantity-selector-label">Quantity</p>
+                    <div class="quantity-controls">
+                        <button type="button" class="quantity-btn" onclick="changeQuantity(-1)">−</button>
+                        <input type="text" class="quantity-input" id="quantity_display" value="1" readonly>
+                        <button type="button" class="quantity-btn" onclick="changeQuantity(1)">+</button>
+                    </div>
+                </div>
+                
+                <div class="shopping-guarantee">
+                    <div class="guarantee-item"><span class="guarantee-icon">✓</span> Free Shipping</div>
+                    <div class="guarantee-item"><span class="guarantee-icon">✓</span> Authentic Product</div>
+                    <div class="guarantee-item"><span class="guarantee-icon">✓</span> 30-Day Return</div>
+                </div>
+                
+                <div class="button-group">
+                    <button type="submit" class="btn-add-to-cart" style="border:none; cursor:pointer; font-family:inherit; font-size:16px;">Add to Cart</button>
+                    <button type="button" class="btn-buy-now" style="border:none; cursor:pointer; font-family:inherit; font-size:16px;" onclick="alert('Proceeding to checkout...');">Buy Now</button>
+                </div>
+            </form>
         </div>
     </div>
     
@@ -240,16 +235,24 @@ if ($spec_res && $spec_res->num_rows > 0) {
         const siblings = element.parentElement.querySelectorAll('.spec-option');
         siblings.forEach(option => option.classList.remove('active'));
         element.classList.add('active');
-        console.log('Selected spec:', spec);
+        
+        // 更新隐藏的 input 值，提交表单时会发给数据库
+        document.getElementById('selected_spec').value = spec;
+        console.log('Selected spec updated to:', spec);
     }
     
     function changeQuantity(delta) {
-        const quantityInput = document.getElementById('quantity');
-        let currentValue = parseInt(quantityInput.value);
+        const displayInput = document.getElementById('quantity_display');
+        const formInput = document.getElementById('form_quantity');
+        
+        let currentValue = parseInt(displayInput.value);
         let newValue = currentValue + delta;
         if (newValue < 1) newValue = 1;
         if (newValue > 10) newValue = 10;
-        quantityInput.value = newValue;
+        
+        displayInput.value = newValue;
+        // 同步更新隐藏表单里的数量
+        formInput.value = newValue;
     }
 </script>
 
