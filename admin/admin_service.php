@@ -132,18 +132,18 @@ $result = $conn->query($sql);
             <h2>Add New Service Option</h2>
             <form method="POST" action="admin_service.php">
                 <div class="form-group">
-                    <label>Category (类型)</label>
+                    <label>Category</label>
                     <select name="service_type" required>
-                        <option value="string">String (穿线线种)</option>
-                        <option value="tension">Tension (磅数)</option>
+                        <option value="string">String</option>
+                        <option value="tension">Tension</option>
                     </select>
                 </div>
                 <div class="form-group">
-                    <label>Option Name (名称)</label>
+                    <label>Option Name</label>
                     <input type="text" name="option_name" placeholder="e.g. BG80 Power" required>
                 </div>
                 <div class="form-group">
-                    <label>Extra Price (价格 RM)</label>
+                    <label>Extra Price</label>
                     <input type="number" step="0.01" name="additional_price" placeholder="e.g. 35.00" required>
                 </div>
                 <button type="submit" name="add_service" class="btn btn-add" style="width: 100%; margin-top: 10px;">Save Option</button>
@@ -159,18 +159,18 @@ $result = $conn->query($sql);
                 <input type="hidden" name="edit_id" id="edit_id">
                 
                 <div class="form-group">
-                    <label>Category (类型)</label>
+                    <label>Category</label>
                     <select name="service_type" id="edit_type" required>
-                        <option value="string">String (穿线线种)</option>
-                        <option value="tension">Tension (磅数)</option>
+                        <option value="string">String</option>
+                        <option value="tension">Tension</option>
                     </select>
                 </div>
                 <div class="form-group">
-                    <label>Option Name (名称)</label>
+                    <label>Option Name</label>
                     <input type="text" name="option_name" id="edit_name" required>
                 </div>
                 <div class="form-group">
-                    <label>Extra Price (价格 RM)</label>
+                    <label>Extra Price</label>
                     <input type="number" step="0.01" name="additional_price" id="edit_price" required>
                 </div>
                 <button type="submit" name="edit_service" class="btn btn-edit" style="width: 100%; margin-top: 10px; background: #0033a0;">Update Option</button>

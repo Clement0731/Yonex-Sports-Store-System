@@ -12,8 +12,9 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     // 2. 这里是模拟支付逻辑 (在实际项目中，你会在这里写 SQL 存入 orders table)
     // 示例：$sql = "INSERT INTO orders (user_id, total_amount, status) VALUES (...)";
     
-    // 3. 假设支付成功，跳转到成功页面，并把金额传过去显示
-    header("Location: payment_success.php?amount=" . $total);
+    // 3. 假设支付成功，跳转到成功页面，并把金额和支付方式传过去显示
+    // 添加了 method 参数，使得收据页面能正确显示支付方式
+    header("Location: payment_success.php?amount=" . $total . "&method=TNG%20eWallet");
     exit();
 } else {
     // 如果不是 POST 提交，直接退回首页

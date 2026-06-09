@@ -1,0 +1,176 @@
+/* ==========================================================================
+ * Yonex Official Store - Global Consistent CSS
+ * Color Palette & Global Variables
+ * ========================================================================== */
+:root {
+    --yonex-dark-blue: #002d56;
+    --yonex-blue: #005bac;
+    --yonex-gold: #ffcc00;
+    --bg-light: #f4f7f9;
+    --text-main: #333333;
+    --text-muted: #6c757d;
+    --border-color: #e9ecef;
+    --card-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+    --hover-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
+    --transition-speed: 0.3s;
+}
+
+/* ==========================================================================
+   Base & Typography
+   ========================================================================== */
+body {
+    background-color: var(--bg-light);
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    color: var(--text-main);
+    line-height: 1.6;
+    margin: 0;
+    padding: 0;
+}
+
+h1, h2, h3, h4, h5, h6 {
+    font-weight: 700;
+    color: var(--yonex-dark-blue);
+}
+
+a {
+    color: var(--yonex-blue);
+    text-decoration: none;
+    transition: color var(--transition-speed);
+}
+
+a:hover {
+    color: var(--yonex-dark-blue);
+}
+
+/* ==========================================================================
+   Cards & Containers
+   ========================================================================== */
+.container-custom {
+    max-width: 1000px;
+    margin: 40px auto;
+    padding: 0 15px;
+}
+
+.card-custom {
+    border: none;
+    border-radius: 12px;
+    box-shadow: var(--card-shadow);
+    background: #ffffff;
+    padding: 25px;
+    margin-bottom: 20px;
+    transition: box-shadow var(--transition-speed);
+}
+
+.card-custom:hover {
+    box-shadow: var(--hover-shadow);
+}
+
+/* ==========================================================================
+   Buttons
+   ========================================================================== */
+.btn-primary-custom, .btn-checkout, .btn-pay {
+    background-color: var(--yonex-dark-blue);
+    color: #ffffff;
+    border: none;
+    padding: 12px 20px;
+    border-radius: 8px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: background-color var(--transition-speed), transform 0.1s;
+    text-align: center;
+    display: inline-block;
+}
+
+.btn-primary-custom:hover, .btn-checkout:hover, .btn-pay:hover {
+    background-color: #001f3d;
+    color: #ffffff;
+    transform: translateY(-2px);
+}
+
+.btn-primary-custom:active, .btn-checkout:active, .btn-pay:active {
+    transform: translateY(0);
+}
+
+.btn-outline-custom {
+    background-color: transparent;
+    color: var(--yonex-dark-blue);
+    border: 2px solid var(--yonex-dark-blue);
+    padding: 10px 18px;
+    border-radius: 8px;
+    font-weight: bold;
+    transition: all var(--transition-speed);
+}
+
+.btn-outline-custom:hover {
+    background-color: var(--yonex-dark-blue);
+    color: #ffffff;
+}
+
+/* ==========================================================================
+   Forms & Inputs
+   ========================================================================== */
+.form-control, .form-select {
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    padding: 10px 15px;
+    transition: border-color var(--transition-speed), box-shadow var(--transition-speed);
+}
+
+.form-control:focus, .form-select:focus {
+    border-color: var(--yonex-blue);
+    box-shadow: 0 0 0 3px rgba(0, 91, 172, 0.1);
+    outline: none;
+}
+
+/* ==========================================================================
+   Interactive Boxes (Address, Bank Selection)
+   ========================================================================== */
+.selectable-box, .address-box, .bank-card {
+    border: 2px solid var(--border-color);
+    padding: 15px;
+    border-radius: 8px;
+    margin-bottom: 15px;
+    position: relative;
+    cursor: pointer;
+    background: #ffffff;
+    transition: all var(--transition-speed);
+}
+
+.selectable-box:hover, .address-box:hover, .bank-card:hover {
+    border-color: var(--yonex-blue);
+    transform: translateY(-2px);
+}
+
+.selectable-box.active, .address-box.active, .bank-card.selected {
+    border-color: var(--yonex-dark-blue);
+    background-color: #f0f5fa;
+}
+
+/* Badge tags for address labels */
+.badge-custom {
+    background-color: var(--yonex-gold);
+    color: var(--yonex-dark-blue);
+    font-weight: bold;
+    padding: 5px 10px;
+    border-radius: 6px;
+    font-size: 0.8rem;
+}
+
+/* ==========================================================================
+   Modals
+   ========================================================================== */
+.modal-content {
+    border: none;
+    border-radius: 12px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+}
+
+.modal-header {
+    border-bottom: 1px solid var(--border-color);
+    background-color: #f8f9fa;
+    border-radius: 12px 12px 0 0;
+}
+
+.modal-footer {
+    border-top: 1px solid var(--border-color);
+}

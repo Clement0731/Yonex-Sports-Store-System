@@ -31,7 +31,7 @@ if ($service_res && $service_res->num_rows > 0) {
 
 // 💡 3. 新增：动态获取 Product Specs (尺码、重量)
 $spec_options = [];
-$spec_sql = "SELECT spec_value FROM product_specs WHERE category = '$current_category' ORDER BY id ASC";
+$spec_sql = "SELECT DISTINCT spec_value FROM product_variants WHERE product_id = $id AND stock_quantity > 0 ORDER BY id ASC";
 $spec_res = $conn->query($spec_sql);
 if ($spec_res && $spec_res->num_rows > 0) {
     while($s = $spec_res->fetch_assoc()) {
@@ -98,10 +98,10 @@ if ($spec_res && $spec_res->num_rows > 0) {
                 </div>
                 
                 <div class="custom-service-box">
-                    <h4 class="service-title">Stringing Service (穿线服务)</h4>
-                    <label for="string_type" class="service-label" style="margin-top: 0;">String Type (线种):</label>
+                    <h4 class="service-title">Stringing Service</h4>
+                    <label for="string_type" class="service-label" style="margin-top: 0;">String Type:</label>
                     <select name="string_option_id" id="string_type" class="service-input">
-                        <option value="">No Stringing (不穿线)</option>
+                        <option value="">No Stringing</option>
                         <?php foreach($string_options as $opt) { ?>
                             <option value="<?php echo $opt['id']; ?>">
                                 <?php echo htmlspecialchars($opt['option_name']); ?> 
@@ -110,9 +110,9 @@ if ($spec_res && $spec_res->num_rows > 0) {
                         <?php } ?>
                     </select>
 
-                    <label for="tension" class="service-label">Tension (磅数):</label>
+                    <label for="tension" class="service-label">Tension:</label>
                     <select name="tension_option_id" id="tension" class="service-input">
-                        <option value="">Not Required (不需要)</option>
+                        <option value="">Not Required</option>
                         <?php foreach($tension_options as $opt) { ?>
                             <option value="<?php echo $opt['id']; ?>">
                                 <?php echo htmlspecialchars($opt['option_name']); ?>
@@ -167,14 +167,22 @@ if ($spec_res && $spec_res->num_rows > 0) {
                 </div>
                 <?php } ?>
 
-                <?php if ($current_category == 'shuttlecocks') { ?>
+                <?php if ($current_category == 'accessories') { ?>
                 <div class="spec-selector">
-                    <p class="spec-selector-label">Speed</p>
+                    <p class="spec-selector-label">Color</p>
                     <div class="spec-options">
-                        <div class="spec-option" onclick="selectSpec(this, '76')">76 (Slow)</div>
-                        <div class="spec-option active" onclick="selectSpec(this, '77')">77 (Medium)</div>
-                        <div class="spec-option" onclick="selectSpec(this, '78')">78 (Fast)</div>
-                        <script> document.getElementById('selected_spec').value = '77'; </script>
+                        <?php 
+                        $first = true;
+                        foreach($spec_options as $val) {
+                            $active = $first ? 'active' : '';
+                            echo '<div class="spec-option '.$active.'" onclick="selectSpec(this, \''.$val.'\')">'.$val.'</div>';
+                            if($first) {
+                                // 页面加载时，把第一个颜色自动填入隐藏的表单里
+                                echo "<script> document.addEventListener('DOMContentLoaded', () => { document.getElementById('selected_spec').value = '$val'; }); </script>";
+                            }
+                            $first = false;
+                        }
+                        ?>
                     </div>
                 </div>
                 <?php } ?>

@@ -40,8 +40,6 @@ $current_cat_url = isset($_GET['category']) ? $_GET['category'] : '';
             </div>
         </div>
         <a href="admin_service.php" class="<?php echo ($current_page == 'admin_service.php') ? 'active' : ''; ?>">Services</a>
-
-        <a href="admin_specs.php" class="<?php echo ($current_page == 'admin_specs.php') ? 'active' : ''; ?>">Specs</a>
         
         <a href="manage_customer.php" class="<?php echo ($current_page == 'manage_customer.php') ? 'active' : ''; ?>">Manage Customers</a>
         

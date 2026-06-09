@@ -70,7 +70,7 @@ $result = $conn->query($sql);
 
     <div class="main-content">
         <div class="header-flex">
-            <h1 class="page-title">Manage Product Specs (规格管理)</h1>
+            <h1 class="page-title">Manage Product Specs</h1>
             <div>
                 <button onclick="openModal('addModal')" class="btn btn-add">+ Add New Spec</button>
             </div>
@@ -81,9 +81,9 @@ $result = $conn->query($sql);
                 <thead>
                     <tr>
                         <th>ID</th>
-                        <th>Category (分类)</th>
-                        <th>Specification Value (规格值)</th>
-                        <th>Total Stock (总库存)</th> <th>Actions</th>
+                        <th>Category</th>
+                        <th>Specification Value</th>
+                        <th>Total Stock</th> <th>Actions</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -122,15 +122,15 @@ $result = $conn->query($sql);
             <h2>Add New Specification</h2>
             <form method="POST" action="admin_specs.php">
                 <div class="form-group">
-                    <label>Category (应用分类)</label>
+                    <label>Category</label>
                     <select name="category" required>
-                        <option value="rackets">Rackets (球拍)</option>
-                        <option value="footwear">Footwear (鞋子)</option>
-                        <option value="apparel">Apparel (衣服)</option>
+                        <option value="rackets">Rackets</option>
+                        <option value="footwear">Footwear</option>
+                        <option value="apparel">Apparel</option>
                     </select>
                 </div>
                 <div class="form-group">
-                    <label>Specification Value (规格值)</label>
+                    <label>Specification Value/label>
                     <input type="text" name="spec_value" placeholder="e.g. 44, XXL, 5U / G6" required>
                 </div>
                 <button type="submit" name="add_spec" class="btn btn-add" style="width: 100%; margin-top: 10px;">Save Specification</button>
@@ -145,15 +145,15 @@ $result = $conn->query($sql);
             <form method="POST" action="admin_specs.php">
                 <input type="hidden" name="edit_id" id="edit_id">
                 <div class="form-group">
-                    <label>Category (应用分类)</label>
+                    <label>Category</label>
                     <select name="category" id="edit_category" required>
-                        <option value="rackets">Rackets (球拍)</option>
-                        <option value="footwear">Footwear (鞋子)</option>
-                        <option value="apparel">Apparel (衣服)</option>
+                        <option value="rackets">Rackets</option>
+                        <option value="footwear">Footwear</option>
+                        <option value="apparel">Apparel</option>
                     </select>
                 </div>
                 <div class="form-group">
-                    <label>Specification Value (规格值)</label>
+                    <label>Specification Value</label>
                     <input type="text" name="spec_value" id="edit_value" required>
                 </div>
                 <button type="submit" name="edit_spec" class="btn btn-edit" style="width: 100%; margin-top: 10px; background: #0033a0;">Update Specification</button>

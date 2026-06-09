@@ -2,8 +2,13 @@
 session_start();
 require_once 'db_config.php';
 
-// 查询所有订单，按日期从新到旧排列
-$sql = "SELECT * FROM orders ORDER BY order_date DESC";
+if (!isset($_SESSION['user_id'])) {
+    header("Location: ../login_register/login_page.php");
+    exit();
+}
+$user_id = $_SESSION['user_id'];
+
+$sql = "SELECT * FROM orders WHERE USER_ID = '$user_id' ORDER BY ORDER_DATE DESC";
 $result = $conn->query($sql);
 ?>
 
@@ -17,82 +22,65 @@ $result = $conn->query($sql);
         :root { --yonex-blue: #002d56; }
         body { background-color: #f4f7f9; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
         .order-card { 
-            border: none; 
-            border-radius: 12px; 
-            box-shadow: 0 4px 10px rgba(0,0,0,0.05); 
-            margin-bottom: 20px; 
-            background: white;
-            overflow: hidden;
+            border: none; border-radius: 12px; box-shadow: 0 4px 10px rgba(0,0,0,0.05); 
+            margin-bottom: 20px; background: white; overflow: hidden;
         }
         .order-header { 
-            background: #f8f9fa; 
-            padding: 15px 20px; 
-            border-bottom: 1px solid #eee;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
+            background: #f8f9fa; padding: 15px 20px; border-bottom: 1px solid #eee;
+            display: flex; justify-content: space-between; align-items: center;
         }
         .status-pending { color: #f39c12; font-weight: bold; }
         .status-completed { color: #27ae60; font-weight: bold; }
-        .payment-method-box {
-            display: inline-block;
-            background: #eef2f7;
-            color: #555;
-            padding: 4px 12px;
-            border-radius: 6px;
-            font-size: 0.85rem;
-            margin-top: 10px;
-            border: 1px solid #d1d9e6;
-        }
-        .item-details {
-            color: #333;
-            font-size: 1rem;
-            line-height: 1.6;
-        }
+        .item-details { color: #444; font-size: 0.95rem; line-height: 1.6; background: #fafbfc; padding: 15px; border-radius: 8px; border: 1px solid #eef2f7; }
+        .detailed-order-info .badge { font-weight: 600; padding: 6px 10px; font-size: 0.8rem; }
     </style>
 </head>
 <body>
 
 <div class="container py-5">
-    <h3 class="mb-4 fw-bold" style="color: var(--yonex-blue);">My Order History</h3>
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h3 class="fw-bold m-0" style="color: var(--yonex-blue);">My Order History</h3>
+        <a href="../index.php" class="btn btn-outline-secondary btn-sm">← Back to Store</a>
+    </div>
 
     <?php if ($result && $result->num_rows > 0): ?>
         <?php while($row = $result->fetch_assoc()): ?>
             <?php 
-                // 解析数据库中的 product_details 字段
-                // 逻辑：以 "via" 为分界点拆分物品名和付款方式
-                $raw_data = $row['product_details'];
-                $data_parts = explode('via', $raw_data);
+                $raw_data = $row['ORDER_DESC'];
                 
-                $item_info = trim($data_parts[0]); // 物品信息
-                $pay_info = isset($data_parts[1]) ? trim($data_parts[1]) : 'Online Payment'; // 付款方式
+                // 智能判断：如果是新版本的详细订单，直接显示；如果是旧版本的，做兼容处理
+                if (strpos($raw_data, 'detailed-order-info') !== false) {
+                    $display_content = $raw_data;
+                } else {
+                    $data_parts = explode('via', $raw_data);
+                    $item_info = trim($data_parts[0]); 
+                    $pay_info = isset($data_parts[1]) ? trim($data_parts[1]) : 'Online Payment'; 
+                    $display_content = "<div class='mb-2'><span class='badge bg-secondary mb-1'>Items</span><br>" . nl2br(htmlspecialchars($item_info)) . "</div>";
+                    $display_content .= "<div><span class='badge bg-secondary mb-1'>Payment Method</span><br>" . htmlspecialchars($pay_info) . "</div>";
+                }
             ?>
             <div class="card order-card">
                 <div class="order-header">
                     <div>
-                        <span class="fw-bold">Order #<?php echo $row['id']; ?></span>
-                        <span class="text-muted ms-3 small"><?php echo $row['order_date']; ?></span>
+                        <span class="fw-bold">Order #<?php echo $row['ORDER_ID']; ?></span>
+                        <span class="text-muted ms-3 small"><?php echo $row['ORDER_DATE']; ?></span>
                     </div>
-                    <div class="<?php echo ($row['status'] == 'Completed') ? 'status-completed' : 'status-pending'; ?>">
-                        ● <?php echo $row['status']; ?>
+                    <div class="<?php echo ($row['STATUS'] == 'Completed') ? 'status-completed' : 'status-pending'; ?>">
+                        ● <?php echo $row['STATUS']; ?>
                     </div>
                 </div>
                 <div class="card-body p-4">
                     <div class="row">
                         <div class="col-md-8">
-                            <label class="text-muted small fw-bold text-uppercase mb-2 d-block">Items Information</label>
+                            <label class="text-muted small fw-bold text-uppercase mb-2 d-block">Order Details</label>
                             <div class="item-details">
-                                <?php echo nl2br(htmlspecialchars($item_info)); ?>
-                            </div>
-                            
-                            <div class="payment-method-box">
-                                <strong>Payment Method:</strong> <?php echo htmlspecialchars($pay_info); ?>
+                                <?php echo $display_content; ?>
                             </div>
                         </div>
                         <div class="col-md-4 text-end d-flex flex-column justify-content-center">
                             <div class="text-muted small">Amount Paid</div>
                             <div class="h4 fw-bold" style="color: var(--yonex-blue);">
-                                RM <?php echo number_format($row['total_amount'], 2); ?>
+                                RM <?php echo number_format($row['TOTAL_PRICE'], 2); ?>
                             </div>
                         </div>
                     </div>
@@ -102,6 +90,7 @@ $result = $conn->query($sql);
     <?php else: ?>
         <div class="text-center py-5 card border-0 shadow-sm">
             <p class="text-muted mb-0">No order history found.</p>
+            <a href="../index.php" class="btn btn-primary mt-3" style="background:var(--yonex-blue); border:none;">Go Shopping</a>
         </div>
     <?php endif; ?>
 </div>

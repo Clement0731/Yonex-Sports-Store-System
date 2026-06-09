@@ -11,7 +11,6 @@ include 'db.php';
 // ==========================================
 if(isset($_GET['delete'])) {
     $del_id = $_GET['delete'];
-    // 改为从 users 表中删除，并且使用正确的 id 列
     $conn->query("DELETE FROM users WHERE id = '$del_id'");
     header("Location: manage_customer.php");
     exit();
@@ -28,7 +27,6 @@ if(isset($_POST['update_customer'])) {
     $gender = $_POST['gender'];
     $is_verified = $_POST['is_verified'];
     
-    // 更新 users 表里的详细资料
     $conn->query("UPDATE users SET username='$username', email='$email', phone='$phone', gender='$gender', is_verified='$is_verified' WHERE id='$id'");
     header("Location: manage_customer.php");
     exit();
@@ -41,7 +39,6 @@ if(isset($_POST['update_customer'])) {
     <title>Manage Customers</title>
     <link rel="stylesheet" href="style.css">
     <style>
-        /* 新增：编辑表单的样式 */
         .edit-form-box { background: white; padding: 25px; border-radius: 8px; margin-bottom: 30px; box-shadow: 0 2px 15px rgba(0,0,0,0.08); border-top: 4px solid #0033a0; }
         .edit-form-box h3 { margin-top: 0; color: #0033a0; margin-bottom: 20px; border-bottom: 1px solid #eee; padding-bottom: 10px; }
         .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 20px; }
@@ -51,7 +48,6 @@ if(isset($_POST['update_customer'])) {
         .btn-save { background: #0033a0; color: white; padding: 10px 25px; border: none; border-radius: 4px; cursor: pointer; font-weight: bold;}
         .btn-cancel { background: #ccc; color: #333; padding: 10px 25px; text-decoration: none; border-radius: 4px; margin-left: 10px; font-weight: bold;}
         
-        /* 列表按钮与徽章样式 */
         .btn-edit { background: #f39c12; color: white; padding: 6px 12px; text-decoration: none; border-radius: 4px; margin-right: 5px; font-size: 12px; display: inline-block;}
         .btn-delete { background: #e74c3c; color: white; padding: 6px 12px; text-decoration: none; border-radius: 4px; font-size: 12px; display: inline-block;}
         .badge { padding: 4px 10px; border-radius: 12px; font-size: 11px; font-weight: bold; color: white; }
@@ -67,9 +63,6 @@ if(isset($_POST['update_customer'])) {
         </div>
 
         <?php
-        // ==========================================
-        // 💡 区域 A：如果点击了 "Edit"，则显示编辑表单
-        // ==========================================
         if(isset($_GET['edit'])) {
             $edit_id = $_GET['edit'];
             $edit_result = $conn->query("SELECT * FROM users WHERE id = '$edit_id'");
@@ -83,35 +76,35 @@ if(isset($_POST['update_customer'])) {
                     
                     <div class="form-grid">
                         <div class="form-group">
-                            <label>Full Name (名称)</label>
+                            <label>Full Name</label>
                             <input type="text" name="username" value="<?php echo htmlspecialchars($user_data['username']); ?>" required>
                         </div>
                         <div class="form-group">
-                            <label>Email Address (电邮)</label>
+                            <label>Email Address</label>
                             <input type="email" name="email" value="<?php echo htmlspecialchars($user_data['email']); ?>" required>
                         </div>
                         <div class="form-group">
-                            <label>Phone Number (手机)</label>
+                            <label>Phone Number</label>
                             <input type="text" name="phone" value="<?php echo htmlspecialchars($user_data['phone'] ?? ''); ?>">
                         </div>
                         <div class="form-group">
-                            <label>Gender (性别)</label>
+                            <label>Gender</label>
                             <select name="gender">
-                                <option value="" <?php if(empty($user_data['gender'])) echo 'selected'; ?>>Not Set (未设定)</option>
-                                <option value="男" <?php if(($user_data['gender'] ?? '') == '男') echo 'selected'; ?>>男</option>
-                                <option value="女" <?php if(($user_data['gender'] ?? '') == '女') echo 'selected'; ?>>女</option>
-                                <option value="保密" <?php if(($user_data['gender'] ?? '') == '保密') echo 'selected'; ?>>保密</option>
+                                <option value="" <?php if(empty($user_data['gender'])) echo 'selected'; ?>>Not Set</option>
+                                <option value="Male" <?php if(($user_data['gender'] ?? '') == 'Male') echo 'selected'; ?>>Male</option>
+                                <option value="Female" <?php if(($user_data['gender'] ?? '') == 'Female') echo 'selected'; ?>>Female</option>
+                                <option value="Private" <?php if(($user_data['gender'] ?? '') == 'Private') echo 'selected'; ?>>Private</option>
                             </select>
                         </div>
                         <div class="form-group">
-                            <label>Registration Date (注册时间)</label>
+                            <label>Registration Date</label>
                             <input type="text" value="<?php echo $user_data['created_at']; ?>" readonly>
                         </div>
                         <div class="form-group">
-                            <label>Account Status (验证状态)</label>
+                            <label>Account Status</label>
                             <select name="is_verified">
-                                <option value="1" <?php if($user_data['is_verified'] == 1) echo 'selected'; ?>>Verified (已激活)</option>
-                                <option value="0" <?php if($user_data['is_verified'] == 0) echo 'selected'; ?>>Pending OTP (等待验证)</option>
+                                <option value="1" <?php if($user_data['is_verified'] == 1) echo 'selected'; ?>>Verified</option>
+                                <option value="0" <?php if($user_data['is_verified'] == 0) echo 'selected'; ?>>Pending OTP</option>
                             </select>
                         </div>
                     </div>
@@ -138,12 +131,10 @@ if(isset($_POST['update_customer'])) {
                 </thead>
                 <tbody>
                     <?php
-                    // 核心修改：查询你真正的普通顾客表 `users`
                     $customers = $conn->query("SELECT * FROM users ORDER BY id DESC");
                     
                     if ($customers->num_rows > 0) {
                         while($row = $customers->fetch_assoc()) {
-                            // 动态显示账户验证状态
                             $status_badge = ($row['is_verified'] == 1) 
                                 ? "<span class='badge bg-green'>Verified</span>" 
                                 : "<span class='badge bg-red'>Pending</span>";

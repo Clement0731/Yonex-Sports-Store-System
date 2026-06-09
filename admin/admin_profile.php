@@ -194,7 +194,7 @@ if (isset($_POST['change_password'])) {
 
             <div class="settings-card">
                 
-                <h3>Account Details (修改账户邮箱)</h3>
+                <h3>Account Details</h3>
                 
                 <?php if (isset($_SESSION['pending_email'])) { ?>
                     <div class="verify-box">
@@ -217,25 +217,25 @@ if (isset($_POST['change_password'])) {
                             <input type="email" value="<?php echo htmlspecialchars($admin['EMAIL']); ?>" readonly>
                         </div>
                         <div class="form-group">
-                            <label>New Email Address (新邮箱)</label>
+                            <label>New Email Address</label>
                             <input type="email" name="new_email" placeholder="Enter new email to receive OTP" required>
                         </div>
                         <button type="submit" name="request_email_change" class="btn-save">Send OTP to New Email</button>
                     </form>
                 <?php } ?>
 
-                <h3 style="margin-top: 40px;">Security & Password (修改高级密码)</h3>
+                <h3 style="margin-top: 40px;">Security & Password</h3>
                 <form method="POST" action="admin_profile.php">
                     <div class="form-group">
-                        <label>Current Password (旧密码)</label>
+                        <label>Current Password</label>
                         <input type="password" name="old_password" required>
                     </div>
                     <div class="form-group">
-                        <label>New Password (新密码)</label>
+                        <label>New Password</label>
                         <input type="password" name="new_password" placeholder="Min 8 chars, 1 Uppercase, 1 Number" required>
                     </div>
                     <div class="form-group">
-                        <label>Confirm New Password (确认新密码)</label>
+                        <label>Confirm New Password</label>
                         <input type="password" name="confirm_password" required>
                     </div>
                     <button type="submit" name="change_password" class="btn-save btn-red">Update Password</button>
