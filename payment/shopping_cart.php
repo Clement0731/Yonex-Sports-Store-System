@@ -150,12 +150,25 @@ if ($result && $result->num_rows > 0) {
         }
         .btn-pay:hover:not(:disabled) { background: #001f3f; color: var(--primary-gold); transform: translateY(-2px); box-shadow: 0 5px 15px rgba(0,51,102,0.2); }
         .btn-pay:disabled { background: #cbd5e1; cursor: not-allowed; color: #fff; }
+        .btn-light:hover {
+    background-color: var(--primary-blue) !important;
+    color: white !important;
+    border-color: var(--primary-blue) !important;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 10px rgba(0,51,102,0.15);
+}
     </style>
 </head>
 <body>
 
 <div class="cart-container">
-    <h2 class="mb-4 fw-bold page-title"><i class="fas fa-shopping-cart me-2"></i>MY SHOPPING CART</h2>
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2 class="mb-0 fw-bold page-title"><i class="fas fa-shopping-cart me-2"></i>MY SHOPPING CART</h2>
+        
+        <a href="../index.php" class="btn btn-light rounded-pill px-4 fw-bold" style="color: var(--primary-blue); border: 2px solid #eef2f6; transition: 0.3s;">
+            <i class="fas fa-arrow-left me-2"></i>Back to Home
+        </a>
+    </div>
     
     <div class="section-card">
         <h5 class="fw-bold mb-4"><i class="fas fa-map-marker-alt text-danger me-2"></i>Select Delivery Address</h5>
