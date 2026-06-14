@@ -24,7 +24,7 @@ if (isset($_POST['reset_password'])) {
         $msg = "<div class='error-msg'>Password must be at least 8 characters long, contain at least 1 uppercase letter and 1 number! (密码强度不符合现代安全标准)</div>";
     } else {
         // 🎉 统统通过！安全更新密码，并把 OTP 清空
-        $conn->query("UPDATE USERS SET PASSWORD = '$new_password', reset_otp = NULL, otp_expiry = NULL WHERE EMAIL = '$email'");
+        $conn->query("UPDATE admin SET PASSWORD = '$new_password', reset_otp = NULL, otp_expiry = NULL WHERE EMAIL = '$email'");
         
         echo "<script>alert('Password reset successful! Please login with your new strong password.'); window.location.href='login.php';</script>";
         exit();

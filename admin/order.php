@@ -6,10 +6,18 @@ if (!isset($_SESSION['admin_id'])) {
 }
 include 'db.php';
 
-// 标记订单为已完成
-if(isset($_GET['complete'])) {
-    $order_id = $_GET['complete'];
-    $conn->query("UPDATE ORDERS SET STATUS = 'Completed' WHERE ORDER_ID = $order_id");
+try {
+    $conn->query("UPDATE `orders` SET `expected_delivery` = DATE_ADD(ORDER_DATE, INTERVAL 2 DAY) WHERE `expected_delivery` IS NULL");
+    $conn->query("UPDATE `orders` SET `STATUS` = 'Completed' WHERE `STATUS` NOT IN ('Completed', 'Cancelled') AND NOW() >= DATE_ADD(ORDER_DATE, INTERVAL 2 DAY)");
+    $conn->query("UPDATE `orders` SET `STATUS` = 'Shipped', `tracking_number` = CONCAT('NJX', DATE_FORMAT(ORDER_DATE, '%d%m'), 'MY', ORDER_ID) WHERE `STATUS` NOT IN ('Completed', 'Shipped', 'Cancelled') AND NOW() >= DATE_ADD(ORDER_DATE, INTERVAL 1 DAY)");
+    $conn->query("UPDATE `orders` SET `STATUS` = 'Processing' WHERE `STATUS` IN ('Pending', 'Paid') AND NOW() >= DATE_ADD(ORDER_DATE, INTERVAL 5 MINUTE)");
+} catch (Exception $e) {}
+
+if(isset($_POST['update_shipping'])) {
+    $order_id = $_POST['order_id'];
+    $status = $_POST['order_status'];
+    $tracking_no = $_POST['tracking_number'];
+    $conn->query("UPDATE `orders` SET `STATUS` = '$status', `tracking_number` = '$tracking_no' WHERE `ORDER_ID` = '$order_id'");
     header("Location: order.php");
     exit();
 }
@@ -18,140 +26,110 @@ if(isset($_GET['complete'])) {
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Manage Orders | Yonex Pro Admin</title>
+    <title>Logistics & Fulfillment Center | YONEX Pro</title>
     <link rel="stylesheet" href="style.css">
     <style>
-        .badge { padding: 6px 12px; border-radius: 20px; font-size: 12px; font-weight: bold; text-transform: uppercase; letter-spacing: 1px;}
-        .bg-success { background: #d4edda; color: #155724; border: 1px solid #c3e6cb;}
-        .bg-warning { background: #fff3cd; color: #856404; border: 1px solid #ffeeba;}
-        
-        .btn-view { background: #0033a0; color: white; padding: 6px 15px; border-radius: 4px; text-decoration: none; font-size: 13px; font-weight: bold; border: none; cursor: pointer; transition: 0.3s;}
-        .btn-view:hover { background: #002277; }
-        .btn-action { background: #28a745; color: white; padding: 6px 15px; border-radius: 4px; text-decoration: none; font-size: 13px; font-weight: bold; margin-left: 5px; transition: 0.3s;}
-        .btn-action:hover { background: #218838; }
-
-        /* 订单明细弹窗专属 UI */
-        .order-modal { display: none; position: fixed; z-index: 9999; left: 0; top: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.6); align-items: center; justify-content: center; backdrop-filter: blur(4px); }
-        .order-modal-content { background-color: #fff; padding: 0; border-radius: 12px; width: 600px; max-height: 85vh; overflow-y: auto; box-shadow: 0 20px 50px rgba(0,0,0,0.3); position: relative; animation: slideIn 0.3s ease-out; }
-        @keyframes slideIn { from { transform: translateY(-30px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
-        
-        .modal-header { background: #0033a0; color: white; padding: 20px 25px; border-radius: 12px 12px 0 0; display: flex; justify-content: space-between; align-items: center; position: sticky; top: 0; z-index: 10; }
-        .modal-header h2 { margin: 0; font-size: 20px; font-weight: 900; letter-spacing: 1px;}
-        .close-btn { color: white; font-size: 28px; cursor: pointer; font-weight: bold; line-height: 1; transition: 0.2s; }
-        .close-btn:hover { color: #e60012; transform: scale(1.1); }
-        
-        .modal-body { padding: 25px; }
-        .customer-card { background: #f8fafc; border: 1px solid #e2e8f0; padding: 15px; border-radius: 8px; margin-bottom: 20px; }
-        .customer-card p { margin: 5px 0; color: #334155; font-size: 14px;}
-        
-        /* 继承前台漂亮的详细信息样式 */
-        .detailed-order-info { color: #333; font-size: 14.5px; line-height: 1.6; }
-        .detailed-order-info .badge { font-weight: bold; padding: 6px 12px; font-size: 12px; border-radius: 4px; background: #e2e8f0 !important; color: #1e293b !important; border: none; letter-spacing: 0; display: inline-block; margin-bottom: 8px; margin-top: 10px;}
-        .detailed-order-info .text-muted { color: #64748b !important; }
-        
-        .modal-footer { background: #f8fafc; padding: 20px 25px; border-top: 1px solid #e2e8f0; border-radius: 0 0 12px 12px; display: flex; justify-content: space-between; align-items: center; }
-        .total-amount { font-size: 24px; font-weight: 900; color: #e60012; }
+        :root { --premium-navy: #002d56; --slate-dark: #0f172a; --slate-muted: #64748b; --border-fine: #e2e8f0; }
+        body { background-color: #fafafa; font-family: -apple-system, BlinkMacSystemFont, sans-serif; color: var(--slate-dark); }
+        .main-content { padding: 40px; width: 100%; }
+        .header-title { font-size: 1.6rem; font-weight: 800; color: var(--premium-navy); letter-spacing: -0.02em; text-transform: uppercase; border-bottom: 1px solid var(--border-fine); padding-bottom: 20px; margin-bottom: 35px; }
+        .fulfillment-box { background: #f8fafc; border: 1px solid var(--border-fine); padding: 15px 20px; font-size: 0.85rem; line-height: 1.6; text-align: left; color: #334155; }
+        .info-heading { font-size: 0.7rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.08em; color: var(--slate-muted); margin-top: 12px; margin-bottom: 4px; display: block; border-left: 2px solid var(--premium-navy); padding-left: 6px; }
+        .fulfillment-box div:first-of-type .info-heading { margin-top: 0; }
+        .status-tag { font-size: 0.75rem; font-weight: 700; letter-spacing: 0.05em; text-transform: uppercase; border-bottom: 2px solid #000; padding-bottom: 1px; display: inline-block; }
+        .btn-override { background: var(--premium-navy); color: white; border: none; padding: 6px 14px; font-size: 0.75rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; cursor: pointer; }
+        .table-box th { font-size: 0.75rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; color: var(--slate-muted); padding: 15px 20px; }
+        .table-box td { padding: 20px; vertical-align: top; border-bottom: 1px solid var(--border-fine); }
+        .modal { display: none; position: fixed; z-index: 9999; left: 0; top: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.4); align-items: center; justify-content: center; backdrop-filter: blur(4px); }
+        .modal-content { background: #fff; padding: 30px; width: 420px; box-shadow: 0 20px 50px rgba(0,0,0,0.1); position: relative; border: 1px solid var(--border-fine); }
+        .close-btn { position: absolute; right: 20px; top: 20px; font-size: 20px; cursor: pointer; color: #888; }
+        .form-group { margin-bottom: 20px; text-align: left; }
+        .form-group label { display: block; font-weight: 700; font-size: 0.75rem; text-transform: uppercase; color: var(--premium-navy); margin-bottom: 8px; }
+        .form-group input, .form-group select { width: 100%; padding: 12px; border: 1px solid var(--border-fine); box-sizing: border-box; font-size: 0.9rem; outline: none; }
+        .btn-submit { width: 100%; background: var(--premium-navy); color: white; padding: 14px; border: none; font-weight: 700; text-transform: uppercase; cursor: pointer; }
     </style>
 </head>
 <body>
     <?php include 'sidebar.php'; ?>
     <div class="main-content">
-        <div class="header-flex">
-            <h1 style="color: #0033a0; font-weight: 900; text-transform: uppercase;">Order Management</h1>
-        </div>
-
-        <div class="table-box">
-            <table>
+        <h1 class="header-title">Logistics & Fulfillment Center</h1>
+        <div class="table-box" style="background: #ffffff; border: 1px solid var(--border-fine);">
+            <table style="width: 100%; border-collapse: collapse;">
                 <thead>
-                    <tr>
-                        <th>Order ID</th>
-                        <th>Customer Name</th>
-                        <th>Order Date & Time</th>
-                        <th>Total Amount</th>
-                        <th>Status</th>
-                        <th style="text-align: right;">Actions</th>
+                    <tr style="border-bottom: 1px solid var(--border-fine);">
+                        <th style="text-align: left; width: 15%;">Order Reference</th>
+                        <th style="text-align: left; width: 18%;">Customer Identity</th>
+                        <th style="text-align: left; width: 45%;">Fulfillment & Dispatch Specifications</th>
+                        <th style="text-align: left; width: 12%;">Net Revenue</th>
+                        <th style="text-align: right; width: 10%;">Dispatch Control</th>
                     </tr>
                 </thead>
                 <tbody>
                     <?php
-                    // 联表查询，抓取订单和用户的详细信息（包括电话和邮箱）
-                    $sql = "SELECT o.ORDER_ID, o.ORDER_DATE, o.TOTAL_PRICE, o.STATUS, o.ORDER_DESC, u.username, u.email, u.phone 
-                            FROM ORDERS o 
-                            LEFT JOIN USERS u ON o.USER_ID = u.id 
-                            ORDER BY o.ORDER_ID DESC";
+                    $sql = "SELECT o.*, u.username FROM `orders` o LEFT JOIN `users` u ON o.USER_ID = u.id ORDER BY o.ORDER_ID DESC";
                     $orders = $conn->query($sql);
-
                     if ($orders && $orders->num_rows > 0) {
-                        while($row = $orders->fetch_assoc()) {
-                            $badge_class = ($row['STATUS'] == 'Completed' || $row['STATUS'] == 'Paid') ? 'bg-success' : 'bg-warning';
-                            $modal_id = "modal_" . $row['ORDER_ID'];
+                        while($raw_row = $orders->fetch_assoc()) {
+                            $row = array_change_key_case($raw_row, CASE_UPPER);
+                            $o_id = $row['ORDER_ID'];
+                            $status = ucfirst(strtolower(trim($row['STATUS'] ?? 'Pending')));
+                            $track_no = !empty($row['TRACKING_NUMBER']) ? $row['TRACKING_NUMBER'] : 'Awaiting Allocation';
                             
-                            $action_btn = "";
-                            if($row['STATUS'] == 'Pending') {
-                                $action_btn = "<a href='order.php?complete=".$row['ORDER_ID']."' class='btn-action'>✔ Mark Done</a>";
-                            }
-                            
-                            // 表格行
                             echo "<tr>
-                                    <td style='font-weight: bold; color:#0033a0;'># YNX-".$row['ORDER_ID']."</td>
-                                    <td style='font-weight: bold;'>".htmlspecialchars($row['username'])."</td>
-                                    <td style='color:#64748b; font-size:14px;'>".$row['ORDER_DATE']."</td>
-                                    <td style='font-weight: bold; color:#e60012;'>RM ".number_format($row['TOTAL_PRICE'], 2)."</td>
-                                    <td><span class='badge ".$badge_class."'>".$row['STATUS']."</span></td>
+                                    <td>
+                                        <div style='font-weight: 700; color: var(--premium-navy);'>YNX-{$o_id}</div>
+                                        <div style='color: var(--slate-muted); font-size: 0.75rem; margin-top: 4px;'>".date('d M Y', strtotime($row['ORDER_DATE']))."</div>
+                                    </td>
+                                    <td>
+                                        <div style='font-weight: 700;'>".htmlspecialchars($row['USERNAME'] ?? 'Guest Account')."</div>
+                                        <div style='font-size:0.75rem; color:var(--slate-muted); margin-top:4px;'>Client ID: #".$row['USER_ID']."</div>
+                                    </td>
+                                    <td>
+                                        <div class='fulfillment-box'>
+                                            <span class='info-heading'>Items Purchased</span>";
+                            
+                            // 🚀 DYNAMIC JOIN: Fetch live relational data mapping from order_items table
+                            $items_sql = "SELECT oi.quantity, p.name, pv.spec_value, s1.option_name as string_name, s2.option_name as tension_name 
+                                          FROM order_items oi
+                                          JOIN products p ON oi.product_id = p.id
+                                          JOIN product_variants pv ON oi.variant_id = pv.id
+                                          LEFT JOIN service_options s1 ON oi.string_option_id = s1.id
+                                          LEFT JOIN service_options s2 ON oi.tension_option_id = s2.id
+                                          WHERE oi.order_id = '$o_id'";
+                            $items_res = $conn->query($items_sql);
+                            
+                            if($items_res && $items_res->num_rows > 0) {
+                                while($item = $items_res->fetch_assoc()) {
+                                    echo "• <b>" . htmlspecialchars($item['name']) . "</b> (" . htmlspecialchars($item['spec_value']) . ") <b>x" . $item['quantity'] . "</b><br>";
+                                    if(!empty($item['string_name'])) {
+                                        echo "&nbsp;&nbsp;<small style='color:var(--slate-muted);'>[Service: " . htmlspecialchars($item['string_name']) . " @ " . htmlspecialchars($item['tension_name']) . "]</small><br>";
+                                    }
+                                }
+                            } else {
+                                echo "<span style='color:var(--slate-muted); font-style:italic;'>Standard Product Pack (Legacy Data Mapping)</span><br>";
+                            }
+
+                            echo "          <span class='info-heading'>Delivery Coordinates</span>
+                                            <div style='white-space: pre-line; color:var(--slate-dark);'>".htmlspecialchars($row['SHIPPING_ADDRESS'])."</div>
+                                            
+                                            <span class='info-heading'>Payment Method</span>
+                                            <div>".htmlspecialchars($row['PAYMENT_METHOD'])."</div>
+
+                                            <span class='info-heading'>Courier Assignment</span>
+                                            <span style='font-family: monospace; font-weight: 700; color: var(--premium-navy);'>{$track_no}</span>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <div style='font-weight: 700; color: #000;'>RM ".number_format((float)$row['TOTAL_PRICE'], 2)."</div>
+                                        <div style='margin-top: 8px;'><span class='status-tag'>{$status}</span></div>
+                                    </td>
                                     <td style='text-align: right;'>
-                                        <button onclick=\"openOrderModal('$modal_id')\" class='btn-view'>📄 View Full Details</button>
-                                        $action_btn
+                                        <button class='btn-override' onclick=\"openShipModal('{$o_id}', '{$status}', '{$track_no}')\">Override</button>
                                     </td>
                                   </tr>";
-                            
-                            // 🚀 隐藏的专业版弹窗 (每一行都有一个自己的弹窗)
-                            ?>
-                            <div id="<?php echo $modal_id; ?>" class="order-modal">
-                                <div class="order-modal-content">
-                                    <div class="modal-header">
-                                        <h2>Order #YNX-<?php echo $row['ORDER_ID']; ?> Details</h2>
-                                        <span class="close-btn" onclick="closeOrderModal('<?php echo $modal_id; ?>')">&times;</span>
-                                    </div>
-                                    <div class="modal-body">
-                                        <div class="customer-card">
-                                            <h4 style="color: #0033a0; border-bottom: 2px solid #cbd5e1; padding-bottom: 5px; margin-top: 0; margin-bottom: 10px;">👤 Customer Profile</h4>
-                                            <p><b>Name:</b> <?php echo htmlspecialchars($row['username'] ?? 'Guest'); ?></p>
-                                            <p><b>Email:</b> <a href="mailto:<?php echo htmlspecialchars($row['email'] ?? ''); ?>" style="color:#0033a0;"><?php echo htmlspecialchars($row['email'] ?? 'N/A'); ?></a></p>
-                                            <p><b>Registered Phone:</b> <?php echo htmlspecialchars($row['phone'] ?? 'Not provided'); ?></p>
-                                        </div>
-                                        
-                                        <div style="background: #ffffff; border: 1px solid #e2e8f0; border-radius: 8px; padding: 20px;">
-                                            <?php 
-                                            // 智能兼容旧订单和新订单
-                                            $desc = $row['ORDER_DESC'];
-                                            if (strpos($desc, 'detailed-order-info') !== false) {
-                                                echo $desc; // 新版本：直接输出前台生成的完美明细 (地址、商品、支付方式)
-                                            } else {
-                                                // 旧版本订单兼容显示
-                                                echo "<div class='detailed-order-info'>";
-                                                echo "<span class='badge'>🛒 Legacy Order Data</span><br>";
-                                                echo nl2br(htmlspecialchars($desc));
-                                                echo "</div>";
-                                            }
-                                            ?>
-                                        </div>
-                                    </div>
-                                    <div class="modal-footer">
-                                        <div>
-                                            <span style="color:#64748b; font-size:12px; display:block;">Order Status</span>
-                                            <span class="badge <?php echo $badge_class; ?>"><?php echo $row['STATUS']; ?></span>
-                                        </div>
-                                        <div style="text-align: right;">
-                                            <span style="color:#64748b; font-size:12px; display:block; font-weight:bold;">Total Paid by Customer</span>
-                                            <span class="total-amount">RM <?php echo number_format($row['TOTAL_PRICE'], 2); ?></span>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                            <?php
                         }
                     } else {
-                        echo "<tr><td colspan='6' style='text-align: center; padding: 40px; color: #94a3b8;'>No orders found in the system.</td></tr>";
+                        echo "<tr><td colspan='5' style='text-align: center; padding: 40px; color: var(--slate-muted);'>No entries indexed.</td></tr>";
                     }
                     ?>
                 </tbody>
@@ -159,22 +137,38 @@ if(isset($_GET['complete'])) {
         </div>
     </div>
 
+    <div id="shipModal" class="modal">
+        <div class="modal-content">
+            <span class="close-btn" onclick="closeModal()">&times;</span>
+            <h2 style="font-size: 1.1rem; color: var(--premium-navy); margin-top: 0; margin-bottom: 25px; border-bottom: 1px solid var(--border-fine); padding-bottom: 10px; font-weight:800;">LOGISTICS OVERRIDE</h2>
+            <form method="POST" action="">
+                <input type="hidden" name="order_id" id="modal_order_id">
+                <div class="form-group">
+                    <label>Fulfillment Milestone</label>
+                    <select name="order_status" id="modal_status" required>
+                        <option value="Paid">Paid</option>
+                        <option value="Processing">Processing</option>
+                        <option value="Shipped">Shipped</option>
+                        <option value="Completed">Completed</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Consignment Waybill Number</label>
+                    <input type="text" name="tracking_number" id="modal_tracking" placeholder="e.g. NJX123456MY">
+                </div>
+                <button type="submit" name="update_shipping" class="btn-submit">Commit Changes</button>
+            </form>
+        </div>
+    </div>
+
     <script>
-        function openOrderModal(modalId) {
-            document.getElementById(modalId).style.display = 'flex';
-            document.body.style.overflow = 'hidden'; // 防止背景滚动
+        function openShipModal(id, status, tracking) {
+            document.getElementById('modal_order_id').value = id;
+            document.getElementById('modal_status').value = status;
+            document.getElementById('modal_tracking').value = (tracking === 'Awaiting Allocation') ? '' : tracking;
+            document.getElementById('shipModal').style.display = 'flex';
         }
-        function closeOrderModal(modalId) {
-            document.getElementById(modalId).style.display = 'none';
-            document.body.style.overflow = 'auto';
-        }
-        // 点击黑色半透明背景也能关闭
-        window.onclick = function(event) {
-            if (event.target.classList.contains('order-modal')) {
-                event.target.style.display = "none";
-                document.body.style.overflow = 'auto';
-            }
-        }
+        function closeModal() { document.getElementById('shipModal').style.display = 'none'; }
     </script>
 </body>
 </html>

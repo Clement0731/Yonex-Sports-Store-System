@@ -6,7 +6,7 @@ if (!isset($_SESSION['admin_id'])) {
 }
 include 'db.php';
 
-// 引入 PHPMailer
+// Include PHPMailer
 use PHPMailer\PHPMailer\PHPMailer;
 use PHPMailer\PHPMailer\Exception;
 require 'PHPMailer/Exception.php';
@@ -16,123 +16,93 @@ require 'PHPMailer/SMTP.php';
 $admin_id = $_SESSION['admin_id'];
 $msg = "";
 
-// 每次刷新都获取最新资料
+// Fetch latest data on refresh
 $sql = "SELECT * FROM admin WHERE USER_ID = '$admin_id'";
 $result = $conn->query($sql);
 $admin = $result->fetch_assoc();
+$current_email = $admin['EMAIL'];
 
 // ==========================================
-// 💡 功能 1.1：请求修改邮箱，发送 OTP
+// Feature 1: Request Password Change, Send OTP
 // ==========================================
-if (isset($_POST['request_email_change'])) {
-    $new_email = trim($_POST['new_email']);
-    
-    // 检查邮箱格式和是否被占用
-    if (!filter_var($new_email, FILTER_VALIDATE_EMAIL)) {
-        $msg = "<div class='alert alert-danger'>Invalid email format! (邮箱格式不正确)</div>";
-    } else {
-        $check_sql = "SELECT * FROM admin WHERE EMAIL = '$new_email' AND USER_ID != '$admin_id'";
-        if ($conn->query($check_sql)->num_rows > 0) {
-            $msg = "<div class='alert alert-danger'>This email is already in use! (该邮箱已被占用)</div>";
-        } else {
-            // 生成验证码，存入 Session (暂不改数据库)
-            $otp = rand(100000, 999999);
-            $_SESSION['pending_email'] = $new_email;
-            $_SESSION['email_change_otp'] = $otp;
-            $_SESSION['email_change_expiry'] = time() + (15 * 60); // 15分钟过期
+if (isset($_POST['request_pwd_otp'])) {
+    // Generate OTP, store in Session
+    $otp = rand(100000, 999999);
+    $_SESSION['pwd_otp'] = $otp;
+    $_SESSION['pwd_otp_expiry'] = time() + (15 * 60); // 15 mins expiry
+    $_SESSION['awaiting_pwd_otp'] = true;
 
-            // 开始发邮件给新邮箱
-            $mail = new PHPMailer(true);
-            try {
-                $mail->isSMTP();
-                $mail->Host       = 'smtp.gmail.com';
-                $mail->SMTPAuth   = true;
-                
-                // 👇 换成你的专属发件邮箱
-                $mail->Username   = '你的专属发件邮箱@gmail.com'; 
-                // 👇 换成你的 16 位专用密码
-                $mail->Password   = 'abcdefghijklmnop'; 
-                
-                $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;
-                $mail->Port       = 587;
+    // Send email to admin's current email
+    $mail = new PHPMailer(true);
+    try {
+        $mail->isSMTP();
+        $mail->Host       = 'smtp.gmail.com';
+        $mail->SMTPAuth   = true;
+        
+        $mail->Username   = 'yonexadmin@gmail.com'; 
+        $mail->Password   = 'vztsnwjuxqfvnjod'; 
+        
+        $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;
+        $mail->Port       = 587;
 
-                // 👇 发件人信息
-                $mail->setFrom('你的专属发件邮箱@gmail.com', 'Yonex Admin System');
-                
-                $mail->addAddress($new_email); // 发给请求更换的新邮箱
+        $mail->setFrom('yonexadmin@gmail.com', 'Yonex Admin System');
+        $mail->addAddress($current_email);
 
-                $mail->isHTML(true);
-                $mail->Subject = 'Verify Your New Email - Yonex Admin';
-                $mail->Body    = "<h3>Your Email Verification OTP is: <b style='color:red;'>$otp</b></h3><p>Please enter this code in your profile page to confirm your new email address. It will expire in 15 minutes.</p>";
+        $mail->isHTML(true);
+        $mail->Subject = 'Password Change OTP - Yonex Admin';
+        $mail->Body    = "<h3>Your OTP to change password is: <b style='color:red;'>$otp</b></h3><p>Please enter this code in your profile page to authorize the password change. It will expire in 15 minutes.</p>";
 
-                $mail->send();
-                $msg = "<div class='alert alert-success'>An OTP has been sent to <b>$new_email</b>. Please enter it below to confirm. (验证码已发送至新邮箱，请验证)</div>";
-            } catch (Exception $e) {
-                $msg = "<div class='alert alert-danger'>Email could not be sent. Error: {$mail->ErrorInfo}</div>";
-                unset($_SESSION['pending_email']); // 发送失败则取消暂存
-            }
-        }
+        $mail->send();
+        $msg = "<div class='alert alert-success'>An OTP has been sent to your email (<b>$current_email</b>). Please check your inbox.</div>";
+    } catch (Exception $e) {
+        $msg = "<div class='alert alert-danger'>Email could not be sent. Error: {$mail->ErrorInfo}</div>";
+        unset($_SESSION['awaiting_pwd_otp']); 
     }
 }
 
 // ==========================================
-// 💡 功能 1.2：验证 OTP 并真正修改邮箱
+// Feature 2: Verify OTP and Change Password
 // ==========================================
-if (isset($_POST['verify_email_change'])) {
-    $entered_otp = $_POST['email_otp'];
-    
-    if (isset($_SESSION['pending_email']) && isset($_SESSION['email_change_otp'])) {
-        if (time() > $_SESSION['email_change_expiry']) {
-            $msg = "<div class='alert alert-danger'>OTP has expired! Please request again. (验证码已过期)</div>";
-            unset($_SESSION['pending_email']);
-        } elseif ($entered_otp == $_SESSION['email_change_otp']) {
-            // 验证成功！更新数据库
-            $new_email = $_SESSION['pending_email'];
-            $conn->query("UPDATE USERS SET EMAIL = '$new_email' WHERE USER_ID = '$admin_id'");
-            
-            $msg = "<div class='alert alert-success'>Email updated successfully to $new_email! (邮箱更新成功)</div>";
-            $admin['EMAIL'] = $new_email; // 刷新画面
-            
-            // 清除 Session 记录
-            unset($_SESSION['pending_email']);
-            unset($_SESSION['email_change_otp']);
-        } else {
-            $msg = "<div class='alert alert-danger'>Invalid OTP! (验证码错误)</div>";
-        }
-    } else {
-        $msg = "<div class='alert alert-danger'>No pending email change request found. (找不到修改请求)</div>";
-    }
-}
-
-// 取消邮箱修改请求
-if (isset($_POST['cancel_email_change'])) {
-    unset($_SESSION['pending_email']);
-    unset($_SESSION['email_change_otp']);
-    header("Location: admin_profile.php");
-    exit();
-}
-
-// ==========================================
-// 💡 功能 2：修改密码
-// ==========================================
-if (isset($_POST['change_password'])) {
-    $old_password = $_POST['old_password'];
+if (isset($_POST['verify_and_change_pwd'])) {
+    $entered_otp = $_POST['pwd_otp'];
     $new_password = $_POST['new_password'];
     $confirm_password = $_POST['confirm_password'];
 
     $password_regex = "/^(?=.*[A-Z])(?=.*\d).{8,}$/";
 
-    if ($old_password != $admin['PASSWORD']) {
-        $msg = "<div class='alert alert-danger'>Incorrect current password! (旧密码错误)</div>";
-    } elseif ($new_password != $confirm_password) {
-        $msg = "<div class='alert alert-danger'>New passwords do not match! (新密码不一致)</div>";
-    } elseif (!preg_match($password_regex, $new_password)) {
-        $msg = "<div class='alert alert-danger'>Password must be at least 8 characters long, contain at least 1 uppercase letter and 1 number! (密码太弱：必须满8位，包含大写字母和数字)</div>";
+    if (isset($_SESSION['pwd_otp']) && isset($_SESSION['awaiting_pwd_otp'])) {
+        if (time() > $_SESSION['pwd_otp_expiry']) {
+            $msg = "<div class='alert alert-danger'>OTP has expired! Please request again.</div>";
+            unset($_SESSION['awaiting_pwd_otp']);
+            unset($_SESSION['pwd_otp']);
+        } elseif ($entered_otp != $_SESSION['pwd_otp']) {
+            $msg = "<div class='alert alert-danger'>Invalid OTP!</div>";
+        } elseif ($new_password != $confirm_password) {
+            $msg = "<div class='alert alert-danger'>New passwords do not match!</div>";
+        } elseif (!preg_match($password_regex, $new_password)) {
+            $msg = "<div class='alert alert-danger'>Password must be at least 8 characters long, contain at least 1 uppercase letter and 1 number.</div>";
+        } else {
+            // Success! Update DB
+            $conn->query("UPDATE admin SET PASSWORD = '$new_password' WHERE USER_ID = '$admin_id'");
+            
+            $msg = "<div class='alert alert-success'>Password updated successfully!</div>";
+            $admin['PASSWORD'] = $new_password; 
+            
+            // Clear Session
+            unset($_SESSION['awaiting_pwd_otp']);
+            unset($_SESSION['pwd_otp']);
+        }
     } else {
-        $conn->query("UPDATE USERS SET PASSWORD = '$new_password' WHERE USER_ID = '$admin_id'");
-        $msg = "<div class='alert alert-success'>Password changed successfully to a strong password! (强密码修改成功)</div>";
-        $admin['PASSWORD'] = $new_password;
+        $msg = "<div class='alert alert-danger'>No pending password change request found.</div>";
     }
+}
+
+// Cancel Request
+if (isset($_POST['cancel_pwd_change'])) {
+    unset($_SESSION['awaiting_pwd_otp']);
+    unset($_SESSION['pwd_otp']);
+    header("Location: admin_profile.php");
+    exit();
 }
 ?>
 <!DOCTYPE html>
@@ -169,7 +139,7 @@ if (isset($_POST['change_password'])) {
         .btn-grey { background: #ccc; color: #333; }
         .btn-grey:hover { background: #bbb; }
         
-        .verify-box { background: #f0f4f8; border: 1px solid #cce0f5; padding: 20px; border-radius: 8px; margin-bottom: 20px; }
+        .verify-box { background: #fdf2f2; border: 1px solid #f8d7da; padding: 20px; border-radius: 8px; margin-bottom: 20px; }
     </style>
 </head>
 <body>
@@ -195,51 +165,43 @@ if (isset($_POST['change_password'])) {
             <div class="settings-card">
                 
                 <h3>Account Details</h3>
+                <div class="form-group">
+                    <label>Admin Email Address (Read-only)</label>
+                    <input type="email" value="<?php echo htmlspecialchars($admin['EMAIL']); ?>" readonly>
+                </div>
+
+                <h3 style="margin-top: 40px;">Security & Password</h3>
                 
-                <?php if (isset($_SESSION['pending_email'])) { ?>
+                <?php if (isset($_SESSION['awaiting_pwd_otp'])) { ?>
                     <div class="verify-box">
-                        <h4 style="color: #0033a0; margin-bottom: 10px;">Verification Required</h4>
-                        <p style="font-size: 14px; margin-bottom: 15px;">We have sent a 6-digit OTP to <b><?php echo htmlspecialchars($_SESSION['pending_email']); ?></b>.</p>
+                        <h4 style="color: #e60012; margin-bottom: 10px;">Verification Required</h4>
+                        <p style="font-size: 14px; margin-bottom: 15px;">Please check your email <b><?php echo htmlspecialchars($current_email); ?></b> for the 6-digit OTP.</p>
                         
-                        <form method="POST" action="admin_profile.php" style="display: flex; gap: 10px; align-items: flex-end;">
-                            <div class="form-group" style="margin-bottom: 0; flex: 1;">
+                        <form method="POST" action="admin_profile.php">
+                            <div class="form-group">
                                 <label>Enter OTP Code</label>
-                                <input type="text" name="email_otp" required placeholder="e.g. 123456" maxlength="6">
+                                <input type="text" name="pwd_otp" required placeholder="e.g. 123456" maxlength="6" style="border: 1px solid #e60012;">
                             </div>
-                            <button type="submit" name="verify_email_change" class="btn-save btn-red">Verify & Update</button>
-                            <button type="submit" name="cancel_email_change" class="btn-save btn-grey">Cancel</button>
+                            <div class="form-group">
+                                <label>New Password</label>
+                                <input type="password" name="new_password" placeholder="Min 8 chars, 1 Uppercase, 1 Number" required>
+                            </div>
+                            <div class="form-group">
+                                <label>Confirm New Password</label>
+                                <input type="password" name="confirm_password" required>
+                            </div>
+                            <div style="display: flex; gap: 10px;">
+                                <button type="submit" name="verify_and_change_pwd" class="btn-save btn-red">Update Password</button>
+                                <button type="submit" name="cancel_pwd_change" class="btn-save btn-grey" formnovalidate>Cancel</button>
+                            </div>
                         </form>
                     </div>
                 <?php } else { ?>
+                    <p style="font-size: 14px; color: #666; margin-bottom: 20px;">To update your password, we need to verify your identity by sending an OTP to your current email address.</p>
                     <form method="POST" action="admin_profile.php">
-                        <div class="form-group">
-                            <label>Current Email Address</label>
-                            <input type="email" value="<?php echo htmlspecialchars($admin['EMAIL']); ?>" readonly>
-                        </div>
-                        <div class="form-group">
-                            <label>New Email Address</label>
-                            <input type="email" name="new_email" placeholder="Enter new email to receive OTP" required>
-                        </div>
-                        <button type="submit" name="request_email_change" class="btn-save">Send OTP to New Email</button>
+                        <button type="submit" name="request_pwd_otp" class="btn-save">Send OTP to Email & Change Password</button>
                     </form>
                 <?php } ?>
-
-                <h3 style="margin-top: 40px;">Security & Password</h3>
-                <form method="POST" action="admin_profile.php">
-                    <div class="form-group">
-                        <label>Current Password</label>
-                        <input type="password" name="old_password" required>
-                    </div>
-                    <div class="form-group">
-                        <label>New Password</label>
-                        <input type="password" name="new_password" placeholder="Min 8 chars, 1 Uppercase, 1 Number" required>
-                    </div>
-                    <div class="form-group">
-                        <label>Confirm New Password</label>
-                        <input type="password" name="confirm_password" required>
-                    </div>
-                    <button type="submit" name="change_password" class="btn-save btn-red">Update Password</button>
-                </form>
 
             </div>
         </div>

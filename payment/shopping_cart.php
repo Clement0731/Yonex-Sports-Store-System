@@ -17,10 +17,11 @@ if (isset($_GET['action']) && $_GET['action'] == 'remove' && isset($_GET['cart_i
     exit();
 }
 
-// 3. 获取真实的购物车数据 (连接变体、球线、磅数)
+// 3. 获取真实的购物车数据 (连接变体、球线、磅数、印字名字)
 $sql = "SELECT 
             c.id AS cart_id, 
             c.quantity, 
+            c.custom_name, 
             p.id AS product_id, 
             p.name, 
             p.price AS base_price, 
@@ -40,7 +41,14 @@ $result = $conn->query($sql);
 $cart_items = [];
 if ($result && $result->num_rows > 0) {
     while($row = $result->fetch_assoc()) {
+        // 💡 价格智能计算：基础价格 + 线 + 磅数
         $row['final_price'] = $row['base_price'] + $row['string_price'] + $row['tension_price'];
+        
+        // 💡 如果有印字服务，自动加 RM 15.00
+        if (!empty($row['custom_name'])) {
+            $row['final_price'] += 15;
+        }
+        
         $cart_items[] = $row;
     }
 }
@@ -71,7 +79,6 @@ if ($result && $result->num_rows > 0) {
         
         .page-title { font-family: 'Oswald', sans-serif; color: var(--primary-blue); letter-spacing: 1px; }
         
-        /* 容器与卡片 */
         .cart-container { max-width: 1000px; margin: 40px auto; }
         .section-card { 
             background: white; border-radius: 16px; 
@@ -79,7 +86,6 @@ if ($result && $result->num_rows > 0) {
             padding: 30px; border: 1px solid #eef2f6; 
         }
 
-        /* === 顶级地址卡片 UI (与 Checkout 保持一致) === */
         .address-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 15px; }
         .addr-card {
             border: 2px solid #eef2f6; border-radius: 12px; padding: 20px;
@@ -98,7 +104,6 @@ if ($result && $result->num_rows > 0) {
         .addr-phone { color: #6c757d; font-weight: 500; font-size: 0.9rem; }
         .addr-detail { font-size: 0.9rem; color: #555; line-height: 1.5; margin-top: 10px; }
 
-        /* === 购物车列表 UI === */
         .cart-table th { 
             text-transform: uppercase; font-size: 0.85rem; color: #94a3b8; 
             font-weight: 600; border-bottom: 2px solid #eef2f6; padding-bottom: 15px;
@@ -120,11 +125,9 @@ if ($result && $result->num_rows > 0) {
         }
         .item-price { color: var(--primary-blue); font-size: 1.2rem; font-weight: 700; }
         
-        /* 自定义大号 Checkbox */
         .form-check-input { width: 1.3em; height: 1.3em; cursor: pointer; border-color: #cbd5e1; }
         .form-check-input:checked { background-color: var(--primary-blue); border-color: var(--primary-blue); }
         
-        /* 数量调节器 */
         .qty-wrapper { display: inline-flex; align-items: center; background: #fff; border: 1px solid #cbd5e1; border-radius: 8px; overflow: hidden; }
         .qty-btn { background: #f8fafc; border: none; padding: 6px 14px; font-weight: bold; color: #475569; transition: 0.2s; cursor: pointer; }
         .qty-btn:hover { background: #e2e8f0; color: var(--primary-blue); }
@@ -133,7 +136,6 @@ if ($result && $result->num_rows > 0) {
         .btn-remove { color: #cbd5e1; transition: 0.2s; font-size: 1.2rem; }
         .btn-remove:hover { color: #dc3545; transform: scale(1.1); }
 
-        /* === 悬浮底部结账栏 === */
         .checkout-bar { 
             position: fixed; bottom: 0; left: 0; right: 0; 
             background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(10px);
@@ -151,12 +153,12 @@ if ($result && $result->num_rows > 0) {
         .btn-pay:hover:not(:disabled) { background: #001f3f; color: var(--primary-gold); transform: translateY(-2px); box-shadow: 0 5px 15px rgba(0,51,102,0.2); }
         .btn-pay:disabled { background: #cbd5e1; cursor: not-allowed; color: #fff; }
         .btn-light:hover {
-    background-color: var(--primary-blue) !important;
-    color: white !important;
-    border-color: var(--primary-blue) !important;
-    transform: translateY(-2px);
-    box-shadow: 0 4px 10px rgba(0,51,102,0.15);
-}
+            background-color: var(--primary-blue) !important;
+            color: white !important;
+            border-color: var(--primary-blue) !important;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 10px rgba(0,51,102,0.15);
+        }
     </style>
 </head>
 <body>
@@ -192,7 +194,7 @@ if ($result && $result->num_rows > 0) {
                         </div>
                         <div class="addr-detail">
                             <?php echo htmlspecialchars($addr['full_address']); ?><br>
-                            <?php echo htmlspecialchars($addr['postcode']); ?>, <?php echo htmlspecialchars($addr['city_state']); ?>
+                            <?php echo htmlspecialchars($addr['postcode']); ?>, <?php echo isset($addr['city_state']) ? htmlspecialchars($addr['city_state']) : ''; ?>
                         </div>
                     </div>
                 <?php 
@@ -247,6 +249,14 @@ if ($result && $result->num_rows > 0) {
                                                 <span class="spec-badge"><i class="fas fa-weight-hanging me-1"></i> <?php echo htmlspecialchars($item['tension_name']); ?></span>
                                             <?php endif; ?>
                                         <?php endif; ?>
+                                        
+                                        <?php if(!empty($item['custom_name'])): ?>
+                                            <br>
+                                            <div style="font-size: 0.85rem; color: #d0021b; font-weight: 700; margin-top: 8px; background: #fff1f2; padding: 4px 8px; border-radius: 4px; display: inline-block;">
+                                                Name Printing: <?php echo htmlspecialchars($item['custom_name']); ?> (+RM 15.00)
+                                            </div>
+                                        <?php endif; ?>
+
                                     </div>
                                 </div>
                             </div>

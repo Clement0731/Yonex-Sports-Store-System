@@ -194,6 +194,11 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         .register-footer { margin-top: 30px; padding-top: 20px; border-top: 1px solid #f1f5f9; font-size: 14px; color: var(--accent-gray); }
         .register-footer a { color: var(--yonex-blue); text-decoration: none; font-weight: 700; }
         .register-footer a:hover { text-decoration: underline; }
+        input::-ms-reveal,
+        input::-ms-clear,
+        input::-webkit-contacts-auto-fill-button {
+            display: none !important;
+        }
     </style>
 </head>
 <body>

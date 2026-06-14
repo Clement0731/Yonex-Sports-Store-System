@@ -22,7 +22,7 @@ if (isset($_POST['send_otp'])) {
         $otp = rand(100000, 999999);
         
         // 把 OTP 存进数据库，并设置 15 分钟后过期
-        $conn->query("UPDATE USERS SET reset_otp = '$otp', otp_expiry = DATE_ADD(NOW(), INTERVAL 15 MINUTE) WHERE EMAIL = '$email'");
+        $conn->query("UPDATE admin SET reset_otp = '$otp', otp_expiry = DATE_ADD(NOW(), INTERVAL 15 MINUTE) WHERE EMAIL = '$email'");
 
         // 🚀 开始配置发邮件
         $mail = new PHPMailer(true);

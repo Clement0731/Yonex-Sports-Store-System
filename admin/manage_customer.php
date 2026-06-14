@@ -6,28 +6,10 @@ if (!isset($_SESSION['admin_id'])) {
 }
 include 'db.php';
 
-// ==========================================
-// 1. 处理删除请求 (Delete)
-// ==========================================
 if(isset($_GET['delete'])) {
-    $del_id = $_GET['delete'];
-    $conn->query("DELETE FROM users WHERE id = '$del_id'");
-    header("Location: manage_customer.php");
-    exit();
-}
-
-// ==========================================
-// 2. 处理更新请求 (Edit / Save)
-// ==========================================
-if(isset($_POST['update_customer'])) {
-    $id = $_POST['customer_id'];
-    $username = $_POST['username'];
-    $email = $_POST['email'];
-    $phone = $_POST['phone'];
-    $gender = $_POST['gender'];
-    $is_verified = $_POST['is_verified'];
-    
-    $conn->query("UPDATE users SET username='$username', email='$email', phone='$phone', gender='$gender', is_verified='$is_verified' WHERE id='$id'");
+    $del_id = (int)$_GET['delete'];
+    $conn->query("DELETE FROM `users` WHERE `id` = $del_id");
+    $conn->query("DELETE FROM `addresses` WHERE `user_id` = $del_id"); 
     header("Location: manage_customer.php");
     exit();
 }
@@ -36,123 +18,124 @@ if(isset($_POST['update_customer'])) {
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Manage Customers</title>
+    <title>Client Directory & Access Control | YONEX Pro</title>
     <link rel="stylesheet" href="style.css">
     <style>
-        .edit-form-box { background: white; padding: 25px; border-radius: 8px; margin-bottom: 30px; box-shadow: 0 2px 15px rgba(0,0,0,0.08); border-top: 4px solid #0033a0; }
-        .edit-form-box h3 { margin-top: 0; color: #0033a0; margin-bottom: 20px; border-bottom: 1px solid #eee; padding-bottom: 10px; }
-        .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 20px; }
-        .form-group label { display: block; font-size: 13px; font-weight: bold; color: #555; margin-bottom: 8px; }
-        .form-group input, .form-group select { width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 4px; box-sizing: border-box; font-size: 14px;}
-        .form-group input[readonly] { background: #f5f5f5; color: #777; cursor: not-allowed; }
-        .btn-save { background: #0033a0; color: white; padding: 10px 25px; border: none; border-radius: 4px; cursor: pointer; font-weight: bold;}
-        .btn-cancel { background: #ccc; color: #333; padding: 10px 25px; text-decoration: none; border-radius: 4px; margin-left: 10px; font-weight: bold;}
+        :root { 
+            --premium-navy: #002d56; 
+            --slate-dark: #0f172a; 
+            --slate-muted: #64748b; 
+            --border-fine: #e2e8f0; 
+        }
+        body { background-color: #fafafa; font-family: -apple-system, BlinkMacSystemFont, sans-serif; color: var(--slate-dark); }
+        .main-content { padding: 40px; width: 100%; }
+        .header-flex { border-bottom: 1px solid var(--border-fine); padding-bottom: 20px; margin-bottom: 35px; }
+        .header-title { font-size: 1.6rem; font-weight: 800; color: var(--premium-navy); letter-spacing: -0.02em; text-transform: uppercase; }
         
-        .btn-edit { background: #f39c12; color: white; padding: 6px 12px; text-decoration: none; border-radius: 4px; margin-right: 5px; font-size: 12px; display: inline-block;}
-        .btn-delete { background: #e74c3c; color: white; padding: 6px 12px; text-decoration: none; border-radius: 4px; font-size: 12px; display: inline-block;}
-        .badge { padding: 4px 10px; border-radius: 12px; font-size: 11px; font-weight: bold; color: white; }
-        .bg-green { background: #2ecc71; }
-        .bg-red { background: #e74c3c; }
+        .address-directory-box { background: #f8fafc; border: 1px solid var(--border-fine); padding: 12px 16px; font-size: 0.82rem; line-height: 1.6; color: #334155; text-align: left; }
+        .address-card-line { border-bottom: 1px dashed var(--border-fine); padding-bottom: 6px; margin-bottom: 6px; }
+        .address-card-line:last-child { border-bottom: none; padding-bottom: 0; margin-bottom: 0; }
+        .address-label-tag { font-size: 0.65rem; font-weight: 800; background: #0f172a; color: white; padding: 2px 6px; text-transform: uppercase; letter-spacing: 0.05em; display: inline-block; margin-right: 5px; }
+        
+        .verification-tag { font-size: 0.72rem; font-weight: 700; letter-spacing: 0.05em; text-transform: uppercase; }
+        .status-verified { color: #000; border-bottom: 1px solid #000; }
+        .status-pending { color: var(--slate-muted); text-decoration: line-through; }
+
+        .btn-remove-client { background: transparent; color: var(--slate-muted); border: 1px solid var(--border-fine); padding: 6px 14px; font-size: 0.75rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; text-decoration: none; display: inline-block; transition: all 0.2s; }
+        .btn-remove-client:hover { border-color: #000; color: #000; }
+        
+        .table-box th { font-size: 0.75rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; color: var(--slate-muted); padding: 15px 20px; }
+        .table-box td { padding: 18px 20px; vertical-align: top; border-bottom: 1px solid var(--border-fine); }
     </style>
 </head>
 <body>
     <?php include 'sidebar.php'; ?>
     <div class="main-content">
         <div class="header-flex">
-            <h1>Manage Customers</h1>
+            <h1 class="header-title">Client Registry</h1>
         </div>
 
-        <?php
-        if(isset($_GET['edit'])) {
-            $edit_id = $_GET['edit'];
-            $edit_result = $conn->query("SELECT * FROM users WHERE id = '$edit_id'");
-            if($edit_result->num_rows > 0) {
-                $user_data = $edit_result->fetch_assoc();
-        ?>
-            <div class="edit-form-box">
-                <h3>View & Edit Customer: <?php echo htmlspecialchars($user_data['username']); ?></h3>
-                <form method="POST" action="manage_customer.php">
-                    <input type="hidden" name="customer_id" value="<?php echo $user_data['id']; ?>">
-                    
-                    <div class="form-grid">
-                        <div class="form-group">
-                            <label>Full Name</label>
-                            <input type="text" name="username" value="<?php echo htmlspecialchars($user_data['username']); ?>" required>
-                        </div>
-                        <div class="form-group">
-                            <label>Email Address</label>
-                            <input type="email" name="email" value="<?php echo htmlspecialchars($user_data['email']); ?>" required>
-                        </div>
-                        <div class="form-group">
-                            <label>Phone Number</label>
-                            <input type="text" name="phone" value="<?php echo htmlspecialchars($user_data['phone'] ?? ''); ?>">
-                        </div>
-                        <div class="form-group">
-                            <label>Gender</label>
-                            <select name="gender">
-                                <option value="" <?php if(empty($user_data['gender'])) echo 'selected'; ?>>Not Set</option>
-                                <option value="Male" <?php if(($user_data['gender'] ?? '') == 'Male') echo 'selected'; ?>>Male</option>
-                                <option value="Female" <?php if(($user_data['gender'] ?? '') == 'Female') echo 'selected'; ?>>Female</option>
-                                <option value="Private" <?php if(($user_data['gender'] ?? '') == 'Private') echo 'selected'; ?>>Private</option>
-                            </select>
-                        </div>
-                        <div class="form-group">
-                            <label>Registration Date</label>
-                            <input type="text" value="<?php echo $user_data['created_at']; ?>" readonly>
-                        </div>
-                        <div class="form-group">
-                            <label>Account Status</label>
-                            <select name="is_verified">
-                                <option value="1" <?php if($user_data['is_verified'] == 1) echo 'selected'; ?>>Verified</option>
-                                <option value="0" <?php if($user_data['is_verified'] == 0) echo 'selected'; ?>>Pending OTP</option>
-                            </select>
-                        </div>
-                    </div>
-                    <button type="submit" name="update_customer" class="btn-save">Save Changes</button>
-                    <a href="manage_customer.php" class="btn-cancel">Cancel</a>
-                </form>
-            </div>
-        <?php 
-            } 
-        } 
-        ?>
-
-        <div class="table-box">
-            <table>
+        <div class="table-box" style="background: #ffffff; border: 1px solid var(--border-fine); border-radius: 0px;">
+            <table style="width: 100%; border-collapse: collapse;">
                 <thead>
-                    <tr>
-                        <th>ID</th>
-                        <th>Name</th>
-                        <th>Email</th>
-                        <th>Phone</th>
-                        <th>Status</th>
-                        <th>Actions</th>
+                    <tr style="border-bottom: 1px solid var(--border-fine);">
+                        <th style="text-align: left; width: 12%;">Client Reference</th>
+                        <th style="text-align: left; width: 18%;">Personal Profiles</th>
+                        <th style="text-align: left; width: 22%;">Contact Credentials</th>
+                        <th style="text-align: left; width: 38%;">Registered Shipping Directory</th>
+                        <th style="text-align: right; width: 10%;">System Actions</th>
                     </tr>
                 </thead>
                 <tbody>
                     <?php
-                    $customers = $conn->query("SELECT * FROM users ORDER BY id DESC");
-                    
-                    if ($customers->num_rows > 0) {
-                        while($row = $customers->fetch_assoc()) {
-                            $status_badge = ($row['is_verified'] == 1) 
-                                ? "<span class='badge bg-green'>Verified</span>" 
-                                : "<span class='badge bg-red'>Pending</span>";
+                    $sql = "SELECT * FROM `users` ORDER BY `id` DESC";
+                    $result = $conn->query($sql);
+
+                    if ($result && $result->num_rows > 0) {
+                        while($row = $result->fetch_assoc()) {
+                            $user_id = $row['id'];
                             
+                            $addr_res = $conn->query("SELECT * FROM `addresses` WHERE `user_id` = '$user_id' ORDER BY `id` DESC");
+                            $address_html = "";
+                            
+                            if ($addr_res && $addr_res->num_rows > 0) {
+                                $address_html .= "<div class='address-directory-box'>";
+                                while($addr = $addr_res->fetch_assoc()) {
+                                    $label = !empty($addr['label']) ? htmlspecialchars($addr['label']) : 'Default';
+                                    
+                                    // 💡 核心修复：提前提取变量，并用 ?? 赋予安全默认值。
+                                    // 如果数据库里叫 'city_state'、'state' 或 'city' 都能自动兼容，没有也不会报错
+                                    $rec_name = htmlspecialchars($addr['receiver_name'] ?? '');
+                                    $rec_phone = htmlspecialchars($addr['receiver_phone'] ?? '');
+                                    $full_address = htmlspecialchars($addr['full_address'] ?? '');
+                                    $postcode = htmlspecialchars($addr['postcode'] ?? '');
+                                    $city_state = htmlspecialchars($addr['city_state'] ?? $addr['state'] ?? $addr['city'] ?? '');
+
+                                    $address_html .= "<div class='address-card-line'>
+                                                        <span class='address-label-tag'>{$label}</span> 
+                                                        <b>{$rec_name}</b> ({$rec_phone})<br>
+                                                        <span style='color:var(--slate-muted);'>{$full_address} , {$postcode} {$city_state}</span>
+                                                      </div>";
+                                }
+                                $address_html .= "</div>";
+                            } else {
+                                $address_html .= "<div style='color:var(--slate-muted); font-size:0.8rem; font-style: italic;'>No shipping coordinates saved by client.</div>";
+                            }
+
+                            $gender = !empty($row['gender']) ? htmlspecialchars($row['gender']) : 'Unspecified';
+                            $birthday = (!empty($row['birthday']) && $row['birthday'] != '0000-00-00') ? date('d M Y', strtotime($row['birthday'])) : 'Unspecified';
+                            
+                            // 💡 顺手防御：防止这里的 is_verified 字段也有未定义风险
+                            $is_verified = (($row['is_verified'] ?? 0) == 1);
+                            $status_text = $is_verified ? 'Verified Account' : 'Pending Verification';
+                            $status_class = $is_verified ? 'status-verified' : 'status-pending';
+
                             echo "<tr>
-                                    <td>#".$row['id']."</td>
-                                    <td>".htmlspecialchars($row['username'])."</td>
-                                    <td>".htmlspecialchars($row['email'])."</td>
-                                    <td>".htmlspecialchars($row['phone'] ?? '-')."</td>
-                                    <td>".$status_badge."</td>
                                     <td>
-                                        <a href='manage_customer.php?edit=".$row['id']."' class='btn-edit'>View / Edit</a>
-                                        <a href='manage_customer.php?delete=".$row['id']."' class='btn-delete' onclick=\"return confirm('Are you sure you want to completely remove this customer?');\">Remove</a>
+                                        <div style='font-weight: 700; color: var(--premium-navy);'># YNX-USR-{$user_id}</div>
+                                        <div style='margin-top: 8px;'>
+                                            <span class='verification-tag {$status_class}'>{$status_text}</span>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <div style='font-weight: 700; color: #000;'>".htmlspecialchars($row['username'] ?? '')."</div>
+                                        <div style='font-size: 0.75rem; color: var(--slate-muted); margin-top: 4px;'>Gender: {$gender}</div>
+                                        <div style='font-size: 0.75rem; color: var(--slate-muted);'>DOB: {$birthday}</div>
+                                    </td>
+                                    <td>
+                                        <div style='font-weight: 600; font-size: 0.85rem;'>".htmlspecialchars($row['email'] ?? '')."</div>
+                                        <div style='font-size: 0.8rem; color: var(--premium-navy); font-weight: 700; margin-top: 2px;'>".htmlspecialchars($row['phone'] ?? '-')."</div>
+                                    </td>
+                                    <td>
+                                        {$address_html}
+                                    </td>
+                                    <td style='text-align: right;'>
+                                        <a href='manage_customer.php?delete={$user_id}' class='btn-remove-client' onclick=\"return confirm('Are you sure you want to completely expunge this client profile and their saved address books? This cannot be undone.');\">Revoke</a>
                                     </td>
                                   </tr>";
                         }
                     } else {
-                        echo "<tr><td colspan='6' style='text-align:center; padding:20px;'>No customers registered yet.</td></tr>";
+                        echo "<tr><td colspan='5' style='text-align:center; padding:40px; color: var(--slate-muted); font-size: 0.85rem;'>No clients indexed in database directory.</td></tr>";
                     }
                     ?>
                 </tbody>

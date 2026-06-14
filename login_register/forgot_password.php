@@ -30,7 +30,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             $_SESSION['reset_token_time'] = time();
 
             // 生成绝对路径的重置链接，方便用户在邮件客户端里直接点击
-            $reset_link = "http://localhost/fyp/Yonex-Sports-Store-System/login_register/reset_password.php?token=" . $token;
+            $reset_link = "http://localhost/Yonex-Sports-Store-System/login_register/reset_password.php?token=" . $token;
 
             // ==================== 【核心修改：使用 PHPMailer 发送真实邮件】 ====================
             $mail = new PHPMailer(true);

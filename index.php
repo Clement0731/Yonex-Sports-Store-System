@@ -1,39 +1,39 @@
 <?php
-// ★ 新增：开启 Session 以便检查用户是否登录
 session_start();
 
 include 'db_connect.php';
 
-// 当前活跃类别，默认为 'home'
 $activeCategory = isset($_GET['category']) ? htmlspecialchars($_GET['category']) : 'home';
-
-// ★ 检测网址里有没有产品 ID (比如 ?id=1)
 $productId = isset($_GET['id']) ? intval($_GET['id']) : 0;
 
-// 主导航类别
 $categories = [
     'home'      => 'Home',
     'badminton' => 'Badminton',
     'service'   => 'Service',
     'about'     => 'About',
-    'contact'   => 'contact',
-    'Find Rackets Smart' => 'Find Rackets Smart',
+    'contact'   => 'Contact',
 ];
 
-// Badminton 子类别及其对应的 PHP 文件
+// Dynamic Subcategories
 $badmintonSubcategories = [
-    'badminton'    => ['label' => 'All Product', 'file' => 'data/all_product.php'],
-    'rackets'      => ['label' => 'Racket', 'file' => 'data/rackets.php'],
-    'footwear'     => ['label' => 'Footwear', 'file' => 'data/footwear.php'],
-    'shuttlecocks' => ['label' => 'Shuttlecocks', 'file' => 'data/shuttlecocks.php'],
-    'bags'         => ['label' => 'Bags', 'file' => 'data/bags.php'],
-    'apparel'      => ['label' => 'Apparel', 'file' => 'data/apparel.php'],
-    'accessories'  => ['label' => 'Accessories', 'file' => 'data/accessories.php'],
-    'package'      => ['label' => 'Package', 'file' => 'data/package.php'],
+    'badminton' => ['label' => 'All Product', 'image' => 'images/badminton-hero.jpg']
 ];
 
-// 🛠️ 核心修改：移除原有的条件判断，让小人图标始终固定指向 user_profile.php
-// 这样无论登入还是登出，都能顺畅进入该页面进行状态回显，彻底根除 404 隐患
+$cat_sql = "SELECT * FROM categories ORDER BY id ASC";
+$cat_result = $conn->query($cat_sql);
+
+if ($cat_result && $cat_result->num_rows > 0) {
+    while($cat = $cat_result->fetch_assoc()) {
+        $db_cat_name = $cat['category_name'];
+        $db_cat_key = strtolower(str_replace(' ', '_', $db_cat_name)); 
+        
+        $badmintonSubcategories[$db_cat_key] = [
+            'label' => $db_cat_name,
+            'image' => $cat['image_url']
+        ];
+    }
+}
+
 $account_url = "login_register/user_profile.php";
 ?>
 <!DOCTYPE html>
@@ -44,8 +44,8 @@ $account_url = "login_register/user_profile.php";
     <title>YONEX — Official Badminton Products</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700;800&family=Cormorant+Garamond:wght@400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
     <style>
-        /* 全局变量和基础设置保持不变 */
         *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
         :root {
             --white:     #ffffff;
@@ -69,7 +69,6 @@ $account_url = "login_register/user_profile.php";
         body { font-family: 'Montserrat', sans-serif; background: var(--offwhite); color: var(--text-main); min-height: 100vh; display: flex; flex-direction: column; }
         main { flex: 1; }
 
-        /* --- Header & 导航栏 --- */
         header { position: sticky; top: 0; z-index: 1000; background: var(--white); height: var(--nav-h); display: flex; align-items: center; padding: 0 40px; box-shadow: 0 1px 0 var(--border); }
         .logo-area { display: flex; align-items: center; text-decoration: none; min-width: 200px; }
         .logo-image { height: 38px; width: auto; display: block; }
@@ -136,14 +135,34 @@ $account_url = "login_register/user_profile.php";
             color: var(--red); 
             padding-left: 30px; 
         }
-        
-        .dropdown-content a::after { display: none; }
 
         .header-actions { min-width: 200px; display: flex; justify-content: flex-end; align-items: center; gap: 16px; }
         .icon-btn { background: none; border: none; cursor: pointer; color: var(--text-muted); padding: 6px; border-radius: 6px; transition: color 0.2s, background 0.2s; display: flex; align-items: center; text-decoration: none; }
         .icon-btn:hover { color: var(--charcoal); background: var(--lightgray); }
 
-        /* --- 首页特定样式：大型产品宣传面 --- */
+        /* =========================================
+           🚀 SEARCH OVERLAY (下拉搜索栏高级样式)
+           ========================================= */
+        .search-overlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 120px; background: var(--white);
+            z-index: 2000; transform: translateY(-100%); transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+            display: flex; align-items: center; justify-content: center; box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        }
+        .search-overlay.active { transform: translateY(0); }
+        .search-container { width: 100%; max-width: 900px; padding: 0 40px; display: flex; align-items: center; }
+        .search-form { display: flex; align-items: center; gap: 20px; width: 100%; }
+        .search-form input { 
+            flex: 1; border: none; font-size: 1.8rem; font-family: 'Cormorant Garamond', serif; 
+            color: var(--charcoal); outline: none; background: transparent; font-weight: 600;
+        }
+        .search-form input::placeholder { color: var(--midgray); font-weight: 500;}
+        .close-search { background: none; border: none; font-size: 3rem; color: var(--midgray); cursor: pointer; transition: color 0.2s; line-height: 1; padding: 0 10px;}
+        .close-search:hover { color: var(--red); }
+        .search-icon-large { color: var(--charcoal); }
+
+        /* =========================================
+           HOME PAGE STYLES
+           ========================================= */
         .hero {
             background: linear-gradient(rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0.25)), url('images/badminton-hero.jpg');
             background-size: cover; background-position: center 40%; padding: 180px 60px 170px;
@@ -181,9 +200,6 @@ $account_url = "login_register/user_profile.php";
         .page-header { padding: 200px 60px; text-align: center; background: var(--charcoal); color: var(--white); }
         .page-header h1 { font-family: 'Cormorant Garamond', serif; font-size: 4.2rem; font-weight: 600; }
 
-        footer { background: var(--white); color: var(--text-muted); text-align: center; padding: 32px 40px; font-size: 0.75rem; letter-spacing: 0.06em; border-top: 1px solid var(--border); }
-        footer strong { color: var(--charcoal); }
-
         @media (max-width: 900px) {
             header { padding: 0 20px; }
             .hero { padding: 120px 30px 100px; }
@@ -192,9 +208,52 @@ $account_url = "login_register/user_profile.php";
             .promo-image { margin-top: 30px; }
             .promo-name { font-size: 2.8rem; }
         }
+
+        /* =========================================
+           PRODUCT ANIMATION (Fade & Slide Up)
+           ========================================= */
+        @keyframes fadeSlideUp {
+            0% { opacity: 0; transform: translateY(50px); }
+            100% { opacity: 1; transform: translateY(0); }
+        }
+        
+        .product-card-anim {
+            opacity: 0;
+            animation: fadeSlideUp 0.7s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+            
+            text-decoration: none; 
+            color: inherit; 
+            display: block; 
+            background: var(--white); 
+            border: 1px solid var(--border); 
+            border-radius: 8px; 
+            padding: 20px; 
+            text-align: center; 
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+
+        .product-card-anim:hover {
+            transform: translateY(-8px) !important;
+            box-shadow: var(--shadow-hover);
+        }
+
+        footer { background: var(--white); color: var(--text-muted); text-align: center; padding: 32px 40px; font-size: 0.75rem; letter-spacing: 0.06em; border-top: 1px solid var(--border); }
+        footer strong { color: var(--charcoal); }
+
     </style>
 </head>
 <body>
+
+<div id="searchOverlay" class="search-overlay">
+    <div class="search-container">
+        <form action="index.php" method="GET" class="search-form">
+            <input type="hidden" name="category" value="search">
+            <svg class="search-icon-large" width="32" height="32" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.35-4.35"/></svg>
+            <input type="text" name="q" id="searchInput" placeholder="Search for rackets, footwear, series..." required autocomplete="off">
+            <button type="button" class="close-search" onclick="closeSearch()">&times;</button>
+        </form>
+    </div>
+</div>
 
 <header>
     <a href="?category=home" class="logo-area">
@@ -212,7 +271,7 @@ $account_url = "login_register/user_profile.php";
             <div class="dropdown-content">
                 <?php foreach ($badmintonSubcategories as $subKey => $subData): ?>
                     <a href="?category=<?= $subKey ?>">
-                        <?= $subData['label'] ?>
+                        <?= htmlspecialchars($subData['label']) ?>
                     </a>
                 <?php endforeach; ?>
             </div>
@@ -227,7 +286,9 @@ $account_url = "login_register/user_profile.php";
         </a>
     </nav>
     <div class="header-actions">
-        <button class="icon-btn" title="Search"><svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.35-4.35"/></svg></button>
+        <button class="icon-btn" title="Search" onclick="openSearch()">
+            <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.35-4.35"/></svg>
+        </button>
         <a href="payment/shopping_cart.php" class="icon-btn" title="Cart"><svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 01-8 0"/></svg></a>
         
         <a href="<?= $account_url ?>" class="icon-btn" title="Account">
@@ -241,7 +302,7 @@ $account_url = "login_register/user_profile.php";
 
 <main>
     <?php 
-        // 1. 如果网址里有 ?id=X，就直接在 main 里面加载万能详情页！
+        // 1. 如果有产品ID，显示商品详情页
         if ($productId > 0) {
             if (file_exists('product_detail.php')) {
                 include 'product_detail.php';
@@ -251,24 +312,102 @@ $account_url = "login_register/user_profile.php";
                 echo '<div class="page-header"><h1>Product Not Found</h1></div>';
             }
         } 
-        // 2. Badminton 子类别页面 (Rackets, Shoes 等)
-        elseif (isset($badmintonSubcategories[$activeCategory])) {
-            $fileToLoad = $badmintonSubcategories[$activeCategory]['file'];
-            // 兼容 file_exists 可能不在 data 文件夹里的情况
-            $fallbackFile = str_replace('data/', '', $fileToLoad);
+        // 🌟 2. 新增：如果是搜索页面
+        elseif ($activeCategory === 'search') {
+            $query_str = isset($_GET['q']) ? trim($_GET['q']) : '';
             
-            if (file_exists($fileToLoad)) {
-                include $fileToLoad;
-            } elseif (file_exists($fallbackFile)) {
-                include $fallbackFile;
+            echo '<div style="padding: 60px 40px; max-width: 1200px; margin: 0 auto; min-height: 60vh;">';
+            echo '<h1 style="font-family: \'Cormorant Garamond\', serif; font-size: 3rem; margin-bottom: 10px; color: var(--charcoal); text-transform: uppercase;">Search Results</h1>';
+            
+            if (empty($query_str)) {
+                echo '<p style="color: var(--text-muted); font-size: 1.2rem;">Please enter a search keyword to begin.</p>';
             } else {
-                echo '<div class="page-header">';
-                echo '<h1>' . htmlspecialchars($badmintonSubcategories[$activeCategory]['label']) . '</h1>';
-                echo '<p style="margin-top:20px; font-size:1.2rem; color:var(--midgray);">Coming soon...</p>';
-                echo '</div>';
+                echo '<p style="color: var(--text-muted); font-size: 1.1rem; margin-bottom: 40px; border-bottom: 2px solid var(--border); padding-bottom: 20px;">Showing results for: <strong style="color: var(--red); font-size: 1.3rem;">"' . htmlspecialchars($query_str) . '"</strong></p>';
+                
+                // 智能数据库检索：同时匹配 名字 / 系列 / 分类 / 描述
+                $escaped_q = $conn->real_escape_string($query_str);
+                $search_sql = "SELECT * FROM products WHERE name LIKE '%$escaped_q%' OR series LIKE '%$escaped_q%' OR category LIKE '%$escaped_q%' OR subtitle LIKE '%$escaped_q%' ORDER BY id DESC";
+                $search_res = $conn->query($search_sql);
+                
+                if ($search_res && $search_res->num_rows > 0) {
+                    echo '<div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 30px;">';
+                    $delay = 0;
+                    while($p = $search_res->fetch_assoc()) {
+                        $img_name = basename($p['image_url']);
+                        if (empty($img_name)) $img_name = 'placeholder.png'; 
+                        
+                        echo '<a href="?id=' . $p['id'] . '" class="product-card-anim" style="animation-delay: ' . $delay . 's;">';
+                        echo '<img src="images/' . htmlspecialchars($img_name) . '" style="width: 100%; height: 200px; object-fit: contain; margin-bottom: 15px;" alt="Product">';
+                        echo '<div style="font-size: 0.75rem; color: var(--red); font-weight: 700; letter-spacing: 0.1em; margin-bottom: 5px; text-transform: uppercase;">' . htmlspecialchars($p['series']) . '</div>';
+                        echo '<h3 style="font-size: 1.1rem; margin-bottom: 10px; color: var(--charcoal);">' . htmlspecialchars($p['name']) . '</h3>';
+                        echo '<div style="font-weight: 600; color: var(--charcoal);">RM ' . number_format($p['price'], 2) . '</div>';
+                        echo '</a>';
+                        $delay += 0.08;
+                    }
+                    echo '</div>';
+                } else {
+                    // 如果找不到商品，显示友好的空状态
+                    echo '<div style="text-align:center; padding: 60px 20px; background: var(--white); border: 1px dashed var(--border); border-radius: 8px;">';
+                    echo '<svg width="64" height="64" fill="none" stroke="var(--midgray)" stroke-width="1" viewBox="0 0 24 24" style="margin-bottom:20px;"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.35-4.35"/></svg>';
+                    echo '<h3 style="font-size: 1.5rem; margin-bottom: 15px; color: var(--charcoal);">No products found</h3>';
+                    echo '<p style="color: var(--text-muted); margin-bottom: 30px;">We couldn\'t find anything matching "'.htmlspecialchars($query_str).'". Try adjusting your keywords.</p>';
+                    echo '<a href="?category=badminton" class="btn-primary">Browse All Products</a>';
+                    echo '</div>';
+                }
             }
+            echo '</div>';
+        }
+        // 3. 如果是指定的羽毛球分类页面 (Bags, Apparel 等)
+        elseif (isset($badmintonSubcategories[$activeCategory])) {
+            
+            $catLabel = $badmintonSubcategories[$activeCategory]['label'];
+            $catImage = isset($badmintonSubcategories[$activeCategory]['image']) ? $badmintonSubcategories[$activeCategory]['image'] : '';
+            
+            $cleanImage = str_replace('../', '', $catImage);
+            if (empty($cleanImage) || !file_exists($cleanImage)) {
+                $cleanImage = 'images/badminton-hero.jpg'; 
+            }
+
+            echo '<div style="position:relative; height: 35vh; min-height: 250px; display:flex; align-items:center; justify-content:center; background: linear-gradient(rgba(0,0,0,0.5), rgba(0,0,0,0.6)), url(\'' . htmlspecialchars($cleanImage) . '\') center/cover;">';
+            echo '<h1 style="color:white; font-family: \'Cormorant Garamond\', serif; font-size: 3.5rem; text-transform: uppercase; letter-spacing: 0.1em; margin:0; text-shadow: 2px 2px 10px rgba(0,0,0,0.5);">' . htmlspecialchars($catLabel) . '</h1>';
+            echo '</div>';
+            
+            echo '<div style="padding: 60px 40px; max-width: 1200px; margin: 0 auto; min-height: 50vh;">';
+
+            if ($activeCategory === 'badminton') {
+                $prod_sql = "SELECT * FROM products ORDER BY id DESC"; 
+            } else {
+                $escapedLabel = $conn->real_escape_string($catLabel);
+                $prod_sql = "SELECT * FROM products WHERE category = '$escapedLabel' ORDER BY id DESC";
+            }
+            
+            $prod_res = $conn->query($prod_sql);
+
+            if ($prod_res && $prod_res->num_rows > 0) {
+                echo '<div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 30px;">';
+                
+                $delay = 0; 
+                
+                while($p = $prod_res->fetch_assoc()) {
+                    $img_name = basename($p['image_url']);
+                    if (empty($img_name)) $img_name = 'placeholder.png'; 
+                    
+                    echo '<a href="?id=' . $p['id'] . '" class="product-card-anim" style="animation-delay: ' . $delay . 's;">';
+                    echo '<img src="images/' . htmlspecialchars($img_name) . '" style="width: 100%; height: 200px; object-fit: contain; margin-bottom: 15px;" alt="Product">';
+                    echo '<div style="font-size: 0.75rem; color: var(--red); font-weight: 700; letter-spacing: 0.1em; margin-bottom: 5px; text-transform: uppercase;">' . htmlspecialchars($p['series']) . '</div>';
+                    echo '<h3 style="font-size: 1.1rem; margin-bottom: 10px; color: var(--charcoal);">' . htmlspecialchars($p['name']) . '</h3>';
+                    echo '<div style="font-weight: 600; color: var(--charcoal);">RM ' . number_format($p['price'], 2) . '</div>';
+                    echo '</a>';
+                    
+                    $delay += 0.08; 
+                }
+                echo '</div>';
+            } else {
+                echo '<p style="color: var(--text-muted); font-size: 1.1rem; text-align:center; padding: 40px;">No products currently available in this category.</p>';
+            }
+            echo '</div>';
         } 
-        // 3. 首页
+        // 4. 首页
         elseif ($activeCategory === 'home') {
             if (file_exists('home.php')) {
                 include 'home.php';
@@ -276,9 +415,9 @@ $account_url = "login_register/user_profile.php";
                 echo "<p style='padding:50px; text-align:center;'>Error: home.php not found.</p>";
             }
         } 
-        // 4. 其他页面
+        // 5. 其他页面
         else {
-            $otherFile = $activeCategory . '.php'; // 比如 service 就会变成 service.php
+            $otherFile = $activeCategory . '.php'; 
             if (file_exists($otherFile)) {
                 include $otherFile;
             } else {
@@ -294,6 +433,24 @@ $account_url = "login_register/user_profile.php";
 <footer>
     <p>&copy; <?= date('Y') ?> <strong>YONEX</strong>. All rights reserved. &nbsp;|&nbsp; Badminton FYP Project &nbsp;|&nbsp;Multimedia University</p>
 </footer>
+
+<script>
+    function openSearch() {
+        document.getElementById('searchOverlay').classList.add('active');
+        setTimeout(() => document.getElementById('searchInput').focus(), 100);
+    }
+
+    function closeSearch() {
+        document.getElementById('searchOverlay').classList.remove('active');
+    }
+
+    // 按键盘的 Esc 键也能快速关闭搜索框
+    document.addEventListener('keydown', function(event){
+        if(event.key === "Escape"){
+            closeSearch();
+        }
+    });
+</script>
 
 </body>
 </html>

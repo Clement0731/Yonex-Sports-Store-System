@@ -183,12 +183,12 @@ $grand_total = $total_product_price + $shipping_fee;
                                 <span class="addr-name"><?php echo htmlspecialchars($addr['receiver_name']); ?></span>
                                 <span class="addr-phone ms-2"><?php echo htmlspecialchars($addr['receiver_phone']); ?></span>
                             </div>
-                            <span class="badge bg-secondary rounded-pill px-2" style="font-size: 0.7rem;"><?php echo htmlspecialchars($addr['label']); ?></span>
+                            <span class="badge bg-secondary rounded-pill px-2" style="font-size: 0.7rem;"><?php echo htmlspecialchars($addr['label'] ?? 'Home'); ?></span>
                         </div>
                         
                         <div class="addr-detail">
                             <?php echo htmlspecialchars($addr['full_address']); ?><br>
-                            <?php echo htmlspecialchars($addr['postcode']); ?>, <?php echo htmlspecialchars($addr['city_state']); ?>
+                            <?php echo htmlspecialchars($addr['postcode']); ?>, <?php echo htmlspecialchars($addr['city_state'] ?? ''); ?>
                         </div>
                         
                         <a href="check_out.php?ids=<?php echo $ids_str; ?>&qtys=<?php echo $qtys_str; ?>&delete_id=<?php echo $addr['id']; ?>" class="btn-delete" onclick="event.stopPropagation(); return confirm('Delete this address?');">
@@ -211,7 +211,7 @@ $grand_total = $total_product_price + $shipping_fee;
             </div>
             <div class="col-md-6">
                 <label class="payment-option d-block p-3">
-                    <input class="form-check-input ms-1 mt-1 me-2" type="radio" name="payment_method" value="tng">
+                    <input class="form-check-input ms-1 mt-1 me-2" type="radio" name="payment_method" value="tng" checked>
                     <span class="fw-medium"><i class="fas fa-mobile-alt text-primary me-2"></i> Touch 'n Go eWallet</span>
                 </label>
             </div>
