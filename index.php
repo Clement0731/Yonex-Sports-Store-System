@@ -43,7 +43,8 @@ $account_url = "login_register/user_profile.php";
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>YONEX — Official Badminton Products</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700;800&family=Cormorant+Garamond:wght@400;500;600&display=swap" rel="stylesheet">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,400;14..32,500;14..32,600;14..32,700&family=Montserrat:wght@300;400;500;600;700;800&family=Cormorant+Garamond:wght@400;500;600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="style.css">
     <style>
         *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -65,6 +66,20 @@ $account_url = "login_register/user_profile.php";
             --nav-h:     70px;
         }
 
+        /* ========== 全局定制滚动条 ========== */
+        ::-webkit-scrollbar {
+            width: 8px;
+            background: var(--lightgray);
+        }
+        ::-webkit-scrollbar-thumb {
+            background: var(--charcoal);
+            border-radius: 8px;
+            border: 2px solid var(--lightgray);
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: var(--dark);
+        }
+
         html { scroll-behavior: smooth; }
         body { font-family: 'Montserrat', sans-serif; background: var(--offwhite); color: var(--text-main); min-height: 100vh; display: flex; flex-direction: column; }
         main { flex: 1; }
@@ -76,11 +91,12 @@ $account_url = "login_register/user_profile.php";
         nav { flex: 1; display: flex; justify-content: center; gap: 4px; height: 100%; align-items: center; }
         
         nav a, .dropdown-trigger {
+            font-family: 'Inter', system-ui, -apple-system, sans-serif;
             position: relative; padding: 8px 18px; color: var(--text-muted); text-decoration: none; 
             font-size: 0.85rem; font-weight: 600; letter-spacing: 0.12em; text-transform: uppercase; 
             transition: color 0.25s; white-space: nowrap; cursor: pointer;
             display: flex; align-items: center; height: 100%;
-            background: none; border: none; font-family: inherit;
+            background: none; border: none;
         }
         
         nav a::after, .dropdown-trigger::after {
@@ -117,6 +133,7 @@ $account_url = "login_register/user_profile.php";
         }
         
         .dropdown-content a {
+            font-family: 'Inter', system-ui, -apple-system, sans-serif;
             color: var(--text-muted); 
             padding: 12px 24px; 
             text-decoration: none; 
@@ -128,6 +145,11 @@ $account_url = "login_register/user_profile.php";
             transition: 0.2s; 
             text-align: left;
             white-space: nowrap;
+            position: relative;
+        }
+        
+        .dropdown-content a::after {
+            display: none;
         }
         
         .dropdown-content a:hover { 
@@ -140,9 +162,6 @@ $account_url = "login_register/user_profile.php";
         .icon-btn { background: none; border: none; cursor: pointer; color: var(--text-muted); padding: 6px; border-radius: 6px; transition: color 0.2s, background 0.2s; display: flex; align-items: center; text-decoration: none; }
         .icon-btn:hover { color: var(--charcoal); background: var(--lightgray); }
 
-        /* =========================================
-           🚀 SEARCH OVERLAY (下拉搜索栏高级样式)
-           ========================================= */
         .search-overlay {
             position: fixed; top: 0; left: 0; width: 100%; height: 120px; background: var(--white);
             z-index: 2000; transform: translateY(-100%); transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
@@ -160,9 +179,6 @@ $account_url = "login_register/user_profile.php";
         .close-search:hover { color: var(--red); }
         .search-icon-large { color: var(--charcoal); }
 
-        /* =========================================
-           HOME PAGE STYLES
-           ========================================= */
         .hero {
             background: linear-gradient(rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0.25)), url('images/badminton-hero.jpg');
             background-size: cover; background-position: center 40%; padding: 180px 60px 170px;
@@ -199,7 +215,316 @@ $account_url = "login_register/user_profile.php";
 
         .page-header { padding: 200px 60px; text-align: center; background: var(--charcoal); color: var(--white); }
         .page-header h1 { font-family: 'Cormorant Garamond', serif; font-size: 4.2rem; font-weight: 600; }
-
+        
+        .brand-features {
+            background: var(--white);
+            padding: 80px 10%;
+            border-bottom: 1px solid var(--border);
+        }
+        
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 40px;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        .feature-card {
+            text-align: center;
+            padding: 30px 20px;
+            transition: all 0.3s ease;
+            border-radius: 16px;
+            background: var(--offwhite);
+        }
+        
+        .feature-card:hover {
+            transform: translateY(-5px);
+            box-shadow: var(--shadow-hover);
+        }
+        
+        .feature-icon {
+            font-size: 2.5rem;
+            margin-bottom: 20px;
+            display: inline-block;
+        }
+        
+        .feature-card h4 {
+            font-size: 1.2rem;
+            font-weight: 700;
+            color: var(--charcoal);
+            margin-bottom: 12px;
+        }
+        
+        .feature-card p {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            line-height: 1.6;
+        }
+        
+        .news-section {
+            background: var(--offwhite);
+            padding: 80px 10%;
+        }
+        
+        .section-header {
+            text-align: center;
+            margin-bottom: 50px;
+        }
+        
+        .section-header h2 {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 2.5rem;
+            font-weight: 600;
+            color: var(--charcoal);
+            margin-bottom: 15px;
+        }
+        
+        .section-header .divider {
+            width: 60px;
+            height: 3px;
+            background: var(--red);
+            margin: 0 auto;
+        }
+        
+        .news-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 30px;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        .news-card {
+            background: var(--white);
+            border-radius: 16px;
+            overflow: hidden;
+            transition: all 0.3s ease;
+            box-shadow: var(--shadow);
+        }
+        
+        .news-card:hover {
+            transform: translateY(-5px);
+            box-shadow: var(--shadow-hover);
+        }
+        
+        .news-image {
+            height: 200px;
+            overflow: hidden;
+        }
+        
+        .news-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.3s ease;
+        }
+        
+        .news-card:hover .news-image img {
+            transform: scale(1.05);
+        }
+        
+        .news-content {
+            padding: 25px;
+        }
+        
+        .news-date {
+            font-size: 0.7rem;
+            color: var(--red);
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            margin-bottom: 10px;
+        }
+        
+        .news-title {
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: var(--charcoal);
+            margin-bottom: 12px;
+            line-height: 1.4;
+        }
+        
+        .news-excerpt {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            line-height: 1.6;
+        }
+        
+        .partners-section {
+            background: var(--white);
+            padding: 60px 10%;
+            border-top: 1px solid var(--border);
+            border-bottom: 1px solid var(--border);
+        }
+        
+        .partners-grid {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            align-items: center;
+            gap: 50px;
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+        
+        .partner-item {
+            text-align: center;
+            opacity: 0.7;
+            transition: opacity 0.3s ease;
+        }
+        
+        .partner-item:hover {
+            opacity: 1;
+        }
+        
+        .partner-name {
+            font-size: 0.8rem;
+            font-weight: 600;
+            color: var(--text-muted);
+            letter-spacing: 0.05em;
+        }
+        
+        .social-section {
+            background: var(--charcoal);
+            padding: 60px 10%;
+            text-align: center;
+        }
+        
+        .social-section h3 {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 2rem;
+            color: var(--white);
+            margin-bottom: 15px;
+        }
+        
+        .social-section p {
+            color: rgba(255,255,255,0.7);
+            margin-bottom: 30px;
+        }
+        
+        .social-links {
+            display: flex;
+            justify-content: center;
+            gap: 25px;
+        }
+        
+        .social-link {
+            width: 48px;
+            height: 48px;
+            background: rgba(255,255,255,0.1);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+            color: var(--white);
+            text-decoration: none;
+        }
+        
+        .social-link:hover {
+            background: var(--red);
+            transform: translateY(-3px);
+        }
+        
+        .footer-enhanced {
+            background: var(--charcoal);
+            color: var(--white);
+            padding: 60px 10% 30px;
+        }
+        
+        .footer-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 50px;
+            max-width: 1200px;
+            margin: 0 auto;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+            padding-bottom: 40px;
+        }
+        
+        .footer-col h4 {
+            font-size: 1rem;
+            font-weight: 700;
+            letter-spacing: 0.1em;
+            margin-bottom: 20px;
+            color: var(--white);
+            position: relative;
+            display: inline-block;
+        }
+        
+        .footer-col h4::after {
+            content: '';
+            position: absolute;
+            bottom: -8px;
+            left: 0;
+            width: 40px;
+            height: 2px;
+            background: var(--red);
+        }
+        
+        .footer-col p {
+            color: rgba(255,255,255,0.6);
+            font-size: 0.85rem;
+            line-height: 1.7;
+            margin-bottom: 20px;
+        }
+        
+        .footer-contact-info {
+            list-style: none;
+            margin-top: 15px;
+        }
+        
+        .footer-contact-info li {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 15px;
+            color: rgba(255,255,255,0.6);
+            font-size: 0.85rem;
+        }
+        
+        .footer-contact-info svg {
+            flex-shrink: 0;
+        }
+        
+        .footer-hours {
+            margin-top: 20px;
+            padding-top: 15px;
+            border-top: 1px solid rgba(255,255,255,0.1);
+        }
+        
+        .footer-hours p {
+            margin-bottom: 8px;
+            font-size: 0.8rem;
+        }
+        
+        .store-list {
+            list-style: none;
+        }
+        
+        .store-list li {
+            margin-bottom: 15px;
+        }
+        
+        .store-list li strong {
+            color: var(--white);
+            display: block;
+            margin-bottom: 4px;
+        }
+        
+        .store-list li span {
+            font-size: 0.8rem;
+            color: rgba(255,255,255,0.5);
+        }
+        
+        .footer-bottom {
+            text-align: center;
+            padding-top: 30px;
+            font-size: 0.75rem;
+            color: rgba(255,255,255,0.5);
+        }
+        
         @media (max-width: 900px) {
             header { padding: 0 20px; }
             .hero { padding: 120px 30px 100px; }
@@ -207,11 +532,21 @@ $account_url = "login_register/user_profile.php";
             .promo-text { padding: 20px 0; }
             .promo-image { margin-top: 30px; }
             .promo-name { font-size: 2.8rem; }
+            
+            .features-grid { grid-template-columns: repeat(2, 1fr); gap: 20px; }
+            .news-grid { grid-template-columns: repeat(2, 1fr); }
+            .footer-grid { grid-template-columns: 1fr; text-align: center; gap: 40px; }
+            .footer-col h4::after { left: 50%; transform: translateX(-50%); }
+            .footer-contact-info li { justify-content: center; }
+            .partners-grid { gap: 30px; }
+        }
+        
+        @media (max-width: 600px) {
+            .features-grid { grid-template-columns: 1fr; }
+            .news-grid { grid-template-columns: 1fr; }
+            .social-links { gap: 15px; }
         }
 
-        /* =========================================
-           PRODUCT ANIMATION (Fade & Slide Up)
-           ========================================= */
         @keyframes fadeSlideUp {
             0% { opacity: 0; transform: translateY(50px); }
             100% { opacity: 1; transform: translateY(0); }
@@ -220,7 +555,6 @@ $account_url = "login_register/user_profile.php";
         .product-card-anim {
             opacity: 0;
             animation: fadeSlideUp 0.7s cubic-bezier(0.16, 1, 0.3, 1) forwards;
-            
             text-decoration: none; 
             color: inherit; 
             display: block; 
@@ -236,10 +570,6 @@ $account_url = "login_register/user_profile.php";
             transform: translateY(-8px) !important;
             box-shadow: var(--shadow-hover);
         }
-
-        footer { background: var(--white); color: var(--text-muted); text-align: center; padding: 32px 40px; font-size: 0.75rem; letter-spacing: 0.06em; border-top: 1px solid var(--border); }
-        footer strong { color: var(--charcoal); }
-
     </style>
 </head>
 <body>
@@ -302,7 +632,6 @@ $account_url = "login_register/user_profile.php";
 
 <main>
     <?php 
-        // 1. 如果有产品ID，显示商品详情页
         if ($productId > 0) {
             if (file_exists('product_detail.php')) {
                 include 'product_detail.php';
@@ -312,7 +641,6 @@ $account_url = "login_register/user_profile.php";
                 echo '<div class="page-header"><h1>Product Not Found</h1></div>';
             }
         } 
-        // 🌟 2. 新增：如果是搜索页面
         elseif ($activeCategory === 'search') {
             $query_str = isset($_GET['q']) ? trim($_GET['q']) : '';
             
@@ -324,7 +652,6 @@ $account_url = "login_register/user_profile.php";
             } else {
                 echo '<p style="color: var(--text-muted); font-size: 1.1rem; margin-bottom: 40px; border-bottom: 2px solid var(--border); padding-bottom: 20px;">Showing results for: <strong style="color: var(--red); font-size: 1.3rem;">"' . htmlspecialchars($query_str) . '"</strong></p>';
                 
-                // 智能数据库检索：同时匹配 名字 / 系列 / 分类 / 描述
                 $escaped_q = $conn->real_escape_string($query_str);
                 $search_sql = "SELECT * FROM products WHERE name LIKE '%$escaped_q%' OR series LIKE '%$escaped_q%' OR category LIKE '%$escaped_q%' OR subtitle LIKE '%$escaped_q%' ORDER BY id DESC";
                 $search_res = $conn->query($search_sql);
@@ -346,7 +673,6 @@ $account_url = "login_register/user_profile.php";
                     }
                     echo '</div>';
                 } else {
-                    // 如果找不到商品，显示友好的空状态
                     echo '<div style="text-align:center; padding: 60px 20px; background: var(--white); border: 1px dashed var(--border); border-radius: 8px;">';
                     echo '<svg width="64" height="64" fill="none" stroke="var(--midgray)" stroke-width="1" viewBox="0 0 24 24" style="margin-bottom:20px;"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.35-4.35"/></svg>';
                     echo '<h3 style="font-size: 1.5rem; margin-bottom: 15px; color: var(--charcoal);">No products found</h3>';
@@ -357,7 +683,6 @@ $account_url = "login_register/user_profile.php";
             }
             echo '</div>';
         }
-        // 3. 如果是指定的羽毛球分类页面 (Bags, Apparel 等)
         elseif (isset($badmintonSubcategories[$activeCategory])) {
             
             $catLabel = $badmintonSubcategories[$activeCategory]['label'];
@@ -407,7 +732,6 @@ $account_url = "login_register/user_profile.php";
             }
             echo '</div>';
         } 
-        // 4. 首页
         elseif ($activeCategory === 'home') {
             if (file_exists('home.php')) {
                 include 'home.php';
@@ -415,7 +739,6 @@ $account_url = "login_register/user_profile.php";
                 echo "<p style='padding:50px; text-align:center;'>Error: home.php not found.</p>";
             }
         } 
-        // 5. 其他页面
         else {
             $otherFile = $activeCategory . '.php'; 
             if (file_exists($otherFile)) {
@@ -430,8 +753,100 @@ $account_url = "login_register/user_profile.php";
     ?>
 </main>
 
-<footer>
-    <p>&copy; <?= date('Y') ?> <strong>YONEX</strong>. All rights reserved. &nbsp;|&nbsp; Badminton FYP Project &nbsp;|&nbsp;Multimedia University</p>
+<div class="partners-section">
+    <div class="partners-grid">
+        <div class="partner-item">
+            <div class="partner-name">🏸 BWF World Tour</div>
+        </div>
+        <div class="partner-item">
+            <div class="partner-name">🏆 All England Open</div>
+        </div>
+        <div class="partner-item">
+            <div class="partner-name">🌏 Thomas & Uber Cup</div>
+        </div>
+        <div class="partner-item">
+            <div class="partner-name">⭐ World Championships</div>
+        </div>
+        <div class="partner-item">
+            <div class="partner-name">🏅 Sudirman Cup</div>
+        </div>
+    </div>
+</div>
+
+<div class="social-section">
+    <h3>Connect With YONEX</h3>
+    <p>Follow us for the latest updates, product launches and tournament news</p>
+    <div class="social-links">
+        <a href="https://www.bing.com/ck/a?!&&p=1b78ae21ae39206a25e261822e2f2991ec0316d1eede06aa20ac4c740e9f7f1eJmltdHM9MTc4MTM5NTIwMA&ptn=3&ver=2&hsh=4&fclid=086117f6-b82c-6386-2e95-032fb9bb6265&psq=yonex+facebook&u=a1aHR0cHM6Ly93d3cuZmFjZWJvb2suY29tL3lvbmV4YmFkbWludG9uLw" class="social-link">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor"><path d="M22 12c0-5.523-4.477-10-10-10S2 6.477 2 12c0 4.991 3.657 9.128 8.438 9.879v-6.99h-2.54V12h2.54V9.797c0-2.506 1.492-3.89 3.777-3.89 1.094 0 2.238.195 2.238.195v2.46h-1.26c-1.243 0-1.63.771-1.63 1.562V12h2.773l-.443 2.89h-2.33v6.99C18.343 21.128 22 16.991 22 12z"/></svg>
+        </a>
+        <a href="https://www.bing.com/ck/a?!&&p=30ac00a68fcc78525f1a01a73686ba665cd835c6a93d8b3a61e89d2c9627c97aJmltdHM9MTc4MTM5NTIwMA&ptn=3&ver=2&hsh=4&fclid=086117f6-b82c-6386-2e95-032fb9bb6265&psq=yonex+x&u=a1aHR0cHM6Ly94LmNvbS95b25leF9jb20" class="social-link">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/>
+            </svg>
+        </a>
+        <a href="https://www.bing.com/ck/a?!&&p=9adb6bb7c971b7adc6b5bdb3233ea95df846018f438ddaee1811b94547041cbcJmltdHM9MTc4MTM5NTIwMA&ptn=3&ver=2&hsh=4&fclid=086117f6-b82c-6386-2e95-032fb9bb6265&psq=yonex+instagram&u=a1aHR0cHM6Ly93d3cuaW5zdGFncmFtLmNvbS95b25leF9jb20v" class="social-link">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zM12 0C8.741 0 8.333.014 7.053.072 2.695.272.273 2.69.073 7.052.014 8.333 0 8.741 0 12c0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98C8.333 23.986 8.741 24 12 24c3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98C15.668.014 15.259 0 12 0zm0 5.838a6.162 6.162 0 100 12.324 6.162 6.162 0 000-12.324zM12 16a4 4 0 110-8 4 4 0 010 8zm6.406-11.845a1.44 1.44 0 100 2.881 1.44 1.44 0 000-2.881z"/></svg>
+        </a>
+        <a href="https://www.bing.com/ck/a?!&&p=3dcd154fb5d0766b18fde4f74c7fe56c24d5f629d5c72bec205de0571d14c23fJmltdHM9MTc4MTM5NTIwMA&ptn=3&ver=2&hsh=4&fclid=086117f6-b82c-6386-2e95-032fb9bb6265&psq=yonex+youtube&u=a1aHR0cHM6Ly93d3cueW91dHViZS5jb20veW9uZXhjb20" class="social-link">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.376.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.376-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/>
+            </svg>
+        </a>
+    </div>
+</div>
+
+<footer class="footer-enhanced">
+    <div class="footer-grid">
+        <div class="footer-col">
+            <h4>About YONEX</h4>
+            <p>Founded in 1946 in Niigata, Japan, YONEX has grown into the world's leading badminton brand, trusted by champions across generations.</p>
+            <p>Our philosophy: "Innovation through craftsmanship" — delivering excellence in every product we create.</p>
+        </div>
+        
+        <div class="footer-col">
+            <h4>Contact Us</h4>
+            <ul class="footer-contact-info">
+                <li>
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.127.96.362 1.903.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.907.338 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+                    <span>+60 3-1234 5678</span>
+                </li>
+                <li>
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+                    <span>support@yonex.com.my</span>
+                </li>
+                <li>
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+                    <span>Level 20, Menara Exchange, 59200 KL</span>
+                </li>
+            </ul>
+            <div class="footer-hours">
+                <p>🕒 Mon - Fri: 9:00 - 18:00</p>
+                <p>🕒 Sat: 10:00 - 15:00</p>
+            </div>
+        </div>
+        
+        <div class="footer-col">
+            <h4>Find a Store</h4>
+            <ul class="store-list">
+                <li>
+                    <strong>YONEX KL Flagship</strong>
+                    <span>Bukit Bintang, Kuala Lumpur</span>
+                </li>
+                <li>
+                    <strong>YONEX Penang</strong>
+                    <span>Gurney Plaza, George Town</span>
+                </li>
+                <li>
+                    <strong>YONEX Johor Bahru</strong>
+                    <span>Mid Valley Southkey</span>
+                </li>
+            </ul>
+        </div>
+    </div>
+    <div class="footer-bottom">
+        <p>&copy; <?= date('Y') ?> <strong>YONEX</strong>. All rights reserved. | Badminton FYP Project | Multimedia University</p>
+    </div>
 </footer>
 
 <script>
@@ -444,7 +859,6 @@ $account_url = "login_register/user_profile.php";
         document.getElementById('searchOverlay').classList.remove('active');
     }
 
-    // 按键盘的 Esc 键也能快速关闭搜索框
     document.addEventListener('keydown', function(event){
         if(event.key === "Escape"){
             closeSearch();

@@ -1,9 +1,21 @@
 <style>
+    /* 新增的弹出动画定义 */
+    @keyframes fadeUp {
+        from {
+            opacity: 0;
+            transform: translateY(24px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
     /* Service 页面专属头部 */
     .service-hero {
-        background: linear-gradient(rgba(15, 23, 42, 0.8), rgba(15, 23, 42, 0.9)), url('images/badminton-hero.jpg') no-repeat center center;
+        background: linear-gradient(rgba(15, 23, 42, 0.8), rgba(15, 23, 42, 0.9)), url('images/badminton_service_bg.jpg') no-repeat center center;
         background-size: cover;
-        padding: 120px 20px;
+        padding: 250px 20px;
         text-align: center;
         color: var(--white);
     }
@@ -12,6 +24,8 @@
         font-family: 'Cormorant Garamond', serif;
         font-size: 4rem;
         margin-bottom: 20px;
+        /* 添加了动画效果 */
+        animation: fadeUp 0.8s ease-out forwards;
     }
     
     .service-hero p {
@@ -20,6 +34,9 @@
         max-width: 600px;
         margin: 0 auto;
         line-height: 1.6;
+        /* 添加了动画效果，并设置了 0.2s 的延迟，更有层次感 */
+        opacity: 0; 
+        animation: fadeUp 0.8s ease-out 0.2s forwards; 
     }
 
     /* 服务卡片容器 */
@@ -164,11 +181,9 @@
 
 <div class="services-container">
     
-    <!-- 第一项服务：专业穿线 -->
     <div class="service-card">
         <div class="service-image">
             <div class="img-placeholder">IMAGE: STRINGING</div>
-            <!-- 如果你有穿线的图片，可以放进 images 文件夹，然后在这里改名字 -->
             <img src="images/RS.jpg" alt="Racket Stringing Service" onerror="this.style.opacity='0'">
         </div>
         <div class="service-content">
@@ -184,11 +199,9 @@
         </div>
     </div>
 
-    <!-- 第二项服务：衣服印字 -->
     <div class="service-card">
         <div class="service-image">
             <div class="img-placeholder">IMAGE: APPAREL PRINTING</div>
-            <!-- 如果你有印字的图片，可以放进 images 文件夹，然后在这里改名字 -->
             <img src="images/AC.jpg" alt="Apparel Printing Service" onerror="this.style.opacity='0'">
         </div>
         <div class="service-content">
