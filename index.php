@@ -894,5 +894,490 @@ $account_url = "login_register/user_profile.php";
     });
 </script>
 
+<!-- ========================================= -->
+<!-- 产品推荐助手 Chatbot - 通过问答推荐球拍/球鞋 -->
+<!-- 基于 YONEX 实际产品库：8款球拍 + 4款球鞋 -->
+<!-- ========================================= -->
+
+<style>
+/* 聊天机器人浮动按钮 + 窗口样式 */
+.chatbot-btn {
+    position: fixed;
+    bottom: 30px;
+    right: 30px;
+    width: 60px;
+    height: 60px;
+    background: var(--red, #d0021b);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    z-index: 1000;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+    transition: all 0.3s ease;
+    border: none;
+    color: white;
+}
+
+.chatbot-btn:hover {
+    transform: scale(1.1);
+    background: var(--red-hover, #a80016);
+}
+
+.chatbot-window {
+    position: fixed;
+    bottom: 100px;
+    right: 30px;
+    width: 380px;
+    height: 550px;
+    background: var(--white);
+    border-radius: 20px;
+    box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+    z-index: 1001;
+    display: none;
+    flex-direction: column;
+    overflow: hidden;
+    font-family: 'Inter', sans-serif;
+    border: 1px solid var(--border);
+}
+
+.chatbot-window.active {
+    display: flex;
+}
+
+.chatbot-header {
+    background: var(--red, #d0021b);
+    color: white;
+    padding: 18px 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.chatbot-header h3 {
+    font-size: 1.1rem;
+    font-weight: 600;
+    margin: 0;
+    font-family: 'Inter', sans-serif;
+}
+
+.chatbot-close {
+    background: none;
+    border: none;
+    color: white;
+    font-size: 1.5rem;
+    cursor: pointer;
+    padding: 0;
+    line-height: 1;
+}
+
+.chatbot-messages {
+    flex: 1;
+    padding: 20px;
+    overflow-y: auto;
+    background: var(--offwhite);
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.chatbot-message {
+    max-width: 85%;
+    padding: 12px 16px;
+    border-radius: 18px;
+    font-size: 0.9rem;
+    line-height: 1.4;
+}
+
+.chatbot-message.bot {
+    background: var(--white);
+    color: var(--charcoal);
+    align-self: flex-start;
+    border-bottom-left-radius: 4px;
+    box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+}
+
+.chatbot-message.user {
+    background: var(--red, #d0021b);
+    color: white;
+    align-self: flex-end;
+    border-bottom-right-radius: 4px;
+}
+
+.chatbot-options {
+    padding: 15px;
+    border-top: 1px solid var(--border);
+    background: var(--white);
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
+.chatbot-option {
+    background: var(--offwhite);
+    border: 1px solid var(--border);
+    padding: 10px 16px;
+    border-radius: 30px;
+    font-size: 0.8rem;
+    cursor: pointer;
+    transition: all 0.2s;
+    color: var(--charcoal);
+    font-weight: 500;
+}
+
+.chatbot-option:hover {
+    background: var(--red);
+    color: white;
+    border-color: var(--red);
+}
+
+.chatbot-restart {
+    background: none;
+    border: none;
+    color: var(--red);
+    font-size: 0.75rem;
+    cursor: pointer;
+    margin-top: 10px;
+    text-align: center;
+    width: 100%;
+}
+
+@media (max-width: 500px) {
+    .chatbot-window {
+        width: calc(100vw - 40px);
+        right: 20px;
+        bottom: 80px;
+        height: 500px;
+    }
+    .chatbot-btn {
+        bottom: 20px;
+        right: 20px;
+        width: 50px;
+        height: 50px;
+    }
+}
+</style>
+
+<div class="chatbot-btn" id="chatbotBtn">
+    <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
+        <line x1="9" y1="10" x2="9.01" y2="10"/>
+        <line x1="15" y1="10" x2="15.01" y2="10"/>
+    </svg>
+</div>
+
+<div class="chatbot-window" id="chatbotWindow">
+    <div class="chatbot-header">
+        <h3>🏸 YONEX Product Advisor</h3>
+        <button class="chatbot-close" id="chatbotClose">×</button>
+    </div>
+    <div class="chatbot-messages" id="chatbotMessages">
+        <div class="chatbot-message bot">
+            👋 Hi! I'm your YONEX Product Advisor.<br><br>
+            I can help you find the perfect racket or footwear. Let's get started:
+        </div>
+    </div>
+    <div class="chatbot-options" id="chatbotOptions">
+        <button class="chatbot-option" onclick="window.startRacketFromBtn()">🏸 Find a Racket</button>
+        <button class="chatbot-option" onclick="window.startShoesFromBtn()">👟 Find Footwear</button>
+    </div>
+</div>
+
+<script>
+// ============================================
+// YONEX Product Advisor Chatbot
+// Based on actual product database: 8 rackets + 4 shoes
+// ============================================
+
+(function() {
+    // 状态管理
+    let currentStep = 'start';
+    let userAnswers = {
+        racket: { level: null, style: null },
+        shoes: { preference: null }
+    };
+    
+    const messagesContainer = document.getElementById('chatbotMessages');
+    const optionsContainer = document.getElementById('chatbotOptions');
+    const chatbotWindow = document.getElementById('chatbotWindow');
+    const chatbotBtn = document.getElementById('chatbotBtn');
+    const chatbotClose = document.getElementById('chatbotClose');
+    
+    // ========== 球拍产品库 (8款) ==========
+    const racketProducts = {
+        'Nanoflare 1000Z': { id: 1, price: 'RM 1,098.98', series: 'NANOFLAIRE', type: 'speed', level: 'advanced' },
+        'Nanoflare 800 Pro': { id: 2, price: 'RM 899.00', series: 'NANOFLAIRE', type: 'speed', level: 'intermediate' },
+        'Duora Z Strike': { id: 3, price: 'RM 999.00', series: 'DUORA', type: 'allround', level: 'advanced' },
+        'Astrox 100 ZZ': { id: 4, price: 'RM 1,099.00', series: 'ASTROX', type: 'offensive', level: 'advanced' },
+        'Astrox 99 Pro': { id: 5, price: 'RM 899.00', series: 'ASTROX', type: 'offensive', level: 'intermediate' },
+        'Astrox 88D Pro': { id: 6, price: 'RM 1,099.00', series: 'ASTROX', type: 'offensive', level: 'advanced' },
+        'Arcsaber 11 Pro': { id: 7, price: 'RM 999.00', series: 'ARCSABER', type: 'allround', level: 'intermediate' },
+        'Arcsaber 7 Play': { id: 8, price: 'RM 899.00', series: 'ARCSABER', type: 'beginner', level: 'beginner' }
+    };
+    
+    // ========== 球鞋产品库 (4款) ==========
+    const shoesProducts = {
+        'SUBAXIA GT': { id: 21, price: 'RM 799.00', series: 'SUBAXIA', feature: 'stability', desc: ' Maximum stability & support' },
+        'Power Cushion Aerus Z': { id: 22, price: 'RM 599.00', series: 'AERUS', feature: 'speed', desc: ' Ultra-lightweight for speed' },
+        'Power Cushion 65 Z4': { id: 23, price: 'RM 599.00', series: 'POWER CUSHION', feature: 'cushion', desc: ' Classic cushioning comfort' },
+        'Power Cushion Eclipsion Z': { id: 24, price: 'RM 699.00', series: 'ECLIPSSION', feature: 'protection', desc: ' Ankle protection & stability' }
+    };
+    
+    // 添加消息到聊天框
+    function addMessage(text, isUser = false) {
+        const msgDiv = document.createElement('div');
+        msgDiv.className = `chatbot-message ${isUser ? 'user' : 'bot'}`;
+        msgDiv.innerHTML = text;
+        messagesContainer.appendChild(msgDiv);
+        messagesContainer.scrollTop = messagesContainer.scrollHeight;
+    }
+    
+    // 清空选项按钮
+    function clearOptions() {
+        optionsContainer.innerHTML = '';
+    }
+    
+    // 添加选项按钮
+    function addOption(text, action) {
+        const btn = document.createElement('button');
+        btn.className = 'chatbot-option';
+        btn.textContent = text;
+        btn.onclick = () => {
+            addMessage(text, true);
+            setTimeout(() => action(), 300);
+        };
+        optionsContainer.appendChild(btn);
+    }
+    
+    // 添加重新开始按钮
+    function addRestartButton() {
+        const restartBtn = document.createElement('button');
+        restartBtn.className = 'chatbot-restart';
+        restartBtn.textContent = '🔄 Restart';
+        restartBtn.onclick = () => {
+            resetChat();
+        };
+        optionsContainer.appendChild(restartBtn);
+    }
+    
+    // 重置聊天
+    function resetChat() {
+        currentStep = 'start';
+        userAnswers = {
+            racket: { level: null, style: null },
+            shoes: { preference: null }
+        };
+        messagesContainer.innerHTML = '';
+        clearOptions();
+        
+        addMessage('👋 Hi! I\'m your YONEX Product Advisor.<br><br>I can help you find the perfect racket or footwear. Let\'s get started:');
+        addOption('🏸 Find a Racket', startRacketRecommend);
+        addOption('👟 Find Footwear', startShoesRecommend);
+    }
+    
+    // ========== 球拍推荐逻辑 ==========
+    function startRacketRecommend() {
+        currentStep = 'racket_q1';
+        addMessage('Great! Let me understand your playing style.<br><br>🎯 **What is your skill level?**');
+        clearOptions();
+        addOption('🏅 Beginner', () => answerRacketLevel('beginner'));
+        addOption('⚡ Intermediate / Club Player', () => answerRacketLevel('intermediate'));
+        addOption('🏆 Advanced / Competitive', () => answerRacketLevel('advanced'));
+    }
+    
+    function answerRacketLevel(level) {
+        userAnswers.racket.level = level;
+        currentStep = 'racket_q2';
+        
+        let levelText = level === 'beginner' ? 'Beginner' : (level === 'intermediate' ? 'Intermediate' : 'Advanced');
+        addMessage(`Your skill level: ${levelText}<br><br>🎨 **What is your preferred playing style?**`);
+        clearOptions();
+        addOption('💪 Aggressive / Smash-focused', () => answerRacketStyle('offensive'));
+        addOption('🛡️ Defensive / Control-focused', () => answerRacketStyle('defensive'));
+        addOption('⚖️ All-round / Balanced', () => answerRacketStyle('allround'));
+    }
+    
+    function answerRacketStyle(style) {
+        userAnswers.racket.style = style;
+        currentStep = 'racket_result';
+        
+        let styleText = style === 'offensive' ? 'Aggressive' : (style === 'defensive' ? 'Defensive' : 'All-round');
+        addMessage(`Your playing style: ${styleText}<br><br>🔍 **Finding the best racket for you...**`);
+        
+        setTimeout(() => {
+            showRacketRecommendation();
+        }, 600);
+    }
+    
+    function showRacketRecommendation() {
+        const level = userAnswers.racket.level;
+        const style = userAnswers.racket.style;
+        
+        let recommendedRackets = [];
+        
+        // 根据水平 + 打法匹配球拍
+        if (level === 'beginner') {
+            recommendedRackets = ['Arcsaber 7 Play'];
+        } 
+        else if (level === 'intermediate') {
+            if (style === 'offensive') {
+                recommendedRackets = ['Astrox 99 Pro'];
+            } else if (style === 'defensive') {
+                recommendedRackets = ['Nanoflare 800 Pro'];
+            } else {
+                recommendedRackets = ['Arcsaber 11 Pro'];
+            }
+        } 
+        else {
+            if (style === 'offensive') {
+                recommendedRackets = ['Astrox 100 ZZ', 'Astrox 88D Pro'];
+            } else if (style === 'defensive') {
+                recommendedRackets = ['Nanoflare 1000Z'];
+            } else {
+                recommendedRackets = ['Duora Z Strike'];
+            }
+        }
+        
+        // 构建推荐消息
+        let recommendationHtml = '';
+        for (let i = 0; i < recommendedRackets.length; i++) {
+            const racket = racketProducts[recommendedRackets[i]];
+            if (racket) {
+                recommendationHtml += `
+                    <div style="margin-bottom: 15px; padding: 10px; background: var(--offwhite); border-radius: 12px;">
+                        <strong style="color: var(--red);">🏸 ${recommendedRackets[i]}</strong><br>
+                        📦 Series: ${racket.series}<br>
+                        💰 Price: ${racket.price}<br>
+                        ⚖️ Weight: 3U / 4U<br>
+                        🧵 String options: BG66 ULTIMAX / EXBOLT 63 / AEROBITE<br>
+                        📏 Tension: 24 / 26 / 28 lbs<br>
+                        👉 <a href="?id=${racket.id}" style="color: var(--red); text-decoration: underline;">View Product</a>
+                    </div>
+                `;
+            }
+        }
+        
+        addMessage(`<strong>🎯 Based on your answers, I recommend:</strong><br><br>${recommendationHtml}`);
+        
+        clearOptions();
+        addOption('🏸 Recommend Another Racket', startRacketRecommend);
+        addOption('👟 Find Footwear', startShoesRecommend);
+        addOption('🔄 Restart', resetChat);
+    }
+    
+    // ========== 球鞋推荐逻辑 ==========
+    function startShoesRecommend() {
+        currentStep = 'shoes_q1';
+        addMessage('👟 Let me help you find the perfect badminton shoes!<br><br>🎯 **What is your main priority when choosing shoes?**');
+        clearOptions();
+        addOption('⚡ Speed & Lightweight', () => answerShoesPreference('speed'));
+        addOption('🛡️ Stability & Support', () => answerShoesPreference('stability'));
+        addOption('💨 Maximum Cushioning', () => answerShoesPreference('cushion'));
+        addOption('🦶 Ankle Protection', () => answerShoesPreference('protection'));
+    }
+    
+    function answerShoesPreference(preference) {
+        userAnswers.shoes.preference = preference;
+        currentStep = 'shoes_result';
+        
+        let prefText = '';
+        if (preference === 'speed') prefText = 'Speed & Lightweight';
+        else if (preference === 'stability') prefText = 'Stability & Support';
+        else if (preference === 'cushion') prefText = 'Maximum Cushioning';
+        else prefText = 'Ankle Protection';
+        
+        addMessage(`Your preference: ${prefText}<br><br>🔍 **Finding the best footwear for you...**`);
+        
+        setTimeout(() => {
+            showShoesRecommendation();
+        }, 600);
+    }
+    
+    function showShoesRecommendation() {
+        const preference = userAnswers.shoes.preference;
+        
+        let recommendedShoes = [];
+        let description = '';
+        
+        switch(preference) {
+            case 'speed':
+                recommendedShoes = ['Power Cushion Aerus Z'];
+                description = 'Ultra-lightweight design for explosive movement and quick footwork.';
+                break;
+            case 'stability':
+                recommendedShoes = ['SUBAXIA GT'];
+                description = 'Excellent lateral support and stability for aggressive players.';
+                break;
+            case 'cushion':
+                recommendedShoes = ['Power Cushion 65 Z4'];
+                description = 'Superior shock absorption with Power Cushion+ technology.';
+                break;
+            case 'protection':
+                recommendedShoes = ['Power Cushion Eclipsion Z'];
+                description = 'Enhanced ankle protection and support for injury prevention.';
+                break;
+            default:
+                recommendedShoes = ['Power Cushion 65 Z4'];
+                description = 'All-round performance with great comfort.';
+        }
+        
+        let recommendationHtml = '';
+        for (let i = 0; i < recommendedShoes.length; i++) {
+            const shoe = shoesProducts[recommendedShoes[i]];
+            if (shoe) {
+                recommendationHtml += `
+                    <div style="margin-bottom: 15px; padding: 10px; background: var(--offwhite); border-radius: 12px;">
+                        <strong style="color: var(--red);">👟 ${recommendedShoes[i]}</strong><br>
+                        📦 Series: ${shoe.series}<br>
+                        🎯 Type: ${shoe.desc}<br>
+                        👟 Size: Standard (Normal fit)<br>
+                        💰 Price: ${shoe.price}<br>
+                        👉 <a href="?id=${shoe.id}" style="color: var(--red); text-decoration: underline;">View Product</a>
+                    </div>
+                `;
+            }
+        }
+        
+        addMessage(`<strong>🎯 Based on your preference, I recommend:</strong><br><br>${recommendationHtml}<br>📝 ${description}`);
+        
+        clearOptions();
+        addOption('👟 Recommend Another Shoe', startShoesRecommend);
+        addOption('🏸 Find a Racket', startRacketRecommend);
+        addOption('🔄 Restart', resetChat);
+    }
+    
+    // 打开/关闭窗口
+    function openChat() {
+        chatbotWindow.classList.add('active');
+        messagesContainer.scrollTop = messagesContainer.scrollHeight;
+    }
+    
+    function closeChat() {
+        chatbotWindow.classList.remove('active');
+    }
+    
+    // 绑定全局函数供初始按钮使用
+    window.startRacketFromBtn = function() {
+        addMessage('🏸 Find a Racket', true);
+        startRacketRecommend();
+    };
+    
+    window.startShoesFromBtn = function() {
+        addMessage('👟 Find Footwear', true);
+        startShoesRecommend();
+    };
+    
+    chatbotBtn.onclick = openChat;
+    chatbotClose.onclick = closeChat;
+    
+    // 点击窗口外部关闭
+    document.addEventListener('click', function(e) {
+        if (!chatbotWindow.contains(e.target) && !chatbotBtn.contains(e.target) && chatbotWindow.classList.contains('active')) {
+            closeChat();
+        }
+    });
+})();
+</script>
 </body>
 </html>
