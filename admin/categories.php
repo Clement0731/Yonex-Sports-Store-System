@@ -40,7 +40,7 @@ if (isset($_GET['delete_id'])) {
 
     if ($prod_count > 0) {
         // 如果有商品，坚决不让删！
-        $error_msg = "<div class='alert alert-danger'>Cannot delete! There are still <b>$prod_count items</b> inside the '$del_name' category. Please move or delete the products first. (防误删拦截：分类下还有商品，禁止删除！)</div>";
+        $error_msg = "<div class='alert alert-danger'>Cannot delete! There are still <b>$prod_count items</b> inside the '$del_name' category. Please move or delete the products first.</div>";
     } else {
         // 如果是空的，允许删除
         $conn->query("DELETE FROM categories WHERE id = $del_id");

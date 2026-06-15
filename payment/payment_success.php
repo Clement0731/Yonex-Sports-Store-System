@@ -34,7 +34,7 @@ if ($user_id > 0) {
         // 计算 subtotal (总价扣掉 10 块运费)
         $subtotal = max(0, $amount - 10.00);
 
-        // 4. Secure Transaction Insertion (完全匹配你的原生列名)
+        // 4. Secure Transaction Insertion
         $stmt = $conn->prepare("INSERT INTO orders (USER_ID, ORDER_DATE, TOTAL_PRICE, subtotal, shipping_fee, STATUS, payment_status, shipping_address, payment_method) VALUES (?, NOW(), ?, ?, 10.00, 'Paid', 'Paid', ?, ?)");
         $stmt->bind_param("iddss", $user_id, $amount, $subtotal, $shipping_address_str, $final_method);
         
@@ -43,10 +43,14 @@ if ($user_id > 0) {
             $_SESSION['last_order_id'] = $db_order_id;
             $_SESSION['last_order_amount'] = $amount;
             
-            // 5. Bulletproof Itemized Data Mapping
-            $cart_sql = "SELECT c.variant_id, c.product_id, c.quantity, p.price, c.string_option_id, c.tension_option_id 
+            // 5. Bulletproof Itemized Data Mapping (Fixed service prices)
+            $cart_sql = "SELECT c.variant_id, c.product_id, c.quantity, p.price, c.string_option_id, c.tension_option_id, c.custom_name,
+                         IFNULL(s1.additional_price, 0) AS string_price,
+                         IFNULL(s2.additional_price, 0) AS tension_price
                          FROM cart_items c
                          JOIN products p ON c.product_id = p.id
+                         LEFT JOIN service_options s1 ON c.string_option_id = s1.id
+                         LEFT JOIN service_options s2 ON c.tension_option_id = s2.id
                          WHERE c.user_id = '$user_id'";
             
             $cart_res = $conn->query($cart_sql);
@@ -55,18 +59,23 @@ if ($user_id > 0) {
                     $p_id = (int)$item['product_id'];
                     $v_id = (int)$item['variant_id'];
                     $qty = (int)$item['quantity'];
-                    $u_price = (float)$item['price'];
+                    
+                    // 智能计算包含服务费的最终单价
+                    $base_price = (float)$item['price'];
+                    $service_fee = (float)$item['string_price'] + (float)$item['tension_price'];
+                    if (!empty($item['custom_name'])) {
+                        $service_fee += 15;
+                    }
+                    $u_price = $base_price + $service_fee; // Final Unit Price
+                    
                     $item_sub = $qty * $u_price;
                     
-                    // Safely handle optional services
                     $string_val = !empty($item['string_option_id']) ? (int)$item['string_option_id'] : 'NULL';
                     $tension_val = !empty($item['tension_option_id']) ? (int)$item['tension_option_id'] : 'NULL';
                     
-                    // Native Query Execution (完全使用你的 string_option_id, tension_option_id, unit_price)
                     $conn->query("INSERT INTO order_items (order_id, product_id, variant_id, string_option_id, tension_option_id, quantity, unit_price, subtotal) 
                                   VALUES ($db_order_id, $p_id, $v_id, $string_val, $tension_val, $qty, $u_price, $item_sub)");
                     
-                    // Deplete Inventory
                     $conn->query("UPDATE product_variants SET stock_quantity = stock_quantity - $qty WHERE id = '$v_id' AND stock_quantity >= $qty");
                 }
             }
@@ -89,31 +98,45 @@ if ($user_id > 0) {
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Payment Confirmed | YONEX Pro</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         :root { --premium-navy: #002d56; --premium-border: #e2e8f0; }
         body { background-color: #fafafa; font-family: -apple-system, BlinkMacSystemFont, sans-serif; height: 100vh; display: flex; align-items: center; justify-content: center; margin: 0; }
-        .success-card { background: white; width: 95%; max-width: 400px; padding: 45px 35px; border: 1px solid var(--premium-border); text-align: center; }
-        .success-indicator { font-size: 11px; font-weight: 700; letter-spacing: 0.1em; color: #0f172a; text-transform: uppercase; margin-bottom: 10px; display: block; }
+        .success-card { background: white; width: 95%; max-width: 400px; padding: 45px 35px; border: 1px solid var(--premium-border); text-align: center; border-radius: 12px; box-shadow: 0 10px 30px rgba(0,0,0,0.05); }
+        .success-indicator { font-size: 11px; font-weight: 700; letter-spacing: 0.1em; color: #10b981; text-transform: uppercase; margin-bottom: 10px; display: block; }
         h2 { font-size: 1.6rem; font-weight: 700; color: var(--premium-navy); letter-spacing: -0.02em; margin-bottom: 30px; }
-        .order-summary { background: #f8fafc; border: 1px solid var(--premium-border); padding: 20px; text-align: left; margin-bottom: 35px; }
+        .order-summary { background: #f8fafc; border: 1px solid var(--premium-border); padding: 20px; text-align: left; margin-bottom: 30px; border-radius: 8px; }
         .summary-item { display: flex; justify-content: space-between; margin-bottom: 12px; font-size: 0.85rem; }
         .summary-item:last-child { margin-bottom: 0; padding-top: 12px; border-top: 1px dashed var(--premium-border); }
         .label { color: #64748b; font-weight: 500; }
         .value { color: #0f172a; font-weight: 600; }
-        .btn-continue { background: var(--premium-navy); color: white; border: none; width: 100%; padding: 14px; font-weight: 600; font-size: 0.9rem; text-decoration: none; display: block; margin-bottom: 15px; letter-spacing: 0.05em; text-transform: uppercase; text-align: center; }
+        
+        .btn-receipt { background: white; color: var(--premium-navy); border: 2px solid var(--premium-navy); width: 100%; padding: 14px; font-weight: 600; font-size: 0.9rem; text-decoration: none; display: block; margin-bottom: 12px; letter-spacing: 0.05em; text-transform: uppercase; text-align: center; border-radius: 8px; transition: all 0.3s ease; }
+        .btn-receipt:hover { background: #f1f5f9; color: var(--premium-navy); }
+        
+        .btn-continue { background: var(--premium-navy); color: white; border: none; width: 100%; padding: 14px; font-weight: 600; font-size: 0.9rem; text-decoration: none; display: block; margin-bottom: 15px; letter-spacing: 0.05em; text-transform: uppercase; text-align: center; border-radius: 8px; transition: all 0.3s ease; }
         .btn-continue:hover { background: #001f3f; color: white; }
     </style>
 </head>
 <body>
 <div class="success-card">
+    <i class="fas fa-check-circle mb-3" style="font-size: 3rem; color: #10b981;"></i>
     <span class="success-indicator">Transaction Authorized</span>
     <h2>PAYMENT SUCCESSFUL</h2>
+    
     <div class="order-summary">
         <div class="summary-item"><span class="label">Order ID</span><span class="value">YNX-<?php echo $db_order_id; ?></span></div>
-        <div class="summary-item"><span class="label">Payment Status</span><span class="value">Paid</span></div>
-        <div class="summary-item"><span class="label">Total Charged</span><span class="value" style="color: var(--premium-navy);">RM <?php echo number_format($amount, 2); ?></span></div>
+        <div class="summary-item"><span class="label">Payment Status</span><span class="value text-success"><i class="fas fa-check me-1"></i>Paid</span></div>
+        <div class="summary-item"><span class="label">Total Charged</span><span class="value" style="color: var(--premium-navy); font-size: 1.1rem;">RM <?php echo number_format($amount, 2); ?></span></div>
     </div>
-    <a href="order_history.php" class="btn-continue">View Order History</a>
+    
+    <a href="receipt.php?order_id=<?php echo $db_order_id; ?>" target="_blank" class="btn-receipt">
+        <i class="fas fa-file-invoice me-2"></i> View Your Receipt
+    </a>
+    
+    <a href="order_history.php" class="btn-continue">
+        View Order History
+    </a>
 </div>
 </body>
 </html>

@@ -138,7 +138,6 @@ if (isset($_POST['edit_service'])) {
                     <select name="service_type" required>
                         <option value="string">Racket Stringing</option>
                         <option value="tension">String Tension</option>
-                        <option value="printing">Name Printing (Apparel)</option>
                     </select>
                 </div>
                 <div class="form-group">

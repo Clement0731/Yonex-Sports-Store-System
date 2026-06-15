@@ -196,28 +196,6 @@ if ($spec_res && $spec_res->num_rows > 0) {
                         ?>
                     </div>
                 </div>
-
-                <?php 
-                // Smart exclusion: Check if the product name contains "short", "pant", or "skirt"
-                $is_bottom = (stripos($row['name'], 'short') !== false || stripos($row['name'], 'pant') !== false || stripos($row['name'], 'skirt') !== false);
-                
-                // Only show printing service if it is NOT a bottom wear
-                if (!$is_bottom) { 
-                ?>
-                <div class="custom-service-box">
-                    <h4 class="service-title">Name Printing Service</h4>
-                    <label class="service-label" style="display: flex; align-items: center; gap: 8px; cursor: pointer; margin-top: 0;">
-                        <input type="checkbox" id="enable_printing" name="enable_printing" value="yes" onchange="togglePrinting()" style="width: 18px; height: 18px; cursor: pointer;"> 
-                        Add Custom Name Printing (+ RM 15.00)
-                    </label>
-                    
-                    <div id="printing_input_div" style="display: none; margin-top: 15px;">
-                        <label for="custom_name" class="service-label" style="margin-top: 0;">Enter Name (Max 5 Letters):</label>
-                        <input type="text" name="custom_name" id="custom_name" class="service-input" maxlength="5" placeholder="e.g. LIN D" style="text-transform: uppercase; font-weight: bold; letter-spacing: 2px;" pattern="[A-Za-z\s]+">
-                        <small style="color: #64748b; font-size: 11px; margin-top: 5px; display: block;">* Only English alphabets and spaces allowed. Max 5 characters.</small>
-                    </div>
-                </div>
-                <?php } ?>
                 <?php } ?>
 
                 <?php if ($current_category == 'bags') { ?>
@@ -330,22 +308,6 @@ if ($spec_res && $spec_res->num_rows > 0) {
         
         displayInput.value = newValue;
         formInput.value = newValue;
-    }
-
-    // 衣服印字服务专属切换逻辑
-    function togglePrinting() {
-        const checkbox = document.getElementById('enable_printing');
-        const inputDiv = document.getElementById('printing_input_div');
-        const inputField = document.getElementById('custom_name');
-        
-        if (checkbox && checkbox.checked) {
-            inputDiv.style.display = 'block';
-            inputField.setAttribute('required', 'required'); 
-        } else {
-            inputDiv.style.display = 'none';
-            inputField.removeAttribute('required');
-            inputField.value = ''; 
-        }
     }
 
     // 球拍穿线服务逻辑

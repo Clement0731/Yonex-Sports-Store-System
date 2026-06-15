@@ -17,10 +17,13 @@ if(isset($_POST['update_shipping'])) {
     $order_id = $_POST['order_id'];
     $status = $_POST['order_status'];
     $tracking_no = $_POST['tracking_number'];
+    $search = $_POST['current_search'] ?? '';
     $conn->query("UPDATE `orders` SET `STATUS` = '$status', `tracking_number` = '$tracking_no' WHERE `ORDER_ID` = '$order_id'");
-    header("Location: order.php");
+    header("Location: order.php?search=" . urlencode($search));
     exit();
 }
+
+$search = isset($_GET['search']) ? trim($_GET['search']) : '';
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -32,7 +35,13 @@ if(isset($_POST['update_shipping'])) {
         :root { --premium-navy: #002d56; --slate-dark: #0f172a; --slate-muted: #64748b; --border-fine: #e2e8f0; }
         body { background-color: #fafafa; font-family: -apple-system, BlinkMacSystemFont, sans-serif; color: var(--slate-dark); }
         .main-content { padding: 40px; width: 100%; }
-        .header-title { font-size: 1.6rem; font-weight: 800; color: var(--premium-navy); letter-spacing: -0.02em; text-transform: uppercase; border-bottom: 1px solid var(--border-fine); padding-bottom: 20px; margin-bottom: 35px; }
+        .header-title { font-size: 1.6rem; font-weight: 800; color: var(--premium-navy); letter-spacing: -0.02em; text-transform: uppercase; margin-bottom: 25px; }
+        
+        .search-container { display: flex; gap: 10px; margin-bottom: 25px; background: #ffffff; padding: 15px; border: 1px solid var(--border-fine); }
+        .search-input { padding: 10px 15px; border: 1px solid var(--border-fine); font-size: 0.9rem; width: 320px; outline: none; }
+        .btn-search { background: var(--premium-navy); color: white; border: none; padding: 10px 24px; font-size: 0.85rem; font-weight: 700; cursor: pointer; text-transform: uppercase; }
+        .btn-clear { background: #f1f5f9; color: var(--slate-dark); border: 1px solid var(--border-fine); padding: 10px 20px; font-size: 0.85rem; font-weight: 700; text-decoration: none; text-transform: uppercase; display: flex; align-items: center; }
+
         .fulfillment-box { background: #f8fafc; border: 1px solid var(--border-fine); padding: 15px 20px; font-size: 0.85rem; line-height: 1.6; text-align: left; color: #334155; }
         .info-heading { font-size: 0.7rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.08em; color: var(--slate-muted); margin-top: 12px; margin-bottom: 4px; display: block; border-left: 2px solid var(--premium-navy); padding-left: 6px; }
         .fulfillment-box div:first-of-type .info-heading { margin-top: 0; }
@@ -47,12 +56,25 @@ if(isset($_POST['update_shipping'])) {
         .form-group label { display: block; font-weight: 700; font-size: 0.75rem; text-transform: uppercase; color: var(--premium-navy); margin-bottom: 8px; }
         .form-group input, .form-group select { width: 100%; padding: 12px; border: 1px solid var(--border-fine); box-sizing: border-box; font-size: 0.9rem; outline: none; }
         .btn-submit { width: 100%; background: var(--premium-navy); color: white; padding: 14px; border: none; font-weight: 700; text-transform: uppercase; cursor: pointer; }
+        
+        .user-status-badge { font-size: 0.65rem; font-weight: 700; padding: 3px 6px; border-radius: 3px; text-transform: uppercase; letter-spacing: 0.05em; display: inline-block; margin-top: 6px;}
+        .badge-active { color: #10b981; background: #ecfdf5; border: 1px solid #6ee7b7; }
+        .badge-deactivated { color: #ef4444; background: #fef2f2; border: 1px solid #fca5a5; }
     </style>
 </head>
 <body>
     <?php include 'sidebar.php'; ?>
     <div class="main-content">
         <h1 class="header-title">Logistics & Fulfillment Center</h1>
+
+        <form method="GET" action="" class="search-container">
+            <input type="text" name="search" class="search-input" value="<?php echo htmlspecialchars($search); ?>" placeholder="Search by Order ID, name, address...">
+            <button type="submit" class="btn-search">Search</button>
+            <?php if (!empty($search)): ?>
+                <a href="order.php" class="btn-clear">Clear</a>
+            <?php endif; ?>
+        </form>
+
         <div class="table-box" style="background: #ffffff; border: 1px solid var(--border-fine);">
             <table style="width: 100%; border-collapse: collapse;">
                 <thead>
@@ -66,7 +88,14 @@ if(isset($_POST['update_shipping'])) {
                 </thead>
                 <tbody>
                     <?php
-                    $sql = "SELECT o.*, u.username FROM `orders` o LEFT JOIN `users` u ON o.USER_ID = u.id ORDER BY o.ORDER_ID DESC";
+                    $search_query = "";
+                    if (!empty($search)) {
+                        $clean_search = $conn->real_escape_string($search);
+                        $numeric_order_id = (int)str_ireplace('YNX-', '', $clean_search);
+                        $search_query = " WHERE (o.ORDER_ID = '$numeric_order_id' OR u.username LIKE '%$clean_search%' OR o.SHIPPING_ADDRESS LIKE '%$clean_search%' OR o.PAYMENT_METHOD LIKE '%$clean_search%')";
+                    }
+
+                    $sql = "SELECT o.*, u.username, u.status AS user_status FROM `orders` o LEFT JOIN `users` u ON o.USER_ID = u.id $search_query ORDER BY o.ORDER_ID DESC";
                     $orders = $conn->query($sql);
                     if ($orders && $orders->num_rows > 0) {
                         while($raw_row = $orders->fetch_assoc()) {
@@ -74,6 +103,9 @@ if(isset($_POST['update_shipping'])) {
                             $o_id = $row['ORDER_ID'];
                             $status = ucfirst(strtolower(trim($row['STATUS'] ?? 'Pending')));
                             $track_no = !empty($row['TRACKING_NUMBER']) ? $row['TRACKING_NUMBER'] : 'Awaiting Allocation';
+                            
+                            $user_status = $row['USER_STATUS'] ?? 'Active';
+                            $badge_class = ($user_status === 'Deactivated') ? 'badge-deactivated' : 'badge-active';
                             
                             echo "<tr>
                                     <td>
@@ -83,12 +115,12 @@ if(isset($_POST['update_shipping'])) {
                                     <td>
                                         <div style='font-weight: 700;'>".htmlspecialchars($row['USERNAME'] ?? 'Guest Account')."</div>
                                         <div style='font-size:0.75rem; color:var(--slate-muted); margin-top:4px;'>Client ID: #".$row['USER_ID']."</div>
+                                        <div class='user-status-badge {$badge_class}'>{$user_status}</div>
                                     </td>
                                     <td>
                                         <div class='fulfillment-box'>
                                             <span class='info-heading'>Items Purchased</span>";
                             
-                            // 🚀 DYNAMIC JOIN: Fetch live relational data mapping from order_items table
                             $items_sql = "SELECT oi.quantity, p.name, pv.spec_value, s1.option_name as string_name, s2.option_name as tension_name 
                                           FROM order_items oi
                                           JOIN products p ON oi.product_id = p.id
@@ -143,6 +175,7 @@ if(isset($_POST['update_shipping'])) {
             <h2 style="font-size: 1.1rem; color: var(--premium-navy); margin-top: 0; margin-bottom: 25px; border-bottom: 1px solid var(--border-fine); padding-bottom: 10px; font-weight:800;">LOGISTICS OVERRIDE</h2>
             <form method="POST" action="">
                 <input type="hidden" name="order_id" id="modal_order_id">
+                <input type="hidden" name="current_search" value="<?php echo htmlspecialchars($search); ?>">
                 <div class="form-group">
                     <label>Fulfillment Milestone</label>
                     <select name="order_status" id="modal_status" required>

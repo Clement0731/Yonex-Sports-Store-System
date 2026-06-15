@@ -117,14 +117,14 @@ if (isset($_POST['cancel_pwd_change'])) {
         .profile-avatar { width: 120px; height: 120px; background: #f0f0f0; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 50px; color: #0033a0; font-weight: bold; margin: 0 auto 20px auto; border: 3px solid #e60012; }
         .profile-card h3 { color: #333; margin-bottom: 5px; font-size: 22px; }
         .profile-card p { color: #888; font-size: 14px; margin-bottom: 20px; word-break: break-all; }
-        .role-badge { background: #0033a0; color: white; padding: 5px 15px; border-radius: 20px; font-size: 12px; font-weight: bold; }
+        .role-badge { background: #0033a0; color: white; padding: 5px 15px; border-radius: 20px; font-size: 12px; font-weight: bold; text-transform: uppercase; }
         
         .settings-card { background: white; padding: 30px; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); flex: 1; }
         .settings-card h3 { color: #0033a0; border-bottom: 2px solid #eee; padding-bottom: 10px; margin-bottom: 20px; }
         
-        .form-group { margin-bottom: 20px; }
+        .form-group { margin-bottom: 20px; text-align: left; }
         .form-group label { display: block; font-weight: bold; color: #555; margin-bottom: 8px; font-size: 14px; }
-        .form-group input { width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 4px; font-size: 14px; box-sizing: border-box;}
+        .form-group input { width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 4px; font-size: 14px; box-sizing: border-box; transition: border-color 0.3s; }
         .form-group input:focus { outline: none; border-color: #0033a0; }
         .form-group input[readonly] { background: #f9f9f9; cursor: not-allowed; color: #777;}
         
@@ -157,14 +157,18 @@ if (isset($_POST['cancel_pwd_change'])) {
                 <div class="profile-avatar">
                     <?php echo (strlen($admin['EMAIL']) > 0) ? strtoupper(substr($admin['EMAIL'], 0, 1)) : 'A'; ?>
                 </div>
-                <h3>System Administrator</h3>
+                <h3><?php echo htmlspecialchars($admin['USERNAME'] ?? 'System Administrator'); ?></h3>
                 <p><?php echo htmlspecialchars($admin['EMAIL']); ?></p>
-                <span class="role-badge"><?php echo strtoupper($admin['ROLE']); ?></span>
+                <span class="role-badge"><?php echo htmlspecialchars($admin['ROLE'] ?? 'ADMIN'); ?></span>
             </div>
 
             <div class="settings-card">
                 
                 <h3>Account Details</h3>
+                <div class="form-group">
+                    <label>Administrator Name (Read-only)</label>
+                    <input type="text" value="<?php echo htmlspecialchars($admin['USERNAME'] ?? 'Administrator'); ?>" readonly>
+                </div>
                 <div class="form-group">
                     <label>Admin Email Address (Read-only)</label>
                     <input type="email" value="<?php echo htmlspecialchars($admin['EMAIL']); ?>" readonly>

@@ -57,16 +57,17 @@ $stmt->execute();
 $address_result = $stmt->get_result();
 $all_addresses = mysqli_fetch_all($address_result, MYSQLI_ASSOC);
 
-// --- 5. 获取订单金额 ---
+// --- 5. 获取订单金额 (加强版分类算法) ---
 $ids_str = isset($_GET['ids']) ? $_GET['ids'] : '';
 $qtys_str = isset($_GET['qtys']) ? $_GET['qtys'] : '';
 
-$total_product_price = 0;
+$base_subtotal = 0;   // 纯原价总计
+$services_total = 0;  // 附加服务费总计
+
 if (!empty($ids_str)) {
     $cart_ids = explode(',', $ids_str);
     foreach ($cart_ids as $c_id) {
         $c_id = intval($c_id);
-        // 修改 Query：加入球线、磅数和印字名称的查询
         $cart_query = "SELECT 
             c.quantity, 
             c.custom_name, 
@@ -81,17 +82,24 @@ if (!empty($ids_str)) {
 
         $cart_res = mysqli_query($conn, $cart_query);
         if ($cart_res && $cart_row = mysqli_fetch_assoc($cart_res)) {
-            // 重新计算最终单价，保持和 shopping_cart.php 一致
-            $final_price = $cart_row['base_price'] + $cart_row['string_price'] + $cart_row['tension_price'];
+            $qty = $cart_row['quantity'];
+            
+            // 1. 累计：商品原价
+            $base_subtotal += $cart_row['base_price'] * $qty;
+            
+            // 2. 累计：附加服务费 (球线 + 磅数)
+            $item_service_fee = $cart_row['string_price'] + $cart_row['tension_price'];
+            // 衣服印字附加费
             if (!empty($cart_row['custom_name'])) {
-                $final_price += 15;
+                $item_service_fee += 15;
             }
-            $total_product_price += $final_price * $cart_row['quantity'];
+            $services_total += $item_service_fee * $qty;
         }
     }
 }
 $shipping_fee = 10.00;
-$grand_total = $total_product_price + $shipping_fee;
+// 原价 + 服务费 + 运费 = 最终总额
+$grand_total = $base_subtotal + $services_total + $shipping_fee;
 ?>
 
 <!DOCTYPE html>
@@ -160,15 +168,11 @@ $grand_total = $total_product_price + $shipping_fee;
 </head>
 <body>
 
-<body>
-
 <div style="max-width: 900px; margin: 30px auto 0;">
     <a href="shopping_cart.php" class="btn btn-light-custom rounded-pill px-4 py-2 text-decoration-none">
         <i class="fas fa-arrow-left me-2"></i>Back to Cart
     </a>
 </div>
-
-<div class="checkout-wrap">
 
 <div class="checkout-wrap">
     <h2 class="mb-4 fw-bold" style="font-family: 'Oswald'; color: var(--primary-blue);">CHECKOUT</h2>
@@ -248,17 +252,29 @@ $grand_total = $total_product_price + $shipping_fee;
         </div>
     </div>
 
-    <div class="section-card">
+    <div class="section-card" style="background: #f8fafc; border: 2px solid #eef2f6;">
         <div class="row align-items-center">
-            <div class="col-md-6 mb-3 mb-md-0">
-                <div class="text-muted small fw-medium text-uppercase tracking-wider">Subtotal: RM <?php echo number_format($total_product_price, 2); ?> | Shipping: RM 10.00</div>
-                <div class="d-flex align-items-end mt-1">
-                    <span class="fs-6 fw-bold me-2">Total:</span>
-                    <span class="fw-bold" style="font-family: 'Oswald'; font-size: 2rem; color: var(--primary-blue); line-height: 1;">RM <?php echo number_format($grand_total, 2); ?></span>
+            <div class="col-md-7 mb-4 mb-md-0">
+                <h6 class="fw-bold mb-3" style="color: var(--primary-blue);">ORDER SUMMARY</h6>
+                <div class="d-flex justify-content-between mb-2 small text-muted fw-bold text-uppercase">
+                    <span>Products Base Price:</span>
+                    <span class="text-dark">RM <?php echo number_format($base_subtotal, 2); ?></span>
+                </div>
+                <div class="d-flex justify-content-between mb-2 small text-muted fw-bold text-uppercase">
+                    <span>Add-on Services (String / Print):</span>
+                    <span class="text-success">+ RM <?php echo number_format($services_total, 2); ?></span>
+                </div>
+                <div class="d-flex justify-content-between mb-3 small text-muted fw-bold text-uppercase">
+                    <span>Shipping Fee:</span>
+                    <span class="text-danger">+ RM <?php echo number_format($shipping_fee, 2); ?></span>
+                </div>
+                <div class="d-flex justify-content-between align-items-end border-top pt-3 mt-1">
+                    <span class="fs-6 fw-bold me-2" style="color: var(--primary-blue);">GRAND TOTAL:</span>
+                    <span class="fw-bold" style="font-family: 'Oswald'; font-size: 2.2rem; color: var(--primary-blue); line-height: 1;">RM <?php echo number_format($grand_total, 2); ?></span>
                 </div>
             </div>
-            <div class="col-md-6 text-md-end">
-                <button class="btn-place-order" id="btn-place-order">PLACE ORDER NOW</button>
+            <div class="col-md-5 text-md-end d-flex align-items-end justify-content-end">
+                <button class="btn-place-order" id="btn-place-order" style="height: 60px;">PLACE ORDER NOW</button>
             </div>
         </div>
     </div>
@@ -330,7 +346,6 @@ $grand_total = $total_product_price + $shipping_fee;
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 <script>
-    // --- 已经移除了东马地区 (Sabah, Sarawak, Labuan) ---
     const malaysiaData = {
         "Johor": { cities: { "Johor Bahru": "80000", "Batu Pahat": "83000", "Kluang": "86000", "Muar": "84000", "Kulai": "81000", "Kota Tinggi": "81900", "Segamat": "85000", "Pontian": "82000" }, prefix: /^(79|80|81|82|83|84|85|86)/, hint: "79000-86999" },
         "Kedah": { cities: { "Alor Setar": "05000", "Sungai Petani": "08000", "Kulim": "09000", "Langkawi": "07000", "Baling": "09100", "Jitra": "06000" }, prefix: /^(05|06|07|08|09)/, hint: "05000-09999" },
@@ -352,12 +367,10 @@ $grand_total = $total_product_price + $shipping_fee;
     const postcodeInput = document.getElementById('postcode_input');
     const postcodeHint = document.getElementById('postcode_hint');
 
-    // 填充州属
     Object.keys(malaysiaData).forEach(state => {
         stateSelect.add(new Option(state, state));
     });
 
-    // 州属改变加载城市
     stateSelect.addEventListener('change', function() {
         citySelect.innerHTML = '<option value="" disabled selected>Select City</option>';
         citySelect.disabled = false;
@@ -373,7 +386,6 @@ $grand_total = $total_product_price + $shipping_fee;
         if(event && event.isTrusted) postcodeInput.value = ''; 
     });
 
-    // 城市改变自动填入邮编
     citySelect.addEventListener('change', function() {
         const state = stateSelect.value;
         const city = this.value;
@@ -401,7 +413,6 @@ $grand_total = $total_product_price + $shipping_fee;
         }
     }
 
-    // 电话格式限制
     const phoneInput = document.getElementById('phone_input');
     phoneInput.addEventListener('focus', function() { if (this.value === '') this.value = '01'; });
     phoneInput.addEventListener('input', function (e) {
@@ -459,7 +470,6 @@ $grand_total = $total_product_price + $shipping_fee;
         element.querySelector('input[type="radio"]').checked = true;
     }
 
-    // 🔥【关键修复】：给 PLACE ORDER NOW 按钮绑定正确的点击跳转事件
     document.getElementById('btn-place-order').addEventListener('click', function() {
         const selectedAddressRadio = document.querySelector('input[name="selected_address"]:checked');
         if (!selectedAddressRadio || selectedAddressRadio.value === "") {

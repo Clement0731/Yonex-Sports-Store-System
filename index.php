@@ -3,6 +3,34 @@ session_start();
 
 include 'db_connect.php';
 
+// --- 账号状态实时检测开始 ---
+if (isset($_SESSION['user_id'])) {
+    $current_user_id = (int)$_SESSION['user_id'];
+    
+    $status_check_sql = "SELECT status FROM users WHERE id = $current_user_id";
+    $status_result = $conn->query($status_check_sql);
+    
+    if ($status_result && $status_result->num_rows > 0) {
+        $user_row = $status_result->fetch_assoc();
+        
+        if ($user_row['status'] === 'Deactivated') {
+            session_unset();
+            session_destroy();
+            echo "<script>
+                alert('Your account has been deactivated by the administrator. Please contact support for assistance.');
+                window.location.href = 'login_register/login_page.php';
+            </script>";
+            exit();
+        }
+    } else {
+        session_unset();
+        session_destroy();
+        header("Location: login_register/login_page.php");
+        exit();
+    }
+}
+// --- 账号状态实时检测结束 ---
+
 $activeCategory = isset($_GET['category']) ? htmlspecialchars($_GET['category']) : 'home';
 $productId = isset($_GET['id']) ? intval($_GET['id']) : 0;
 

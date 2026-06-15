@@ -97,9 +97,34 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     <style>
         :root { --yonex-blue: #003366; --accent-gray: #718096; }
         * { box-sizing: border-box; }
-        body { margin: 0; padding: 0; font-family: 'Inter', sans-serif; background: radial-gradient(circle at center, #ffffff 0%, #e9eff5 100%); display: flex; justify-content: center; align-items: center; height: 100vh; overflow: hidden; position: relative; }
-        body::before { content: ""; position: absolute; top: -50%; left: -50%; width: 200%; height: 200%; background: repeating-linear-gradient(45deg, transparent, transparent 100px, rgba(0, 51, 102, 0.015) 100px, rgba(0, 51, 102, 0.015) 200px); z-index: 0; }
-        .login-card { background: #ffffff; padding: 50px 40px; border-radius: 20px; box-shadow: 0 20px 50px rgba(0, 51, 102, 0.08); width: 100%; max-width: 400px; text-align: center; position: relative; z-index: 1; border: 1px solid rgba(0, 51, 102, 0.05); }
+        
+        body { 
+            margin: 0; padding: 0; 
+            font-family: 'Inter', sans-serif; 
+            
+            /* 🚀 统一更换背景图 */
+            background: url('../images/ADMINBG.jpeg') no-repeat center center; 
+            background-size: cover;
+            
+            display: flex; justify-content: center; align-items: center; 
+            height: 100vh; overflow: hidden; position: relative; 
+        }
+        
+        /* 🚀 加上统一的半透明遮罩 */
+        body::before { 
+            content: ""; position: absolute; 
+            top: 0; left: 0; width: 100%; height: 100%; 
+            background: rgba(0, 0, 0, 0.45); 
+            z-index: 0; 
+        }
+        
+        .login-card { 
+            background: #ffffff; padding: 50px 40px; border-radius: 20px; 
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.2); 
+            width: 100%; max-width: 400px; text-align: center; position: relative; z-index: 1; 
+            border: 1px solid rgba(255, 255, 255, 0.1); 
+        }
+        
         .main-title { font-size: 24px; font-weight: 800; color: var(--yonex-blue); margin: 0 0 10px 0; letter-spacing: 2px; text-transform: uppercase; }
         .sub-title { font-size: 13px; font-weight: 500; color: var(--accent-gray); margin: 0 0 30px 0; line-height: 1.5; }
         .input-group { margin-bottom: 20px; text-align: left; }

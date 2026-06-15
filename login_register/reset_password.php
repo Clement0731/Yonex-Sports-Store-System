@@ -62,26 +62,58 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_SESSION['reset_token'])) {
     <title>Reset Password | YONEX</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        :root { --yonex-blue: #003366; --yonex-green: #00A650; }
-        body { font-family: 'Roboto', sans-serif; background: #f4f6f8; display: flex; align-items: center; justify-content: center; min-height: 100vh; margin: 0; }
-        .reset-card { background: white; width: 100%; max-width: 400px; padding: 40px; border-radius: 8px; box-shadow: 0 4px 20px rgba(0,0,0,0.08); text-align: center; border-top: 4px solid var(--yonex-blue); }
-        .reset-card img { max-width: 200px; margin-bottom: 20px; }
-        .main-title { color: var(--yonex-blue); font-size: 24px; margin-bottom: 10px; font-weight: 900; letter-spacing: 1px; }
-        .sub-title { color: #666; font-size: 14px; margin-bottom: 25px; }
+        :root { --yonex-blue: #003366; --yonex-green: #00A650; --accent-gray: #718096; }
+        * { box-sizing: border-box; }
+        
+        body { 
+            margin: 0; padding: 0; 
+            font-family: 'Inter', sans-serif; 
+            
+            /* 🚀 统一的背景图 */
+            background: url('../images/IqhNWC.webp') no-repeat center center; 
+            background-size: cover;
+            
+            display: flex; justify-content: center; align-items: center; 
+            min-height: 100vh; position: relative; overflow: hidden;
+        }
+        
+        /* 🚀 统一的黑色半透明遮罩 */
+        body::before { 
+            content: ""; position: absolute; 
+            top: 0; left: 0; width: 100%; height: 100%; 
+            background: rgba(0, 0, 0, 0.45); 
+            z-index: 0; 
+        }
+        
+        /* 🚀 统一的高级卡片圆角和阴影 */
+        .reset-card { 
+            background: #ffffff; padding: 50px 40px; border-radius: 20px; 
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.2); 
+            width: 100%; max-width: 420px; text-align: center; position: relative; z-index: 1; 
+            border: 1px solid rgba(255, 255, 255, 0.1); 
+        }
+        
+        .brand-logo { height: 45px; margin-bottom: 20px; object-fit: contain; }
+        
+        .main-title { color: var(--yonex-blue); font-size: 24px; margin: 0 0 10px 0; font-weight: 800; letter-spacing: 2px; text-transform: uppercase; }
+        .sub-title { color: var(--accent-gray); font-size: 13px; margin: 0 0 25px 0; font-weight: 500; line-height: 1.5; }
         
         .input-group { position: relative; margin-bottom: 20px; text-align: left; }
-        .input-group input { width: 100%; padding: 14px 40px 14px 15px; border: 1px solid #ddd; border-radius: 4px; box-sizing: border-box; font-size: 14px; }
-        .input-group input:focus { border-color: var(--yonex-blue); outline: none; }
-        .toggle-password { position: absolute; right: 15px; top: 50%; transform: translateY(-50%); color: #888; cursor: pointer; }
+        .input-group input { width: 100%; padding: 15px; border: 1.5px solid #edf2f7; border-radius: 12px; font-size: 15px; background-color: #f7fafc; outline: none; transition: all 0.2s ease; }
+        .input-group input:focus { border-color: var(--yonex-blue); background-color: #fff; box-shadow: 0 0 0 4px rgba(0, 51, 102, 0.05); }
+        .toggle-password { position: absolute; right: 15px; top: 50%; transform: translateY(-50%); color: var(--accent-gray); cursor: pointer; transition: color 0.2s; }
+        .toggle-password:hover { color: var(--yonex-blue); }
         
-        .btn { width: 100%; padding: 14px; background: var(--yonex-blue); color: white; border: none; border-radius: 4px; font-size: 16px; font-weight: bold; cursor: pointer; transition: 0.3s; text-decoration: none; display: block; box-sizing: border-box; }
-        .btn:hover { background: #002244; }
-        .error-msg { color: #e60012; font-size: 13px; margin-bottom: 15px; font-weight: bold; }
-        .success-msg { color: var(--yonex-green); font-size: 14px; margin-bottom: 15px; font-weight: bold; padding: 10px; background: #e8f5e9; border-radius: 4px; }
-        .back-link { display: block; margin-top: 20px; color: #666; text-decoration: none; font-size: 14px; }
-        .back-link:hover { color: var(--yonex-blue); text-decoration: underline; }
+        .btn { width: 100%; padding: 16px; background: linear-gradient(135deg, #003366 0%, #002244 100%); color: white; border: none; border-radius: 12px; font-size: 16px; font-weight: 700; cursor: pointer; transition: all 0.3s ease; text-decoration: none; display: block; box-sizing: border-box; }
+        .btn:hover { transform: translateY(-2px); box-shadow: 0 5px 15px rgba(0, 51, 102, 0.2); }
         
-        /* Disable browser native password reveal eyes to resolve double eyes conflict */
+        .error-msg { color: #e53e3e; font-size: 13px; margin-bottom: 20px; padding: 8px; background: #fff5f5; border-radius: 8px; }
+        .success-msg { color: #38a169; font-size: 14px; margin-bottom: 15px; font-weight: bold; padding: 12px; background: #f0fff4; border-radius: 8px; border: 1px solid rgba(56, 161, 105, 0.1); }
+        
+        .back-link { display: block; margin-top: 25px; color: var(--yonex-blue); text-decoration: none; font-size: 14px; font-weight: 700; }
+        .back-link:hover { text-decoration: underline; }
+        
+        /* Disable browser native password reveal eyes */
         input::-ms-reveal,
         input::-ms-clear {
             display: none !important;
@@ -91,7 +123,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_SESSION['reset_token'])) {
 <body>
 
 <div class="reset-card">
-    <img src="../images/yonex_logo.png" alt="YONEX">
+    <img src="../yonex-logo.png" alt="YONEX" class="brand-logo" onerror="this.src='yonex_logo.png'; this.onerror=null; this.alt='YONEX';">
+    
     <h2 class="main-title">RESET PASSWORD</h2>
     
     <?php if ($error): ?><div class="error-msg"><?php echo $error; ?></div><?php endif; ?>

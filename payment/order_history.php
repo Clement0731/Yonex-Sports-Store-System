@@ -9,10 +9,21 @@ if (!isset($_SESSION['user_id']) || empty($_SESSION['user_id'])) {
 $user_id = $_SESSION['user_id'];
 
 try {
+    // =========================================================
+    // 🚚 【正式上线模式】 (真实物理时间线，防止假数据)
+    // - 5分钟后：Paid -> Processing
+    // - 1天后：Processing -> Shipped (并生成 Tracking Number)
+    // - 2天后：Shipped -> Delivered
+    // =========================================================
+    
     $conn->query("UPDATE `orders` SET `expected_delivery` = DATE_ADD(ORDER_DATE, INTERVAL 2 DAY) WHERE `expected_delivery` IS NULL");
+    
     $conn->query("UPDATE `orders` SET `STATUS` = 'Completed' WHERE `STATUS` NOT IN ('Completed', 'Cancelled') AND NOW() >= DATE_ADD(ORDER_DATE, INTERVAL 2 DAY)");
+    
     $conn->query("UPDATE `orders` SET `STATUS` = 'Shipped', `tracking_number` = CONCAT('NJX', DATE_FORMAT(ORDER_DATE, '%d%m'), 'MY', ORDER_ID) WHERE `STATUS` NOT IN ('Completed', 'Shipped', 'Cancelled') AND NOW() >= DATE_ADD(ORDER_DATE, INTERVAL 1 DAY)");
+    
     $conn->query("UPDATE `orders` SET `STATUS` = 'Processing' WHERE `STATUS` IN ('Pending', 'Paid') AND NOW() >= DATE_ADD(ORDER_DATE, INTERVAL 5 MINUTE)");
+
 } catch (Exception $e) {}
 
 $sql = "SELECT * FROM `orders` WHERE `USER_ID` = '$user_id' ORDER BY ORDER_ID DESC";
@@ -24,10 +35,35 @@ $result = $conn->query($sql);
     <meta charset="UTF-8">
     <title>Order Tracking | YONEX</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         :root { --premium-navy: #002d56; --premium-muted: #64748b; --premium-border: #e2e8f0; }
         body { background-color: #fafafa; font-family: -apple-system, BlinkMacSystemFont, sans-serif; color: #1e293b; }
+        
         .page-title { color: var(--premium-navy); font-size: 1.5rem; font-weight: 700; letter-spacing: -0.03em; }
+        
+        /* 统一的高级按钮 UI */
+        .btn-dark-pill {
+            background-color: var(--premium-navy);
+            color: #ffffff;
+            font-weight: 600;
+            font-size: 0.95rem;
+            padding: 10px 24px;
+            border-radius: 50rem;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            transition: all 0.3s ease;
+            border: none;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+        }
+        .btn-dark-pill:hover {
+            background-color: #001f3f;
+            color: #ffffff;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 15px rgba(0, 45, 86, 0.25);
+        }
+
         .order-card { border: 1px solid var(--premium-border); margin-bottom: 30px; background: white; }
         .order-header { background: #ffffff; padding: 20px 25px; border-bottom: 1px solid var(--premium-border); display: flex; justify-content: space-between; align-items: center; }
         .order-id-text { font-size: 1rem; font-weight: 600; color: var(--premium-navy); }
@@ -35,6 +71,7 @@ $result = $conn->query($sql);
         .status-text-tag { font-size: 0.85rem; font-weight: 700; color: var(--premium-navy); text-transform: uppercase; border-bottom: 2px solid var(--premium-navy); padding-bottom: 2px; }
         .status-completed-tag { color: var(--premium-muted); border-bottom: 2px solid var(--premium-muted); }
         .tracking-container { padding: 35px 25px 20px; border-top: 1px dashed var(--premium-border); margin-top: 10px; }
+        
         .track-stepper { display: flex; justify-content: space-between; position: relative; margin-bottom: 25px; }
         .track-stepper::before { content: ''; position: absolute; top: 7px; left: 12%; right: 12%; height: 1px; background: var(--premium-border); z-index: 1; }
         .step { position: relative; z-index: 2; text-align: center; width: 25%; }
@@ -44,18 +81,22 @@ $result = $conn->query($sql);
         .step .text { font-size: 0.75rem; font-weight: 500; color: var(--premium-muted); text-transform: uppercase; }
         .step.active .text { color: var(--premium-navy); font-weight: 700; }
         .step.completed .text { color: #0f172a; font-weight: 600; }
+        
         .logistics-info { display: flex; justify-content: space-between; background: #ffffff; padding: 15px 0; border-top: 1px solid var(--premium-border); align-items: center; }
         .info-block-label { display: block; color: var(--premium-muted); font-size: 0.7rem; font-weight: 700; text-transform: uppercase; margin-bottom: 4px; }
         .info-block-value { font-size: 0.85rem; font-weight: 600; color: #0f172a; }
-        .track-num { font-family: monospace; font-size: 0.9rem; font-weight: 700; color: var(--premium-navy); }
+        .track-num { font-family: monospace; font-size: 1rem; font-weight: 700; color: var(--premium-navy); background: #e6f0fa; padding: 4px 10px; border-radius: 6px; letter-spacing: 1px; }
         .info-heading { font-size: 0.75rem; font-weight: 700; text-transform: uppercase; color: var(--premium-muted); margin-bottom: 8px; display: block; border-left: 2px solid var(--premium-navy); padding-left: 8px; }
     </style>
 </head>
 <body>
 <div class="container py-5" style="max-width: 850px;">
+    
     <div class="d-flex justify-content-between align-items-center mb-5">
-        <h3 class="page-title">ORDER HISTORY</h3>
-        <a href="../index.php" class="text-muted text-decoration-none small" style="letter-spacing: 0.05em;">RETURN TO SHOP</a>
+        <h3 class="page-title mb-0">ORDER HISTORY</h3>
+        <a href="../index.php" class="btn-dark-pill">
+            <i class="fas fa-arrow-left me-2"></i>Back to Home
+        </a>
     </div>
 
     <?php if ($result && $result->num_rows > 0): ?>

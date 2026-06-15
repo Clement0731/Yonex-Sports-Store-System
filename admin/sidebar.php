@@ -24,13 +24,11 @@ $current_cat_url = isset($_GET['category']) ? $_GET['category'] : '';
                 <a href="manage_product.php" class="sub-item <?php if($is_product_page && $current_cat_url == '') echo 'sub-active'; ?>">◆ View All</a>
                 
                 <?php
-                // 动态去数据库拿分类名字，自动生成子菜单！
                 if (isset($conn)) {
                     $sidebar_cats = $conn->query("SELECT category_name FROM categories ORDER BY id ASC");
                     if ($sidebar_cats && $sidebar_cats->num_rows > 0) {
                         while($scat = $sidebar_cats->fetch_assoc()) {
                             $s_name = $scat['category_name'];
-                            // 智能判断当前属于哪个子分类，高亮显示
                             $sub_active = ($is_product_page && $current_cat_url == $s_name) ? 'sub-active' : '';
                             echo '<a href="manage_product.php?category='.urlencode($s_name).'" class="sub-item '.$sub_active.'">◆ '.htmlspecialchars($s_name).'</a>';
                         }
@@ -44,8 +42,10 @@ $current_cat_url = isset($_GET['category']) ? $_GET['category'] : '';
         <a href="manage_customer.php" class="<?php echo ($current_page == 'manage_customer.php') ? 'active' : ''; ?>">Manage Customers</a>
         
         <a href="order.php" class="<?php echo ($current_page == 'order.php') ? 'active' : ''; ?>">Orders</a>
+
+        <a href="report.php" class="<?php echo ($current_page == 'report.php') ? 'active' : ''; ?>">Reports Analytics</a>
         
-        <a href="admin_profile.php" class="<?php echo ($current_page == 'admin_profile.php') ? 'active' : ''; ?>" style="margin-top: 250px; color: #ffffff;">Profile</a>
+        <a href="admin_profile.php" class="<?php echo ($current_page == 'admin_profile.php') ? 'active' : ''; ?>" style="margin-top: 195px; color: #ffffff;">Profile</a>
         
         <a href="logout.php" style="color: #ffaaaa;">Sign Out</a>
     </nav>
@@ -55,7 +55,6 @@ $current_cat_url = isset($_GET['category']) ? $_GET['category'] : '';
 .sidebar-dropdown { width: 100%; margin-bottom: 8px; }
 .dropdown-btn { display: flex !important; justify-content: space-between; align-items: center; margin-bottom: 0 !important; }
 
-/* 半透明黑色背景，完美融入图片背景 */
 .submenu-container { background-color: rgba(0, 0, 0, 0.25); padding: 8px 0; border-radius: 0 0 6px 6px; margin-bottom: 8px; }
 
 .sub-item { 
@@ -71,7 +70,6 @@ $current_cat_url = isset($_GET['category']) ? $_GET['category'] : '';
 }
 .sub-item:hover { color: #ffffff !important; background-color: rgba(255,255,255,0.1); border-left: 3px solid rgba(255,255,255,0.5) !important; }
 
-/* 激活状态：变成红色左边框并加深背景 */
 .sub-active { 
     color: #ffffff !important; 
     font-weight: bold; 
@@ -94,4 +92,4 @@ function toggleSubMenu(e) {
         arrow.innerHTML = '▶';
     }
 }
-</script>
+</script>   

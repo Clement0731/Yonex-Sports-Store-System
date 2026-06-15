@@ -4,9 +4,33 @@ include 'db_connect.php';
 
 // 1. 检查用户是否已经登录（只有登录才能加购物车或直接购买）
 if (!isset($_SESSION['user_id'])) {
-    echo "<script>alert('Please login first to proceed.'); window.location.href='login_register/login_page.php';</script>";
+    echo "<script>alert('请先登录系统再继续操作。'); window.location.href='login_register/login_page.php';</script>";
     exit();
 }
+
+// --- 账号状态实时检测开始 ---
+$current_user_id = (int)$_SESSION['user_id'];
+$status_check_sql = "SELECT status FROM users WHERE id = $current_user_id";
+$status_result = $conn->query($status_check_sql);
+
+if ($status_result && $status_result->num_rows > 0) {
+    $user_row = $status_result->fetch_assoc();
+    if ($user_row['status'] === 'Deactivated') {
+        session_unset();
+        session_destroy();
+        echo "<script>
+            alert('Your account has been deactivated by the administrator. Please contact support for assistance.');
+            window.location.href = 'login_register/login_page.php';
+        </script>";
+        exit();
+    }
+} else {
+    session_unset();
+    session_destroy();
+    echo "<script>window.location.href='login_register/login_page.php';</script>";
+    exit();
+}
+// --- 账号状态实时检测结束 ---
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $user_id = $_SESSION['user_id'];
@@ -45,15 +69,15 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 exit();
             } else {
                 // 如果是正常的 Add to Cart，弹窗提示并跳转到购物车列表
-                echo "<script>alert('Item successfully added to your cart!'); window.location.href='payment/shopping_cart.php';</script>";
+                echo "<script>alert('商品已成功加入您的购物车！'); window.location.href='payment/shopping_cart.php';</script>";
                 exit();
             }
             
         } else {
-            echo "Error adding to cart: " . $conn->error;
+            echo "加入购物车时发生错误: " . $conn->error;
         }
     } else {
-        echo "<script>alert('Error: The selected specification is currently out of stock or invalid.'); window.history.back();</script>";
+        echo "<script>alert('错误：您选择的规格目前已售罄或失效。'); window.history.back();</script>";
     }
 } else {
     header("Location: index.php");
