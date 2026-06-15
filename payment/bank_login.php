@@ -2,6 +2,18 @@
 session_start();
 $bank = isset($_GET['bank']) ? $_GET['bank'] : 'Bank';
 $amount = isset($_GET['amount']) ? $_GET['amount'] : '0.00';
+$addr_id = isset($_GET['addr_id']) ? $_GET['addr_id'] : '';
+
+// 1. 匹配对应的银行 Logo 图片
+$bank_logos = [
+    'Maybank (MAE)' => '5.jpg',
+    'CIMB Clicks'   => '6.jpg',
+    'Public Bank'   => '7.jpg',
+    'RHB Bank'      => '8.jpg',
+    'Hong Leong'    => '9.jpg',
+    'AmBank'        => '10.jpg'
+];
+$bank_image = isset($bank_logos[$bank]) ? $bank_logos[$bank] : 'placeholder.jpg';
 ?>
 
 <!DOCTYPE html>
@@ -12,59 +24,16 @@ $amount = isset($_GET['amount']) ? $_GET['amount'] : '0.00';
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        body { 
-            background-color: #eef2f6; 
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            min-height: 100vh;
-        }
-        .login-container { 
-            width: 100%;
-            max-width: 420px; 
-            margin: 20px;
-        }
-        .bank-header { 
-            background: #003366; 
-            color: #fff;
-            padding: 25px 20px; 
-            text-align: center; 
-            border-radius: 12px 12px 0 0;
-            position: relative;
-        }
+        body { background-color: #eef2f6; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 100vh; }
+        .login-container { width: 100%; max-width: 420px; margin: 20px; }
+        .bank-header { background: #003366; color: #fff; padding: 25px 20px; text-align: center; border-radius: 12px 12px 0 0; position: relative; }
         .bank-header h4 { font-weight: 700; letter-spacing: 1px; margin-bottom: 5px; }
         .bank-header p { margin: 0; font-size: 0.85rem; color: #b3cce6; }
-        
-        .login-box { 
-            background: white; 
-            padding: 35px 30px; 
-            border-radius: 0 0 12px 12px; 
-            box-shadow: 0 10px 25px rgba(0,0,0,0.08); 
-        }
-        .payment-info { 
-            background: #f8f9fa; 
-            padding: 15px; 
-            border-radius: 8px; 
-            margin-bottom: 25px; 
-            border: 1px solid #e9ecef; 
-            border-left: 4px solid #003366;
-        }
-        .form-control-lg {
-            font-size: 1rem;
-            border-radius: 8px;
-            padding: 12px 15px;
-        }
-        .form-control:focus {
-            border-color: #003366;
-            box-shadow: 0 0 0 0.25rem rgba(0, 51, 102, 0.1);
-        }
-        .btn-login { 
-            background: #003366; color: white; width: 100%; padding: 14px; 
-            font-weight: bold; border: none; border-radius: 8px;
-            letter-spacing: 1px; transition: 0.3s; margin-top: 10px;
-        }
+        .login-box { background: white; padding: 35px 30px; border-radius: 0 0 12px 12px; box-shadow: 0 10px 25px rgba(0,0,0,0.08); }
+        .payment-info { background: #f8f9fa; padding: 15px; border-radius: 8px; margin-bottom: 25px; border: 1px solid #e9ecef; border-left: 4px solid #003366; }
+        .form-control-lg { font-size: 1rem; border-radius: 8px; padding: 12px 15px; }
+        .form-control:focus { border-color: #003366; box-shadow: 0 0 0 0.25rem rgba(0, 51, 102, 0.1); }
+        .btn-login { background: #003366; color: white; width: 100%; padding: 14px; font-weight: bold; border: none; border-radius: 8px; letter-spacing: 1px; transition: 0.3s; margin-top: 10px; }
         .btn-login:hover { background: #001f3f; color: #FFD700; transform: translateY(-2px); }
         .is-invalid { border-color: #dc3545 !important; }
     </style>
@@ -73,7 +42,9 @@ $amount = isset($_GET['amount']) ? $_GET['amount'] : '0.00';
 
 <div class="login-container">
     <div class="bank-header">
-        <i class="fas fa-shield-alt fs-2 mb-2 text-warning"></i>
+        <div style="background: white; display: inline-block; padding: 8px 15px; border-radius: 8px; margin-bottom: 15px; box-shadow: 0 4px 10px rgba(0,0,0,0.2);">
+            <img src="../images/payment/<?php echo $bank_image; ?>" alt="<?php echo htmlspecialchars($bank); ?>" style="height: 35px; object-fit: contain;">
+        </div>
         <h4 class="text-uppercase"><?php echo htmlspecialchars($bank); ?></h4>
         <p>Secure Internet Banking Gateway</p>
     </div>
@@ -83,12 +54,12 @@ $amount = isset($_GET['amount']) ? $_GET['amount'] : '0.00';
             <span class="h5 mb-0 fw-bold" style="color: #003366;">RM <?php echo number_format((float)$amount, 2); ?></span>
         </div>
 
-        <form id="loginForm" onsubmit="event.preventDefault(); validateAndPay();">
+        <form id="loginForm" autocomplete="off" onsubmit="event.preventDefault(); validateAndPay();">
             <div class="mb-3">
                 <label class="form-label small fw-bold text-secondary">USER ID</label>
                 <div class="input-group">
                     <span class="input-group-text bg-light"><i class="fas fa-user text-muted"></i></span>
-                    <input type="text" id="userid" class="form-control form-control-lg" placeholder="e.g. lijie1234" maxlength="12" required>
+                    <input type="text" id="userid" class="form-control form-control-lg" placeholder="e.g. lijie1234" maxlength="12" autocomplete="off" required>
                 </div>
                 <div id="userid-feedback" class="form-text text-muted mt-2" style="font-size: 0.75rem;">
                     <i class="fas fa-info-circle me-1"></i>Must be a mix of letters & numbers (Max 12).
@@ -99,19 +70,16 @@ $amount = isset($_GET['amount']) ? $_GET['amount'] : '0.00';
                 <label class="form-label small fw-bold text-secondary">PASSWORD</label>
                 <div class="input-group">
                     <span class="input-group-text bg-light"><i class="fas fa-lock text-muted"></i></span>
-                    <input type="password" id="pwd" class="form-control form-control-lg" placeholder="Enter Password" required>
+                    <input type="password" id="pwd" class="form-control form-control-lg" placeholder="Enter Password" autocomplete="new-password" required>
                 </div>
             </div>
 
-            <button type="submit" class="btn btn-login">LOGIN & PAY</button>
-            
-            <div class="text-center mt-4">
-                <a href="fpx_payment.php" class="text-muted small text-decoration-none hover-underline"><i class="fas fa-arrow-left me-1"></i>Cancel Transaction</a>
-            </div>
+            <button type="submit" class="btn-login">LOGIN & PAY</button>
         </form>
-    </div>
-    <div class="text-center mt-4 text-muted small">
-        <i class="fas fa-lock me-1"></i> End-to-End Encrypted Transaction
+
+        <div class="text-center mt-4 text-muted small">
+            <i class="fas fa-lock me-1"></i> End-to-End Encrypted Transaction
+        </div>
     </div>
 </div>
 
@@ -135,18 +103,18 @@ function validateAndPay() {
     const hasUpper = /[A-Z]/.test(password);
     const hasLower = /[a-z]/.test(password);
     const hasPwdNum = /[0-9]/.test(password);
-    const hasSpecial = /[!@#$%^&*(),.?":{}|<>]/.test(password);
+    const hasSpecial = /[!@#$%^&*(),.?\":{}|<>]/ .test(password);
 
     if (hasUpper && hasLower && hasPwdNum && hasSpecial) {
         const bank = "<?php echo urlencode($bank); ?>";
         const amount = "<?php echo $amount; ?>";
-        // 传递 payment method 以便 success 页面显示
-        window.location.href = 'payment_success.php?method=FPX&amount=' + amount + '&bank=' + bank;
+        const addrId = "<?php echo $addr_id; ?>";
+        // 验证通过，跳转到成功付款页面
+        window.location.href = `payment_success.php?amount=${amount}&method=${bank}&addr_id=${addrId}`;
     } else {
-        alert("LOGIN FAILED:\nPassword must include Uppercase, Lowercase, Number, and Special Symbol.");
+        alert("PASSWORD ERROR!\n\nPassword must contain at least one uppercase letter, one lowercase letter, one number, and one special character.");
     }
 }
 </script>
-
 </body>
 </html>

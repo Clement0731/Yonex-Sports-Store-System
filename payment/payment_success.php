@@ -4,7 +4,7 @@ require_once 'db_config.php';
 
 $user_id = isset($_SESSION['user_id']) ? (int)$_SESSION['user_id'] : 0; 
 $db_order_id = 0;
-$amount = 0.00;
+$amount = isset($_GET['amount']) ? (float)$_GET['amount'] : 0.00;
 
 if ($user_id > 0) {
     // 1. Anti-Refresh & Verification Check
@@ -12,34 +12,38 @@ if ($user_id > 0) {
     $cart_count = ($cart_check && $cart_check->num_rows > 0) ? (int)$cart_check->fetch_row()[0] : 0;
 
     if ($cart_count > 0) {
-        // 2. Enterprise Security: Dynamic Server-Side Price Calculation (Ignores URL tampering)
-        $calc_sql = "SELECT SUM(c.quantity * p.price) FROM cart_items c JOIN products p ON c.product_id = p.id WHERE c.user_id = '$user_id'";
-        $calc_res = $conn->query($calc_sql);
-        $amount = ($calc_res && $calc_res->num_rows > 0) ? (float)$calc_res->fetch_row()[0] : 0.00;
-
-        // 3. Fetch Shipping Profile
-        $shipping_address_str = "No shipping address specified (Client Profile Incomplete).";
-        $addr_res = $conn->query("SELECT * FROM addresses WHERE user_id = '$user_id' ORDER BY id DESC LIMIT 1");
-        if ($addr_res && $addr_res->num_rows > 0) {
-            $addr = $addr_res->fetch_assoc();
-            // 【修复关键点】在这里加上了 ($addr['city_state'] ?? '') 防止报错
-            $shipping_address_str = $addr['receiver_name'] . " | " . $addr['receiver_phone'] . "\n" . $addr['full_address'] . ", " . $addr['postcode'] . " " . ($addr['city_state'] ?? '');
+        // --- 核心修复：通过传递过来的 addr_id 抓取完整地址 ---
+        $shipping_address_str = "No shipping address specified.";
+        $addr_id = isset($_GET['addr_id']) ? (int)$_GET['addr_id'] : 0;
+        
+        if ($addr_id > 0) {
+            $addr_stmt = $conn->prepare("SELECT * FROM addresses WHERE id = ? AND user_id = ?");
+            $addr_stmt->bind_param("ii", $addr_id, $user_id);
+            $addr_stmt->execute();
+            $addr_res = $addr_stmt->get_result();
+            if ($addr_row = $addr_res->fetch_assoc()) {
+                $city_state = isset($addr_row['city_state']) ? $addr_row['city_state'] : '';
+                $shipping_address_str = $addr_row['receiver_name'] . " | " . $addr_row['receiver_phone'] . "\n" . $addr_row['full_address'] . ", " . $addr_row['postcode'] . " " . $city_state . " (" . $addr_row['label'] . ")";
+            }
         }
 
         $method = !empty($_GET['method']) ? $_GET['method'] : 'Online Payment';
         $bank = !empty($_GET['bank']) ? $_GET['bank'] : '';
         $final_method = empty($bank) ? $method : $method . " (" . $bank . ")";
 
-        // 4. Secure Transaction Insertion
-        $stmt = $conn->prepare("INSERT INTO orders (USER_ID, ORDER_DATE, TOTAL_PRICE, subtotal, shipping_fee, STATUS, payment_status, shipping_address, payment_method) VALUES (?, NOW(), ?, ?, 0.00, 'Paid', 'Paid', ?, ?)");
-        $stmt->bind_param("iddss", $user_id, $amount, $amount, $shipping_address_str, $final_method);
+        // 计算 subtotal (总价扣掉 10 块运费)
+        $subtotal = max(0, $amount - 10.00);
+
+        // 4. Secure Transaction Insertion (完全匹配你的原生列名)
+        $stmt = $conn->prepare("INSERT INTO orders (USER_ID, ORDER_DATE, TOTAL_PRICE, subtotal, shipping_fee, STATUS, payment_status, shipping_address, payment_method) VALUES (?, NOW(), ?, ?, 10.00, 'Paid', 'Paid', ?, ?)");
+        $stmt->bind_param("iddss", $user_id, $amount, $subtotal, $shipping_address_str, $final_method);
         
         if ($stmt->execute()) {
             $db_order_id = $conn->insert_id;
             $_SESSION['last_order_id'] = $db_order_id;
             $_SESSION['last_order_amount'] = $amount;
             
-            // 5. Bulletproof Itemized Data Mapping (Handles NULL values natively)
+            // 5. Bulletproof Itemized Data Mapping
             $cart_sql = "SELECT c.variant_id, c.product_id, c.quantity, p.price, c.string_option_id, c.tension_option_id 
                          FROM cart_items c
                          JOIN products p ON c.product_id = p.id
@@ -52,15 +56,15 @@ if ($user_id > 0) {
                     $v_id = (int)$item['variant_id'];
                     $qty = (int)$item['quantity'];
                     $u_price = (float)$item['price'];
-                    $subtotal = $qty * $u_price;
+                    $item_sub = $qty * $u_price;
                     
-                    // Safely handle optional services (Prevents Silent Rejection)
+                    // Safely handle optional services
                     $string_val = !empty($item['string_option_id']) ? (int)$item['string_option_id'] : 'NULL';
                     $tension_val = !empty($item['tension_option_id']) ? (int)$item['tension_option_id'] : 'NULL';
                     
-                    // Native Query Execution
+                    // Native Query Execution (完全使用你的 string_option_id, tension_option_id, unit_price)
                     $conn->query("INSERT INTO order_items (order_id, product_id, variant_id, string_option_id, tension_option_id, quantity, unit_price, subtotal) 
-                                  VALUES ($db_order_id, $p_id, $v_id, $string_val, $tension_val, $qty, $u_price, $subtotal)");
+                                  VALUES ($db_order_id, $p_id, $v_id, $string_val, $tension_val, $qty, $u_price, $item_sub)");
                     
                     // Deplete Inventory
                     $conn->query("UPDATE product_variants SET stock_quantity = stock_quantity - $qty WHERE id = '$v_id' AND stock_quantity >= $qty");
@@ -109,7 +113,7 @@ if ($user_id > 0) {
         <div class="summary-item"><span class="label">Payment Status</span><span class="value">Paid</span></div>
         <div class="summary-item"><span class="label">Total Charged</span><span class="value" style="color: var(--premium-navy);">RM <?php echo number_format($amount, 2); ?></span></div>
     </div>
-    <a href="../index.php" class="btn-continue">Continue Shopping</a>
+    <a href="order_history.php" class="btn-continue">View Order History</a>
 </div>
 </body>
 </html>

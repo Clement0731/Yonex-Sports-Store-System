@@ -6,6 +6,7 @@ $total_raw = isset($_GET['total']) ? $_GET['total'] : '0.00';
 $total_clean = str_replace(',', '', $total_raw);
 $total = (float)$total_clean;
 $ids = isset($_GET['ids']) ? $_GET['ids'] : '';
+$addr_id = isset($_GET['addr_id']) ? $_GET['addr_id'] : '';
 ?>
 
 <!DOCTYPE html>
@@ -18,102 +19,21 @@ $ids = isset($_GET['ids']) ? $_GET['ids'] : '';
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@700;800&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        :root {
-            --tng-blue: #005bac;
-            --tng-light-blue: #e6f0fa;
-        }
-
-        body {
-            background-color: #f4f7f9;
-            font-family: 'Inter', sans-serif;
-            height: 100vh;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            margin: 0;
-        }
-
-        .payment-card {
-            background: white;
-            width: 100%;
-            max-width: 400px;
-            border-radius: 16px;
-            box-shadow: 0 15px 35px rgba(0,0,0,0.1);
-            overflow: hidden;
-            border-top: 5px solid var(--tng-blue);
-        }
-
-        .card-header-custom {
-            padding: 25px 20px 15px;
-            text-align: center;
-        }
-
-        .logo-box {
-            display: inline-block;
-            background: white;
-            padding: 10px;
-            border-radius: 12px;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.05);
-            margin-bottom: 15px;
-        }
-
-        .logo-box img { 
-            height: 40px; 
-            width: auto; 
-        }
-
-        .amount-banner {
-            text-align: center;
-            padding: 0 20px 20px;
-            border-bottom: 1px dashed #dee2e6;
-        }
-
-        .amount-val {
-            font-family: 'Montserrat', sans-serif;
-            font-size: 2.2rem;
-            font-weight: 800;
-            color: #1a1a1a;
-            margin: 0;
-        }
-
+        :root { --tng-blue: #005bac; --tng-light-blue: #e6f0fa; }
+        body { background-color: #f4f7f9; font-family: 'Inter', sans-serif; height: 100vh; display: flex; align-items: center; justify-content: center; margin: 0; }
+        .payment-card { background: white; width: 100%; max-width: 400px; border-radius: 16px; box-shadow: 0 15px 35px rgba(0,0,0,0.1); overflow: hidden; border-top: 5px solid var(--tng-blue); }
+        .card-header-custom { padding: 25px 20px 15px; text-align: center; }
+        .logo-box { display: inline-block; background: white; padding: 10px; border-radius: 12px; box-shadow: 0 4px 10px rgba(0,0,0,0.05); margin-bottom: 15px; }
+        .logo-box img { height: 40px; width: auto; }
+        .amount-banner { text-align: center; padding: 0 20px 20px; border-bottom: 1px dashed #dee2e6; }
+        .amount-val { font-family: 'Montserrat', sans-serif; font-size: 2.2rem; font-weight: 800; color: #1a1a1a; margin: 0; }
         .form-section { padding: 25px 30px; }
         .form-label { font-size: 0.85rem; font-weight: 600; color: #6c757d; margin-bottom: 8px; }
-        
-        .form-control-custom {
-            border: 1px solid #ced4da;
-            background-color: #f8f9fa;
-            border-radius: 10px;
-            padding: 14px;
-            font-size: 1rem;
-            width: 100%;
-            transition: 0.3s;
-        }
-
-        .form-control-custom:focus {
-            border-color: var(--tng-blue);
-            background-color: #fff;
-            outline: none;
-            box-shadow: 0 0 0 3px rgba(0, 91, 172, 0.15);
-        }
-
+        .form-control-custom { border: 1px solid #ced4da; background-color: #f8f9fa; border-radius: 10px; padding: 14px; font-size: 1rem; width: 100%; transition: 0.3s; }
+        .form-control-custom:focus { border-color: var(--tng-blue); background-color: #fff; outline: none; box-shadow: 0 0 0 3px rgba(0, 91, 172, 0.15); }
         .pin-input { letter-spacing: 10px; text-align: center; font-weight: bold; font-size: 1.2rem; }
-
-        .btn-pay {
-            background: var(--tng-blue);
-            color: white;
-            border: none;
-            width: 100%;
-            padding: 16px;
-            border-radius: 10px;
-            font-weight: 700;
-            font-size: 1.05rem;
-            margin-top: 15px;
-            transition: 0.3s;
-            box-shadow: 0 4px 12px rgba(0, 91, 172, 0.3);
-        }
-
+        .btn-pay { background: var(--tng-blue); color: white; border: none; width: 100%; padding: 16px; border-radius: 10px; font-weight: 700; font-size: 1.05rem; margin-top: 15px; transition: 0.3s; box-shadow: 0 4px 12px rgba(0, 91, 172, 0.3); }
         .btn-pay:hover { background: #004a8d; transform: translateY(-2px); }
-
         .secure-note { font-size: 0.7rem; color: #adb5bd; text-align: center; margin-top: 25px; }
     </style>
 </head>
@@ -133,21 +53,24 @@ $ids = isset($_GET['ids']) ? $_GET['ids'] : '';
     </div>
 
     <div class="form-section">
-        <form action="tng_process.php" method="POST" onsubmit="return validateForm()">
+        <form action="tng_process.php" method="POST" autocomplete="off" onsubmit="return validateForm()">
             <input type="hidden" name="total_amount" value="<?php echo $total; ?>">
             <input type="hidden" name="product_ids" value="<?php echo $ids; ?>">
+            <input type="hidden" name="addr_id" value="<?php echo htmlspecialchars($addr_id); ?>">
 
             <div class="mb-3">
                 <label class="form-label">Phone Number</label>
                 <div class="input-group">
                     <span class="input-group-text border-end-0 bg-white" style="border-radius: 10px 0 0 10px;"><i class="fas fa-mobile-alt text-muted"></i></span>
-                    <input type="tel" id="phone_no" name="phone_no" class="form-control form-control-custom border-start-0" style="border-radius: 0 10px 10px 0;" placeholder="01xxxxxxxx" maxlength="10" oninput="this.value = this.value.replace(/[^0-9]/g, '');" required>
+                    <!-- 加上 autocomplete="off" -->
+                    <input type="tel" id="phone_no" name="phone_no" class="form-control form-control-custom border-start-0" style="border-radius: 0 10px 10px 0;" placeholder="01xxxxxxxx" maxlength="10" autocomplete="off" oninput="this.value = this.value.replace(/[^0-9]/g, '');" required>
                 </div>
             </div>
 
             <div class="mb-3">
                 <label class="form-label">6-Digit PIN</label>
-                <input type="password" id="payment_pin" name="payment_pin" class="form-control-custom pin-input" maxlength="6" oninput="this.value = this.value.replace(/[^0-9]/g, '');" placeholder="••••••" required>
+                <!-- 加上 autocomplete="new-password" 强制浏览器不填密码 -->
+                <input type="password" id="payment_pin" name="payment_pin" class="form-control-custom pin-input" maxlength="6" autocomplete="new-password" oninput="this.value = this.value.replace(/[^0-9]/g, '');" placeholder="••••••" required>
             </div>
 
             <button type="submit" class="btn-pay">AUTHORIZE PAYMENT</button>
