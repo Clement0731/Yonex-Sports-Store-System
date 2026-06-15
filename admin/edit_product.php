@@ -180,7 +180,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                     </div>
 
                 <h3 class="section-title">2. Stock & Variants Manager (Sizes / Colors)</h3>
-                <p class="dynamic-specs-note">💡 Manage individual stock quantities for different sizes, colors, or specifications.</p>
+                <p class="dynamic-specs-note">Manage individual stock quantities for different sizes, colors, or specifications.</p>
                 
                 <div id="variants-container">
                     <?php foreach($variants as $index => $v): ?>
@@ -202,7 +202,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 <button type="button" class="btn-add-variant" onclick="addVariantRow()">+ Add New Size / Color</button>
 
                 <h3 class="section-title">3. Product Specifications</h3>
-                <p class="dynamic-specs-note">💡 The labels below automatically adapt to the chosen Category.</p>
+                <p class="dynamic-specs-note">The labels below automatically adapt to the chosen Category.</p>
 
                 <div class="form-row">
                     <div class="form-group">
@@ -236,7 +236,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
                 <h3 class="section-title">4. Descriptions & Technologies</h3>
                 <div class="form-group">
-                    <label>Description (Supports HTML like &lt;br&gt; for new lines)</label>
+                    <label>Description</label>
                     <textarea name="description" rows="4"><?= htmlspecialchars($product['description']) ?></textarea>
                 </div>
                 <div class="form-group">
