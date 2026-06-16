@@ -1,9 +1,19 @@
 <?php
 $current_page = basename($_SERVER['SCRIPT_NAME']);
 
-// 💡 提取参数：判断当前是否在产品管理相关的页面
 $is_product_page = in_array($current_page, ['manage_product.php', 'add_product.php', 'edit_product.php']);
 $current_cat_url = isset($_GET['category']) ? $_GET['category'] : '';
+
+// 💡 【新增核心逻辑】：去数据库查询当前登录管理员的 ROLE
+$admin_role = 'Staff'; // 默认最低权限
+if (isset($_SESSION['admin_id']) && isset($conn)) {
+    $sess_id = $_SESSION['admin_id'];
+    $role_query = $conn->query("SELECT ROLE FROM admin WHERE USER_ID = '$sess_id'");
+    if ($role_query && $role_query->num_rows > 0) {
+        $role_row = $role_query->fetch_assoc();
+        $admin_role = $role_row['ROLE'];
+    }
+}
 ?>
 <div class="sidebar" style="background: url('../images/SDBG.jpg') no-repeat left top !important; background-size: 100% 100% !important; padding: 40px 15px 20px 80px !important;">
     
@@ -45,7 +55,11 @@ $current_cat_url = isset($_GET['category']) ? $_GET['category'] : '';
 
         <a href="report.php" class="<?php echo ($current_page == 'report.php') ? 'active' : ''; ?>">Reports Analytics</a>
         
-        <a href="admin_profile.php" class="<?php echo ($current_page == 'admin_profile.php') ? 'active' : ''; ?>" style="margin-top: 195px; color: #ffffff;">Profile</a>
+        <?php if ($admin_role === 'Superadmin'): ?>
+            <a href="manage_admin.php" class="<?php echo ($current_page == 'manage_admin.php') ? 'active' : ''; ?>" style="color: #fca5a5; border-left-color: #fca5a5;">★ Manage Admins</a>
+        <?php endif; ?>
+
+        <a href="admin_profile.php" class="<?php echo ($current_page == 'admin_profile.php') ? 'active' : ''; ?>" style="margin-top: 150px; color: #ffffff;">Profile</a>
         
         <a href="logout.php" style="color: #ffaaaa;">Sign Out</a>
     </nav>
@@ -54,28 +68,10 @@ $current_cat_url = isset($_GET['category']) ? $_GET['category'] : '';
 <style>
 .sidebar-dropdown { width: 100%; margin-bottom: 8px; }
 .dropdown-btn { display: flex !important; justify-content: space-between; align-items: center; margin-bottom: 0 !important; }
-
 .submenu-container { background-color: rgba(0, 0, 0, 0.25); padding: 8px 0; border-radius: 0 0 6px 6px; margin-bottom: 8px; }
-
-.sub-item { 
-    padding: 8px 15px 8px 30px !important; 
-    font-size: 13px !important; 
-    color: #cccccc !important; 
-    border-left: 3px solid transparent !important; 
-    transition: 0.3s; 
-    display: block;
-    margin-bottom: 0 !important;
-    border-radius: 0 !important;
-    text-decoration: none;
-}
+.sub-item { padding: 8px 15px 8px 30px !important; font-size: 13px !important; color: #cccccc !important; border-left: 3px solid transparent !important; transition: 0.3s; display: block; margin-bottom: 0 !important; border-radius: 0 !important; text-decoration: none; }
 .sub-item:hover { color: #ffffff !important; background-color: rgba(255,255,255,0.1); border-left: 3px solid rgba(255,255,255,0.5) !important; }
-
-.sub-active { 
-    color: #ffffff !important; 
-    font-weight: bold; 
-    border-left: 3px solid #e60012 !important; 
-    background-color: rgba(0,0,0,0.4); 
-}
+.sub-active { color: #ffffff !important; font-weight: bold; border-left: 3px solid #e60012 !important; background-color: rgba(0,0,0,0.4); }
 .arrow { font-size: 10px; transition: transform 0.3s; opacity: 0.7; }
 </style>
 
@@ -83,7 +79,6 @@ $current_cat_url = isset($_GET['category']) ? $_GET['category'] : '';
 function toggleSubMenu(e) {
     var submenu = document.getElementById('product-submenu');
     var arrow = document.getElementById('dropdown-arrow');
-    
     if (submenu.style.display === 'none' || submenu.style.display === '') {
         submenu.style.display = 'block';
         arrow.innerHTML = '▼';
@@ -92,4 +87,4 @@ function toggleSubMenu(e) {
         arrow.innerHTML = '▶';
     }
 }
-</script>   
+</script>
