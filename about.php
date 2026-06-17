@@ -17,45 +17,40 @@
     
     <style>
         /* ========== RESET & GLOBAL VARIABLES ========== */
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
+        /* 这里的变量已与 index.php 完全同步，确保没有色差 */
         :root {
             --white:     #ffffff;
             --offwhite:  #fafbfc;
-            --lightgray: #eef2f5;
+            --lightgray: #eef2f5; 
             --midgray:   #cbd5e1;
-            --charcoal:  #1e293b;
+            --charcoal:  #1e293b; /* 与 index.php 的 footer 颜色完全一致 */
             --dark:      #0f172a;
             --red:       #d0021b;
             --red-hover: #a80016;
             --text-main: #1e293b;
             --text-muted:#64748b;
             --border:    #e2e8f0;
-            --shadow-sm: 0 8px 30px rgba(0,0,0,0.05);
-            --shadow-hover: 0 20px 35px -8px rgba(0,0,0,0.1);
-            --transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+            --shadow-sm: 0 4px 20px rgba(0,0,0,0.03);
+            --shadow-hover: 0 12px 30px rgba(0,0,0,0.08);
+            --transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
         }
 
-        body {
+        /* 避免与 index.php 的全局样式冲突，做了轻微作用域限制 */
+        .about-wrapper {
             font-family: 'Montserrat', sans-serif;
             background-color: var(--white);
             color: var(--text-main);
             line-height: 1.6;
-            scroll-behavior: smooth;
         }
 
         /* ========== TYPOGRAPHY ========== */
-        h1, h2, h3, .serif {
+        .about-wrapper h1, .about-wrapper h2, .about-wrapper h3 {
             font-family: 'Cormorant Garamond', serif;
             font-weight: 600;
             letter-spacing: -0.01em;
         }
 
-        .section-title {
+        .about-wrapper .section-title {
             font-size: 2.8rem;
             font-weight: 600;
             text-align: center;
@@ -64,7 +59,7 @@
         }
 
         @media (max-width: 768px) {
-            .section-title {
+            .about-wrapper .section-title {
                 font-size: 2.2rem;
             }
         }
@@ -103,6 +98,7 @@
             max-width: 650px;
             margin: 0 auto;
             line-height: 1.5;
+            font-family: 'Montserrat', sans-serif;
         }
 
         @keyframes fadeUp {
@@ -114,22 +110,21 @@
         .about-container {
             max-width: 1280px;
             margin: 0 auto;
-            padding: 5rem 2rem;
+            padding: 6rem 2rem;
         }
 
-        .divider {
-            width: 72px;
-            height: 3px;
+        .about-wrapper .divider {
+            width: 60px;
+            height: 2px;
             background: var(--red);
-            margin: 1.75rem auto 2rem;
-            border-radius: 4px;
+            margin: 1.75rem auto 2.5rem;
         }
 
         /* ========== INTRO SECTION ========== */
         .intro-section {
             text-align: center;
-            max-width: 880px;
-            margin: 0 auto 5rem;
+            max-width: 840px;
+            margin: 0 auto 6rem;
         }
 
         .intro-section h2 {
@@ -139,122 +134,127 @@
         }
 
         .intro-section p {
-            font-size: 1.1rem;
+            font-size: 1.15rem;
             color: var(--text-muted);
-            line-height: 1.7;
+            line-height: 1.8;
             margin-top: 0.5rem;
         }
 
-        /* ========== CARDS COMMON STYLE (优化悬停动效) ========== */
+        /* ========== CARDS COMMON STYLE ========== */
         .timeline-item, .mv-card, .value-item {
             background: var(--white);
-            border-radius: 16px;
+            border-radius: 4px;
             transition: var(--transition);
             box-shadow: var(--shadow-sm);
-            /* 预留顶部透明边框，防止悬停时抖动 */
             border: 1px solid var(--border);
-            border-top: 4px solid transparent; 
+            border-top: 2px solid transparent; 
         }
 
-        /* 统一悬停时增加品牌红色强调线 */
         .timeline-item:hover, .mv-card:hover, .value-item:hover {
             transform: translateY(-6px);
             box-shadow: var(--shadow-hover);
             border-top-color: var(--red);
-            border-bottom-color: transparent;
-            border-left-color: transparent;
-            border-right-color: transparent;
+        }
+
+        /* ========== SVG ICON WRAPPER ========== */
+        .icon-wrapper {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 64px;
+            height: 64px;
+            border-radius: 50%;
+            background: var(--lightgray);
+            color: var(--charcoal);
+            margin-bottom: 1.5rem;
+            transition: var(--transition);
+        }
+
+        .mv-card:hover .icon-wrapper,
+        .value-item:hover .icon-wrapper {
+            background: var(--red);
+            color: var(--white);
+            transform: scale(1.05);
         }
 
         /* ========== TIMELINE ========== */
-        .history-section { margin-bottom: 6rem; }
+        .history-section { margin-bottom: 7rem; }
 
         .timeline {
             display: flex;
             flex-wrap: wrap;
             justify-content: center;
             gap: 2rem;
-            margin-top: 2rem;
+            margin-top: 3rem;
         }
 
         .timeline-item {
-            padding: 2rem 1.8rem;
+            padding: 2.5rem 2rem;
             width: calc(33.33% - 1.5rem);
             min-width: 260px;
         }
 
         .timeline-year {
             font-family: 'Oswald', sans-serif;
-            font-size: 1.9rem;
+            font-size: 1.8rem;
             font-weight: 700;
             color: var(--red);
-            letter-spacing: -0.02em;
+            letter-spacing: 0.02em;
             margin-bottom: 0.75rem;
             line-height: 1.2;
             display: inline-block;
-            border-bottom: 2px solid var(--lightgray); /* 增加视觉锚点 */
-            padding-bottom: 4px;
         }
 
         .timeline-title {
-            font-size: 1.3rem;
+            font-size: 1.25rem;
             font-weight: 600;
             color: var(--charcoal);
             margin-bottom: 0.75rem;
-            margin-top: 0.5rem;
         }
 
         .timeline-desc {
-            font-size: 0.9rem;
+            font-size: 0.95rem;
             color: var(--text-muted);
-            line-height: 1.55;
+            line-height: 1.6;
         }
 
         /* ========== MISSION & VISION CARDS ========== */
         .mission-vision {
             display: flex;
             flex-wrap: wrap;
-            gap: 2rem;
-            margin-bottom: 6rem;
+            gap: 2.5rem;
+            margin-bottom: 7rem;
         }
 
         .mv-card {
             flex: 1;
             min-width: 280px;
-            padding: 2.5rem 2rem;
+            padding: 3.5rem 3rem;
             text-align: center;
         }
 
-        .mv-icon {
-            font-size: 3.25rem;
-            margin-bottom: 1.25rem;
-            display: inline-block;
-            transition: transform 0.3s ease;
-        }
-
-        .mv-card:hover .mv-icon {
-            transform: scale(1.1); /* 图标放大特效 */
-        }
-
         .mv-card h3 {
-            font-size: 1.8rem;
-            font-weight: 600;
+            font-family: 'Montserrat', sans-serif !important;
+            font-size: 1.5rem;
+            font-weight: 700;
             color: var(--charcoal);
             margin-bottom: 1rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
         }
 
         .mv-card p {
-            font-size: 0.98rem;
+            font-size: 1rem;
             color: var(--text-muted);
-            line-height: 1.65;
+            line-height: 1.7;
         }
 
         /* ========== VALUES SECTION ========== */
         .values-section {
             background: var(--offwhite);
-            padding: 3.5rem 2rem;
-            border-radius: 16px;
-            margin-bottom: 5rem;
+            padding: 5rem 3rem;
+            border-radius: 8px;
+            margin-bottom: 6rem;
         }
 
         .values-grid {
@@ -262,222 +262,250 @@
             flex-wrap: wrap;
             gap: 2rem;
             justify-content: center;
-            margin-top: 2rem;
+            margin-top: 3rem;
         }
 
         .value-item {
             text-align: center;
             width: calc(25% - 1.5rem);
-            min-width: 180px;
-            padding: 1.8rem 1rem;
-        }
-
-        .value-icon {
-            font-size: 2.5rem;
-            margin-bottom: 1rem;
-            display: inline-block;
-            transition: transform 0.3s ease;
-        }
-
-        .value-item:hover .value-icon {
-            transform: scale(1.1); /* 图标放大特效 */
+            min-width: 200px;
+            padding: 2.5rem 1.5rem;
+            background: var(--white);
         }
 
         .value-item h4 {
+            font-family: 'Montserrat', sans-serif !important;
             font-size: 1.1rem;
             font-weight: 700;
             color: var(--charcoal);
-            margin-bottom: 0.65rem;
+            margin-bottom: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
         }
 
         .value-item p {
-            font-size: 0.85rem;
+            font-size: 0.9rem;
             color: var(--text-muted);
-            line-height: 1.5;
+            line-height: 1.6;
         }
 
-        /* ========== CONTACT SECTION (CTA) - 补全这部分的 HTML ========== */
+        /* ========== CONTACT SECTION (CTA) ========== */
         .contact-section {
             text-align: center;
+            /* 这里的背景色与 index.php 的页脚无缝衔接 */
             background: var(--charcoal);
-            padding: 3.5rem 2rem;
-            border-radius: 16px;
+            padding: 5rem 2rem;
+            border-radius: 8px;
             transition: var(--transition);
-            background-image: radial-gradient(circle at 10% 20%, rgba(208,2,27,0.15) 0%, rgba(0,0,0,0) 80%);
+            background-image: radial-gradient(circle at 10% 20%, rgba(208,2,27,0.12) 0%, rgba(0,0,0,0) 80%);
         }
 
         .contact-section h3 {
             font-family: 'Cormorant Garamond', serif;
-            font-size: 2.2rem;
+            font-size: 2.5rem;
             font-weight: 600;
             color: var(--white);
-            margin-bottom: 0.75rem;
+            margin-bottom: 1rem;
         }
 
         .contact-section p {
-            font-size: 1rem;
+            font-family: 'Montserrat', sans-serif;
+            font-size: 1.05rem;
             color: rgba(255,255,255,0.75);
-            margin-bottom: 2rem;
+            margin-bottom: 2.5rem;
         }
 
         .contact-btn {
             display: inline-flex;
             align-items: center;
-            gap: 0.7rem;
+            justify-content: center;
             background: var(--red);
             color: var(--white);
             text-decoration: none;
-            padding: 13px 32px;
-            font-size: 0.78rem;
+            padding: 14px 36px;
+            font-size: 0.85rem;
             font-weight: 700;
             letter-spacing: 0.12em;
             text-transform: uppercase;
             border-radius: 40px;
-            transition: background 0.2s, transform 0.2s;
+            transition: background 0.3s, transform 0.3s;
             border: none;
             cursor: pointer;
+            font-family: 'Montserrat', sans-serif;
         }
 
         .contact-btn:hover {
             background: var(--red-hover);
             transform: translateY(-2px);
-            gap: 0.9rem;
         }
         
-        /* ========== 响应式调整 ========== */
+        /* ========== RESPONSIVE ========== */
         @media (max-width: 992px) {
             .timeline-item { width: calc(50% - 1rem); }
+            .value-item { width: calc(50% - 1rem); }
         }
 
         @media (max-width: 768px) {
             .about-hero { min-height: 60vh; }
             .about-hero-content h1 { font-size: 3.2rem; }
             .about-hero-content p { font-size: 1rem; }
-            .about-container { padding: 3rem 1.5rem; }
+            .about-container { padding: 4rem 1.5rem; }
             .intro-section h2 { font-size: 2.4rem; }
             .timeline-item { width: 100%; }
             .mission-vision { flex-direction: column; }
-            .value-item { width: calc(50% - 1rem); }
-            .contact-section h3 { font-size: 1.8rem; }
+            .values-section { padding: 4rem 1.5rem; }
+            .contact-section h3 { font-size: 2rem; }
         }
 
         @media (max-width: 540px) {
             .value-item { width: 100%; }
-            .section-title { font-size: 1.9rem; }
-            .mv-card h3 { font-size: 1.5rem; }
+            .about-wrapper .section-title { font-size: 2rem; }
         }
     </style>
 </head>
 <body>
 
-<div class="about-hero" role="img" aria-label="YONEX heritage showcase">
-    <div class="about-hero-content">
-        <h1>About YONEX</h1>
-        <p>Innovation and tradition since 1946 — crafting excellence for champions worldwide.</p>
-    </div>
-</div>
-
-<div class="about-container">
-    
-    <section class="intro-section">
-        <h2>Our Story</h2>
-        <div class="divider"></div>
-        <p>
-            Founded in 1946 in Niigata, Japan, YONEX has evolved from a modest manufacturer of wooden 
-            floats into the world's most revered brand in badminton. Driven by an unwavering commitment 
-            to innovation, quality, and performance, YONEX equipment has been the trusted choice of 
-            champions across generations — elevating the sport for over seven decades.
-        </p>
-    </section>
-    
-    <section class="history-section">
-        <h2 class="section-title">Our Journey</h2>
-        <div class="timeline">
-            <div class="timeline-item">
-                <div class="timeline-year">1946</div>
-                <div class="timeline-title">Foundation</div>
-                <div class="timeline-desc">YONEX founded in Niigata, Japan, initially producing wooden floats for fishing nets.</div>
-            </div>
-            <div class="timeline-item">
-                <div class="timeline-year">1957</div>
-                <div class="timeline-title">First Badminton Racket</div>
-                <div class="timeline-desc">Production of the first badminton racket, marking the entry into sports equipment.</div>
-            </div>
-            <div class="timeline-item">
-                <div class="timeline-year">1969</div>
-                <div class="timeline-title">ISOMETRIC™ Technology</div>
-                <div class="timeline-desc">Revolutionary square-shaped head expands the sweet spot, transforming badminton forever.</div>
-            </div>
-            <div class="timeline-item">
-                <div class="timeline-year">1997</div>
-                <div class="timeline-title">Power Cushion®</div>
-                <div class="timeline-desc">Introduction of Power Cushion technology for superior shock absorption in footwear.</div>
-            </div>
-            <div class="timeline-item">
-                <div class="timeline-year">2013</div>
-                <div class="timeline-title">Nanometric Technology</div>
-                <div class="timeline-desc">Advanced nano-materials incorporated into racket construction for enhanced performance.</div>
-            </div>
-            <div class="timeline-item">
-                <div class="timeline-year">2024</div>
-                <div class="timeline-title">Global Leadership</div>
-                <div class="timeline-desc">Official partner of BWF World Tour and the preferred choice of world champions.</div>
-            </div>
-        </div>
-    </section>
-    
-    <div class="mission-vision">
-        <div class="mv-card">
-            <div class="mv-icon">🎯</div>
-            <h3>Our Mission</h3>
-            <p>
-                To contribute to society through technological innovation and the advancement 
-                of sports, providing athletes worldwide with the highest quality equipment 
-                to achieve their fullest potential.
-            </p>
-        </div>
-        <div class="mv-card">
-            <div class="mv-icon">🌟</div>
-            <h3>Our Vision</h3>
-            <p>
-                To be the most trusted and innovative brand in badminton, continuously pushing 
-                the boundaries of performance and inspiring generations of players around the globe.
-            </p>
-        </div>
-    </div>
-    
-    <div class="values-section">
-        <h2 class="section-title">Core Values</h2>
-        <div class="values-grid">
-            <div class="value-item">
-                <div class="value-icon">🔬</div>
-                <h4>Innovation</h4>
-                <p>Continuous R&D of breakthrough technologies for competitive edge.</p>
-            </div>
-            <div class="value-item">
-                <div class="value-icon">🏆</div>
-                <h4>Excellence</h4>
-                <p>Uncompromising quality and precision in every product, from grip to frame.</p>
-            </div>
-            <div class="value-item">
-                <div class="value-icon">🤝</div>
-                <h4>Integrity</h4>
-                <p>Honest, transparent business practices that build lasting trust.</p>
-            </div>
-            <div class="value-item">
-                <div class="value-icon">🌍</div>
-                <h4>Global Spirit</h4>
-                <p>Connecting cultures through the passion and respect for badminton.</p>
-            </div>
+<div class="about-wrapper">
+    <div class="about-hero" role="img" aria-label="YONEX heritage showcase">
+        <div class="about-hero-content">
+            <h1>About YONEX</h1>
+            <p>Innovation and tradition since 1946 — crafting excellence for champions worldwide.</p>
         </div>
     </div>
 
-    <div class="contact-section">
-        <h3>Experience Excellence</h3>
-        <p>Ready to elevate your game with the world's leading badminton equipment?</p>
-        <a href="?category=badminton" class="contact-btn">Explore Products</a>
+    <div class="about-container">
+        <section class="intro-section">
+            <h2>Our Story</h2>
+            <div class="divider"></div>
+            <p>
+                Founded in 1946 in Niigata, Japan, YONEX has evolved from a modest manufacturer of wooden 
+                floats into the world's most revered brand in badminton. Driven by an unwavering commitment 
+                to innovation, quality, and performance, YONEX equipment has been the trusted choice of 
+                champions across generations — elevating the sport for over seven decades.
+            </p>
+        </section>
+        
+        <section class="history-section">
+            <h2 class="section-title">Our Journey</h2>
+            <div class="timeline">
+                <div class="timeline-item">
+                    <div class="timeline-year">1946</div>
+                    <div class="timeline-title">Foundation</div>
+                    <div class="timeline-desc">YONEX founded in Niigata, Japan, initially producing wooden floats for fishing nets.</div>
+                </div>
+                <div class="timeline-item">
+                    <div class="timeline-year">1957</div>
+                    <div class="timeline-title">First Badminton Racket</div>
+                    <div class="timeline-desc">Production of the first badminton racket, marking the entry into sports equipment.</div>
+                </div>
+                <div class="timeline-item">
+                    <div class="timeline-year">1969</div>
+                    <div class="timeline-title">ISOMETRIC™ Technology</div>
+                    <div class="timeline-desc">Revolutionary square-shaped head expands the sweet spot, transforming badminton forever.</div>
+                </div>
+                <div class="timeline-item">
+                    <div class="timeline-year">1997</div>
+                    <div class="timeline-title">Power Cushion®</div>
+                    <div class="timeline-desc">Introduction of Power Cushion technology for superior shock absorption in footwear.</div>
+                </div>
+                <div class="timeline-item">
+                    <div class="timeline-year">2013</div>
+                    <div class="timeline-title">Nanometric Technology</div>
+                    <div class="timeline-desc">Advanced nano-materials incorporated into racket construction for enhanced performance.</div>
+                </div>
+                <div class="timeline-item">
+                    <div class="timeline-year">2024</div>
+                    <div class="timeline-title">Global Leadership</div>
+                    <div class="timeline-desc">Official partner of BWF World Tour and the preferred choice of world champions.</div>
+                </div>
+            </div>
+        </section>
+        
+        <div class="mission-vision">
+            <div class="mv-card">
+                <div class="icon-wrapper">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                        <circle cx="12" cy="12" r="10"/>
+                        <circle cx="12" cy="12" r="6"/>
+                        <circle cx="12" cy="12" r="2"/>
+                    </svg>
+                </div>
+                <h3>Our Mission</h3>
+                <p>
+                    To contribute to society through technological innovation and the advancement 
+                    of sports, providing athletes worldwide with the highest quality equipment 
+                    to achieve their fullest potential.
+                </p>
+            </div>
+            <div class="mv-card">
+                <div class="icon-wrapper">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                        <circle cx="12" cy="12" r="10"/>
+                        <polygon points="16.24 7.76 14.12 14.12 7.76 16.24 9.88 9.88 16.24 7.76"/>
+                    </svg>
+                </div>
+                <h3>Our Vision</h3>
+                <p>
+                    To be the most trusted and innovative brand in badminton, continuously pushing 
+                    the boundaries of performance and inspiring generations of players around the globe.
+                </p>
+            </div>
+        </div>
+        
+        <div class="values-section">
+            <h2 class="section-title">Core Values</h2>
+            <div class="values-grid">
+                <div class="value-item">
+                    <div class="icon-wrapper">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/>
+                            <polyline points="3.27 6.96 12 12.01 20.73 6.96"/>
+                            <line x1="12" y1="22.08" x2="12" y2="12"/>
+                        </svg>
+                    </div>
+                    <h4>Innovation</h4>
+                    <p>Continuous R&D of breakthrough technologies for competitive edge.</p>
+                </div>
+                <div class="value-item">
+                    <div class="icon-wrapper">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                            <circle cx="12" cy="8" r="7"/>
+                            <polyline points="8.21 13.89 7 23 12 20 17 23 15.79 13.88"/>
+                        </svg>
+                    </div>
+                    <h4>Excellence</h4>
+                    <p>Uncompromising quality and precision in every product, from grip to frame.</p>
+                </div>
+                <div class="value-item">
+                    <div class="icon-wrapper">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+                        </svg>
+                    </div>
+                    <h4>Integrity</h4>
+                    <p>Honest, transparent business practices that build lasting trust.</p>
+                </div>
+                <div class="value-item">
+                    <div class="icon-wrapper">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                            <circle cx="12" cy="12" r="10"/>
+                            <line x1="2" y1="12" x2="22" y2="12"/>
+                            <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/>
+                        </svg>
+                    </div>
+                    <h4>Global Spirit</h4>
+                    <p>Connecting cultures through the passion and respect for badminton.</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="contact-section">
+            <h3>Experience Excellence</h3>
+            <p>Ready to elevate your game with the world's leading badminton equipment?</p>
+            <a href="?category=badminton" class="contact-btn">Explore Products</a>
+        </div>
+        
     </div>
-    
 </div>
 
 </body>
