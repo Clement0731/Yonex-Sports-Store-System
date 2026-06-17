@@ -20,8 +20,11 @@
                     </tr>
                 </thead>
                 <tbody>
-                    <tr><td>YNX-RK-01</td><td>Astrox 100 ZZ</td><td>45</td><td><span class="badge bg-success">In Stock</span></td></tr>
-                    <tr><td>YNX-SH-05</td><td>SHB 65 Z3</td><td>3</td><td><span class="badge bg-warning">Low Stock</span></td></tr>
+                    <tr>
+                        <td colspan="4" style="text-align: center; padding: 40px; color: var(--slate-muted, #94a3b8); font-size: 0.9rem;">
+                            No inventory records found.
+                        </td>
+                    </tr>
                 </tbody>
             </table>
         </div>

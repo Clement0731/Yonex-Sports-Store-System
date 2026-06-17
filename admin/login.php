@@ -42,17 +42,16 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     <img src="../images/yonex_logo.png" alt="YONEX Logo" style="max-width: 320px; margin-bottom: 10px; display: inline-block;">
     <p style="font-size: 20px; font-weight: bold; color: #000000;">Admin Portal Secure Login</p>
     <?php if(isset($error)) { echo "<div class='error-msg'>$error</div>"; } ?>
-    <form action="login.php" method="POST">
+    <form action="login.php" method="POST" autocomplete="off">
         <div class="form-group">
             <label>Email Address</label>
-            <input type="email" name="email" required placeholder="example@gmail.com">
+            <input type="email" name="email"autocomplete="off">
         </div>
         <div class="form-group">
             <label>Password</label>
-            <input type="password" name="password" required>
+            <input type="password" name="password" required autocomplete="new-password">
         </div>
-        <button type="submit" class="btn btn-login">Login to Dashboard</button>
-        <a href="forgot_password.php" style="display: block; margin-top: 15px; color: #0033a0; text-decoration: none; font-size: 14px; font-weight: bold;">Forgot Password?</a>
+        <button type="submit" class="btn">SECURE LOGIN</button>
     </form>
 </div>
 </body>
